@@ -1,0 +1,33 @@
+"use client"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { Products } from "@/interfaces/products/products.interface"
+import { ProductCard } from "./product-card"
+
+interface ProductCarouselProps {
+  products: Products[]
+  title?: string
+}
+
+export function ProductCarousel({ products, title }: ProductCarouselProps) {
+  return (
+    <div className="w-full h-full py-6">
+      {title && (
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold">{title}</h2>
+        </div>
+      )}
+
+      <Carousel className="w-full">
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {products.map((product) => (
+            <CarouselItem key={product.id} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <ProductCard product={product} />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="-left-2 "  />
+        <CarouselNext className="-right-2" />
+      </Carousel>
+    </div>
+  )
+}
