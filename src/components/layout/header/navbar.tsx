@@ -42,6 +42,7 @@ import { Card } from "@/components/ui/card";
 import { InformacionTienda } from "@/interfaces/informacion-tienda/informacion-tienda";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CartDropdown from "../cart-dropdown/cart-dropdown";
 
 interface NavbarProps {
   marcas: Marca[];
@@ -322,13 +323,16 @@ export const SearchBar = () => {
       </form>
 
       {/* button cart */}
-      <Button variant="ghost" size="icon" className="relative">
+      {/* <Button variant="ghost" size="icon" className="relative">
         <ShoppingCart className="h-6 w-6" />
         <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full">
           {cartCount}
         </Badge>
         <span className="sr-only">Ver carrito de compras</span>
-      </Button>
+      </Button> */}
+      
+      {/* Carrito con dropdown */}
+      <CartDropdown />
     </div>
   );
 };
