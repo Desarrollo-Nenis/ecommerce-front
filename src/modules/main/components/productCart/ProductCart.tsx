@@ -35,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
           </div>
       </CardContent>
-      <CardFooter className="p-4 flex justify-between items-center bg-gray-100 text-sm text-gray-500">
+      <CardFooter className="p-4 flex justify-between items-center  text-sm text-gray-500">
         <span>{product.unidad_medida?.nombreUnidad}</span>
       </CardFooter>
     </Card>

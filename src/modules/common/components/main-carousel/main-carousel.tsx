@@ -1,21 +1,54 @@
 "use client";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import Image from "next/image";
 import Link from "next/link";
 import { MainCarouselItem } from "../../interface/main-carousel";
+import { useEffect, useRef, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
 
 interface MainCarouselProps {
   banners: MainCarouselItem[];
 }
 
 export function MainCarousel({ banners }: MainCarouselProps) {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
+  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
+
   return (
-    <div className="w-full h-full">
-      <Carousel className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
+    <div className="w-full h-auto md:h-[400px] lg:h-[500px] relative ">
+      <Carousel
+        setApi={setApi}
+        plugins={[plugin.current]}
+        onMouseEnter={plugin.current.stop}
+        onMouseLeave={plugin.current.reset}
+        className="relative w-full h-full overflow-hidden"
+      >
         <CarouselContent>
           {banners.map((banner) => (
-            <CarouselItem key={banner.id} className="relative w-full h-full">
-              {/* Enlace opcional, si no hay `link` simplemente no redirige */}
+            <CarouselItem key={banner.id} className="relative w-full h-auto aspect-[16/9] md:aspect-[21/9]">
               {banner.link ? (
                 <Link href={banner.link} className="block relative w-full h-full">
                   <BannerImage banner={banner} />
@@ -36,29 +69,27 @@ export function MainCarousel({ banners }: MainCarouselProps) {
   );
 }
 
-/**
- * Componente interno para mostrar la imagen y un overlay de texto (opcional).
- */
 function BannerImage({ banner }: { banner: MainCarouselItem }) {
   return (
-    <>
+    <div className="relative w-full h-full">
       <Image
-        src={"/imgs/products/default-img.png"}
+        src={banner.imageUrl}
         alt={banner.title ?? "Banner Image"}
         fill
         priority
         className="object-cover"
-        sizes="(max-width: 768px) 100vw,
-               (max-width: 1200px) 100vw,
-               100vw"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
       />
-      {/* Overlay de texto opcional */}
       {(banner.title || banner.subtitle) && (
-        <div className="absolute inset-0 flex flex-col justify-center items-start p-4 md:p-8 bg-black/30 text-white">
-          {banner.title && <h2 className="text-xl md:text-3xl font-bold mb-2">{banner.title}</h2>}
-          {banner.subtitle && <p className="text-sm md:text-lg">{banner.subtitle}</p>}
+        <div className="absolute inset-0 flex flex-col justify-center items-start p-4 md:p-8 text-white">
+          {banner.title && (
+            <h2 className="text-xl md:text-3xl font-bold mb-2">{banner.title}</h2>
+          )}
+          {banner.subtitle && (
+            <p className="text-sm md:text-lg">{banner.subtitle}</p>
+          )}
         </div>
       )}
-    </>
+    </div>
   );
 }
