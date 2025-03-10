@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ShoppingCart, Menu, Search, ChevronDown, User } from "lucide-react";
+import {
+  ShoppingCart,
+  Menu,
+  Search,
+  ChevronDown,
+  User,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +51,8 @@ import { InformacionTienda } from "@/interfaces/informacion-tienda/informacion-t
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CartDropdown from "../cart-dropdown/cart-dropdown";
+import { useCartStore } from "@/store/products-cart";
+import { useEffect } from "react";
 
 interface NavbarProps {
   marcas: Marca[];
@@ -54,6 +64,13 @@ export default function Navbar({
   categorias,
   informacionTienda,
 }: NavbarProps) {
+
+  const { loadCart } = useCartStore();
+
+  useEffect(() => {
+    loadCart()
+  }, [loadCart])
+  
   return (
     <Card className="border  fixed top-0 left-0 w-full z-50 ">
       <div className="container flex h-16 items-center px-4">
@@ -266,23 +283,36 @@ export default function Navbar({
               <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Link href="/profile" className="flex w-full">
-                  Perfil
+                <Link href="/perfil" className="flex w-full items-center gap-2">
+                  <User className="w-4 h-4" /> Perfil
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/orders" className="flex w-full">
-                  Pedidos
+                <Link
+                  href="/pedidos"
+                  className="flex w-full items-center gap-2"
+                >
+                  <ShoppingCart className="w-4 h-4" /> Pedidos
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link
+                  href="/configuracion"
+                  className="flex w-full items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" /> Configuración
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Button
-                  className="flex w-full"
-                  onClick={() => console.log("Cerrar sesión")}
-                >
-                  Cerrar sesión
-                </Button>
+                <Link href="/auth/login" className="flex w-full items-center gap-2">
+                  <Button
+                    className="flex w-full items-center gap-2"
+                    onClick={() => console.log("Cerrar sesión")}
+                  >
+                    <LogOut className="w-4 h-4" /> Cerrar sesión
+                  </Button>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -330,7 +360,7 @@ export const SearchBar = () => {
         </Badge>
         <span className="sr-only">Ver carrito de compras</span>
       </Button> */}
-      
+
       {/* Carrito con dropdown */}
       <CartDropdown />
     </div>
