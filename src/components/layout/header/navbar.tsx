@@ -51,6 +51,8 @@ import { InformacionTienda } from "@/interfaces/informacion-tienda/informacion-t
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CartDropdown from "../cart-dropdown/cart-dropdown";
+import { useCartStore } from "@/store/products-cart";
+import { useEffect } from "react";
 
 interface NavbarProps {
   marcas: Marca[];
@@ -62,6 +64,13 @@ export default function Navbar({
   categorias,
   informacionTienda,
 }: NavbarProps) {
+
+  const { loadCart } = useCartStore();
+
+  useEffect(() => {
+    loadCart()
+  }, [loadCart])
+  
   return (
     <Card className="border  fixed top-0 left-0 w-full z-50 ">
       <div className="container flex h-16 items-center px-4">

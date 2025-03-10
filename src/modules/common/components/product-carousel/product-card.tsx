@@ -1,6 +1,9 @@
 "use client"
+
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Products } from "@/interfaces/products/products.interface"
+import { useCartStore } from "@/store/products-cart"
 import Image from "next/image"
 
 interface ProductCardProps {
@@ -8,6 +11,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCartStore()
+
   const renderDescription = () => {
     if (!product.descripcion || product.descripcion.length === 0) {
       return "No description available"
@@ -35,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
           src={product.coverUrl || "/placeholder.svg?height=300&width=300"}
           alt={product.nombre}
           fill
-          className="object-contain" // <-- Ahora la imagen no se recorta
+          className="object-contain"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
@@ -47,6 +52,9 @@ export function ProductCard({ product }: ProductCardProps) {
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between items-center">
         <span className="font-bold text-lg">${product.precioVenta.toFixed(2)}</span>
+        <Button size="sm" onClick={() => addToCart(product)}>
+          Añadir al carrito
+        </Button>
       </CardFooter>
     </Card>
   )
