@@ -48,11 +48,13 @@ interface NavbarProps {
   marcas: Marca[];
   categorias: Categoria[];
   informacionTienda: InformacionTienda;
+  avatarUrl: string | null | undefined
 }
 export default function Navbar({
   marcas,
   categorias,
   informacionTienda,
+  avatarUrl,
 }: NavbarProps) {
   return (
     <Card className="border  fixed top-0 left-0 w-full z-50 ">
@@ -90,15 +92,10 @@ export default function Navbar({
               <nav className="flex flex-col gap-4 px-4 py-2">
                 <Collapsible>
                   <CollapsibleTrigger asChild>
-                    <Link href={"/marcas"}>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-between"
-                      >
-                        Marcas
-                        <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                      </Button>
-                    </Link>
+                    <Button variant="ghost" className="w-full justify-between">
+                      Marcas
+                      <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                    </Button>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="space-y-2 mt-2">
                     {marcas.map((marca) => (
@@ -124,7 +121,7 @@ export default function Navbar({
                 <div className="flex items-center gap-3 mb-4 px-4">
                   <Avatar>
                     <AvatarImage
-                      src="/placeholder-avatar.jpg"
+                      src={avatarUrl || "/placeholder-avatar.jpg"}
                       alt="@username"
                     />
                     <AvatarFallback>
@@ -229,12 +226,14 @@ export default function Navbar({
                             {/* <div className="text-sm font-medium leading-none">
                             {marca.nombre}
                           </div> */}
-                            <Image
-                              src={marca.img.url}
-                              width={100}
-                              height={100}
-                              alt={marca.nombre}
-                            />
+                            {marca.img && (
+                              <Image
+                                src={marca.img?.url}
+                                width={100}
+                                height={100}
+                                alt={marca.nombre}
+                              />
+                            )}
                           </Link>
                         </NavigationMenuLink>
                       </li>
@@ -255,7 +254,10 @@ export default function Navbar({
                 className="rounded-full hidden md:block"
               >
                 <Avatar>
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="@username" />
+                  <AvatarImage
+                    src={avatarUrl || "/placeholder-avatar.jpg"}
+                    alt="@username"
+                  />
                   <AvatarFallback>
                     <User className="h-5 w-5" />
                   </AvatarFallback>
@@ -330,7 +332,7 @@ export const SearchBar = () => {
         </Badge>
         <span className="sr-only">Ver carrito de compras</span>
       </Button> */}
-      
+
       {/* Carrito con dropdown */}
       <CartDropdown />
     </div>
