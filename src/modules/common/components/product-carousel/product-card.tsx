@@ -1,6 +1,9 @@
 "use client"
+
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Products } from "@/interfaces/products/products.interface"
+import { useCartStore } from "@/store/products-cart"
 import Image from "next/image"
 
 interface ProductCardProps {
@@ -8,6 +11,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCartStore()
+
   const renderDescription = () => {
     if (!product.descripcion || product.descripcion.length === 0) {
       return "No description available"
