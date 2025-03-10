@@ -8,7 +8,7 @@ export interface Marca {
     createdAt:   Date;
     updatedAt:   Date;
     publishedAt: Date;
-    img:         Img;
+    img?:         Img;
 }
 
 

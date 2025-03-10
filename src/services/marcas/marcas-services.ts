@@ -8,14 +8,17 @@ const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 export function getMarcas(): Promise<DataResponse<Marca[]>> {
   return query<DataResponse<Marca[]>>(`${BASE_ENDPOINT}?populate=*`)
     .then((res) => {
-      const data :DataResponse<Marca[]>= {
+      const data: DataResponse<Marca[]> = {
         ...res,
         data: res.data.map((marca) => {
-          return { ...marca, img: {...marca.img, url:`${STRAPI_HOST}${marca.img.url}`} };
-        }),
-      } 
+          return {
+            ...marca,
+            img: { ...marca.img, url: `${STRAPI_HOST}${marca.img?.url}` },
+          };
+        }) as Marca[],
+      };
 
-      return data
+      return data;
     })
     .catch((error) => {
       console.error(
