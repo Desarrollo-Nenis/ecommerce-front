@@ -1,0 +1,52 @@
+.caroucel1Cesar{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 80%;
+}
+
+.caroucel1ContentCesar {
+  box-sizing: border-box;
+  display: flex;
+  overflow: hidden;
+  overflow-x: auto;
+  gap: 15px;
+}
+
+.caroucel1ContentCesar::-webkit-scrollbar {
+  display: none;
+}
+
+.caroucel1ContentCesar.active {
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+  user-select: none;
+}
+
+.cardCaroucelC1 {
+  display: grid;
+  grid-template-rows: 120px auto;
+  text-align: center;
+  border-radius: 10px;
+  gap: 5px;
+  min-width: 150px;
+  padding: 15px;
+  border: 0.5px solid rgb(206, 206, 206);
+}
+
+.caroucel1Cesar button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 30px;
+  height: 30px;
+  background-color: rgb(136, 136, 136);
+  color: white;
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.caroucel1Cesar button:hover{
+  transform: scale(1.15);
+  background-color: rgb(100, 100, 100);
+}
