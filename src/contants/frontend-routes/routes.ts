@@ -1,4 +1,4 @@
-export const ROUTES = {
+export const FRONTEND_ROUTES = {
     HOME: "/",
     LOGIN: "/auth/login",
     REGISTER: "/auth/register",
@@ -12,4 +12,4 @@ export const ROUTES = {
       PRODUCTS: "/admin/products",
     },
   } as const;
-export type Route = typeof ROUTES[keyof typeof ROUTES];  
+export type Route = typeof FRONTEND_ROUTES[keyof typeof FRONTEND_ROUTES];  

@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { Menu, ChevronDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,9 @@ import { SearchBar } from "../search-bar/SearchBar";
 import { AvatarDropdown } from "../avatar-dropdown/AvatarDropdown";
 import { ButtonLogin } from "@/modules/common/components/auth/login/ButtonLogin";
 import { Session } from "next-auth";
-import { ROUTES } from "../../../contants/routes";
+import { FRONTEND_ROUTES } from "../../../contants/frontend-routes/routes";
+import { useCartStore } from "@/store/products-cart";
+import { useEffect } from "react";
 
 interface NavbarProps {
   marcas: Marca[];
@@ -50,6 +53,13 @@ export default function Navbar({
   informacionTienda,
   session,
 }: NavbarProps) {
+
+  const { loadCart } = useCartStore();
+
+  useEffect(() => {
+    loadCart();
+  }, []);
+  
   return (
     <Card className="border  fixed top-0 left-0 w-full z-50 ">
       <div className="container flex h-16 items-center px-4">
@@ -183,7 +193,7 @@ export default function Navbar({
                       <li key={categoria.nombre}>
                         <NavigationMenuLink asChild>
                           <Link
-                            href={`${ROUTES.CATEGORIA}/${categoria.nombre}`}
+                            href={`${FRONTEND_ROUTES.CATEGORIA}/${categoria.nombre}`}
                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">
@@ -212,7 +222,7 @@ export default function Navbar({
                       <li key={marca.nombre}>
                         <NavigationMenuLink asChild>
                           <Link
-                            href={`${ROUTES.MARCA}/${marca.nombre}`}
+                            href={`${FRONTEND_ROUTES.MARCA}/${marca.nombre}`}
                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             {/* <div className="text-sm font-medium leading-none">

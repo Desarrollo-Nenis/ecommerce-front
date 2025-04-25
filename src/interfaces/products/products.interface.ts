@@ -13,7 +13,7 @@ export interface Products {
     precioVenta:    number;
     categorias:     Categoria[];
     subcategorias:     SubCategoria[];
-    unidad_medida:  UnidadMedida;
+    // unidad_medida:  UnidadMedida;
     cover?:          Cover;
     galeria?:        Cover[];
     coverUrl: string

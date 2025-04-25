@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import React from "react"
-import { signIn } from "next-auth/react"
-import { FcGoogle } from "react-icons/fc"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import React from "react";
+import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,9 +13,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
-export default function LoginForm() {
+export default function LoginForm({
+  onSwitchToRegister,
+}: {
+  onSwitchToRegister: () => void;
+}) {
   return (
     <Card className=" mx-auto max-w-[350px]">
       <CardHeader className="space-y-1">
@@ -43,7 +47,11 @@ export default function LoginForm() {
             </span>
           </div>
         </div>
-        <Button variant="outline" type="button" onClick={() => signIn("google")}>
+        <Button
+          variant="outline"
+          type="button"
+          onClick={() => signIn("google")}
+        >
           <FcGoogle className="mr-2" /> Google
         </Button>
       </CardContent>
@@ -51,12 +59,26 @@ export default function LoginForm() {
         <Button className="w-full" type="button">
           Iniciar sesión
         </Button>
-        <p className="mt-2 text-xs text-center text-muted-foreground">
-          <a href="#" className="underline underline-offset-4 hover:text-primary">
-            ¿Olvidaste tu contraseña?
-          </a>
-        </p>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-muted-foreground">
+            <a
+              href="#"
+              className="underline underline-offset-4 hover:text-primary"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
+          </p>
+          <p className="mt-2 text-sm">
+            ¿No tienes una cuenta?{" "}
+            <span
+              onClick={onSwitchToRegister}
+              className="cursor-pointer font-medium text-primary hover:underline"
+            >
+              Regístrate aquí
+            </span>
+          </p>
+        </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
