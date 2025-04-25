@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Products } from "@/interfaces/products/products.interface";
+import Link from "next/link";
 
 interface ProductCardProps {
   product: Products;
@@ -14,6 +15,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
+    <Link href={`/producto/${product.id}`} className="w-full h-full">
     <Card className="flex flex-col overflow-hidden shadow-md rounded-lg h-full  ">
       <CardHeader className="p-0 flex-shrink-0 bg-gray-100"></CardHeader>
       <CardContent className="flex-grow p-4 flex flex-col">
@@ -39,5 +41,6 @@ export function ProductCard({ product }: ProductCardProps) {
         <span>{product.unidad_medida?.nombreUnidad}</span>
       </CardFooter>
     </Card>
+    </Link>
   );
 }

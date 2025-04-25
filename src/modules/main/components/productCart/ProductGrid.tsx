@@ -1,5 +1,5 @@
 import { Products } from "@/interfaces/products/products.interface"
-import { ProductCard } from "./ProductCart"
+import { ProductCard } from "@/modules/common/components/product-carousel/product-card"
 
 interface ProductGridProps {
   products: Products[]
@@ -9,7 +9,7 @@ interface ProductGridProps {
 
 export function ProductGrid({ products }: ProductGridProps) {
   return (
-    <div  className="grid grid-cols-2 gap-4">
+    <div  className="grid grid-cols-5 gap-4">
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}

@@ -1,18 +1,29 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+} from "@/components/ui/carousel";
 import { Categoria } from "@/interfaces/categories/categories.interface";
+import { SubCategoria } from "../../../../interfaces/categories/categories.interface";
 
 interface CategoryCarouselProps {
-  categorias: Categoria[];
+  categorias: Categoria[] | SubCategoria[];
   className?: string;
 }
 
-export default function CategoryCarousel({ categorias, className }: CategoryCarouselProps) {
+export default function CategoryCarousel({
+  categorias,
+  className,
+}: CategoryCarouselProps) {
   return (
     <Carousel
-      className={`w-full pt-4 lg:w-1/2 mx-auto flex justify-center ${className || ""}`}
+      className={`w-full pt-4 lg:w-1/2 mx-auto flex justify-center ${
+        className || ""
+      }`}
       opts={{
         align: "center", // Asegura la alineación central en el carrusel
         loop: false,
@@ -20,12 +31,27 @@ export default function CategoryCarousel({ categorias, className }: CategoryCaro
     >
       <CarouselContent className="flex justify-center items-center -ml-2 md:-ml-4">
         {categorias.map((item, index) => (
-          <CarouselItem key={index} className="pl-2 md:pl-4 basis-[140px] md:basis-[150px] flex justify-center">
-            <Link href={item.nombre || "#"} className="flex flex-col items-center">
+          <CarouselItem
+            key={index}
+            className="pl-2 md:pl-4 basis-[140px] md:basis-[150px] flex justify-center"
+          >
+            <Link
+              href={`/categoria/${item.nombre}`}
+              className="flex flex-col items-center"
+            >
               <div className="relative w-[120px] h-[120px] rounded-full overflow-hidden bg-gray-100">
-                <Image src={item.img?.url || "/placeholder.svg"} alt={item.nombre} fill className="object-cover" />
+                {item.img?.url && (
+                  <Image
+                    src={item.img?.url}
+                    alt={item.nombre}
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
-              <span className="mt-2 text-center text-sm font-medium">{item.nombre}</span>
+              <span className="mt-2 text-center text-sm font-medium">
+                {item.nombre}
+              </span>
             </Link>
           </CarouselItem>
         ))}

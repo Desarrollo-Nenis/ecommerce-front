@@ -5,26 +5,37 @@ import { query } from "@/lib/api/server/strapi";
 const BASE_ENDPOINT: string = "marcas";
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 
-export function getMarcas(): Promise<DataResponse<Marca[]>> {
-  return query<DataResponse<Marca[]>>(`${BASE_ENDPOINT}?populate=*`)
+type MarcaFilters = {
+  nombre?: string;
+};
+
+export function getMarcas(filters: MarcaFilters = {}): Promise<DataResponse<Marca[]>> {
+  const searchParams = new URLSearchParams();
+
+  // Filtro por nombre
+  if (filters.nombre) {
+    searchParams.append("filters[nombre][$containsi]", filters.nombre);
+  }
+
+  // Incluir relaciones (como imágenes)
+  searchParams.append("populate", "*");
+
+  const url = `${BASE_ENDPOINT}?${searchParams.toString()}`;
+
+  return query<DataResponse<Marca[]>>(url)
     .then((res) => {
       const data: DataResponse<Marca[]> = {
         ...res,
-        data: res.data.map((marca) => {
-          return {
-            ...marca,
-            img: { ...marca.img, url: `${STRAPI_HOST}${marca.img?.url}` },
-          };
-        }) as Marca[],
+        data: res.data.map((marca) => ({
+          ...marca,
+          img: marca.img ? { ...marca.img, url: `${STRAPI_HOST}${marca.img.url}` } : undefined,
+        })),
       };
 
       return data;
     })
     .catch((error) => {
-      console.error(
-        "Something terrible happened when getting stock actions: ",
-        error
-      );
+      console.error("Error al obtener marcas filtradas: ", error);
       throw error;
     });
 }

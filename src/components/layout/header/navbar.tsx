@@ -1,19 +1,7 @@
 "use client";
-
-import * as React from "react";
 import Link from "next/link";
-import {
-  ShoppingCart,
-  Menu,
-  Search,
-  ChevronDown,
-  User,
-  Settings,
-  LogOut,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Menu, ChevronDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -34,14 +22,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Marca } from "@/interfaces/marcas/marca.interface";
 import Image from "next/image";
@@ -50,29 +31,25 @@ import { Card } from "@/components/ui/card";
 import { InformacionTienda } from "@/interfaces/informacion-tienda/informacion-tienda";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import CartDropdown from "../cart-dropdown/cart-dropdown";
-import { useCartStore } from "@/store/products-cart";
-import { useEffect } from "react";
+import { SearchBar } from "../search-bar/SearchBar";
+
+import { AvatarDropdown } from "../avatar-dropdown/AvatarDropdown";
+import { ButtonLogin } from "@/modules/common/components/auth/login/ButtonLogin";
+import { Session } from "next-auth";
+import { ROUTES } from "../../../contants/routes";
 
 interface NavbarProps {
   marcas: Marca[];
   categorias: Categoria[];
   informacionTienda: InformacionTienda;
-  avatarUrl: string | null | undefined
+  session: Session | null;
 }
 export default function Navbar({
   marcas,
   categorias,
   informacionTienda,
-  avatarUrl,
+  session,
 }: NavbarProps) {
-
-  const { loadCart } = useCartStore();
-
-  useEffect(() => {
-    loadCart()
-  }, [loadCart])
-  
   return (
     <Card className="border  fixed top-0 left-0 w-full z-50 ">
       <div className="container flex h-16 items-center px-4">
@@ -138,11 +115,11 @@ export default function Navbar({
                 <div className="flex items-center gap-3 mb-4 px-4">
                   <Avatar>
                     <AvatarImage
-                      src={avatarUrl || "/placeholder-avatar.jpg"}
+                      src={session?.user?.image || "/placeholder-avatar.jpg"}
                       alt="@username"
                     />
                     <AvatarFallback>
-                      <User className="h-5 w-5" />
+                      <User className="h-5 w-5 " />
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium">@username</span>
@@ -181,7 +158,7 @@ export default function Navbar({
         </Sheet>
 
         {/* navbar desktop */}
-        <div className="flex flex-row container gap-2">
+        <div className="flex flex-row   container gap-2">
           <Link href="/" className="hidden md:flex items-center  gap-2 mr-6">
             <Image
               src={informacionTienda.logo.url}
@@ -193,13 +170,11 @@ export default function Navbar({
           </Link>
           <NavigationMenu className="hidden md:flex ">
             <NavigationMenuList>
-              <NavigationMenuItem>
+              {/* <NavigationMenuItem>
                 <Link href="/main" legacyBehavior passHref>
-                  <NavigationMenuLink className=" group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
-                    Inicio
-                  </NavigationMenuLink>
+                  <NavigationMenuLink className="font-semibold">Inicio</NavigationMenuLink>
                 </Link>
-              </NavigationMenuItem>
+              </NavigationMenuItem> */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Categorias</NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -208,7 +183,7 @@ export default function Navbar({
                       <li key={categoria.nombre}>
                         <NavigationMenuLink asChild>
                           <Link
-                            href={categoria.nombre}
+                            href={`${ROUTES.CATEGORIA}/${categoria.nombre}`}
                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">
@@ -237,7 +212,7 @@ export default function Navbar({
                       <li key={marca.nombre}>
                         <NavigationMenuLink asChild>
                           <Link
-                            href={marca.nombre}
+                            href={`${ROUTES.MARCA}/${marca.nombre}`}
                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             {/* <div className="text-sm font-medium leading-none">
@@ -258,113 +233,27 @@ export default function Navbar({
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+
+               <NavigationMenuItem>
+                <Link href="/main" legacyBehavior passHref>
+                  <NavigationMenuLink className="font-semibold">ubicacion</NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
           {/* search */}
           <SearchBar />
-          {/* avatar */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full hidden md:block"
-              >
-                <Avatar>
-                  <AvatarImage
-                    src={avatarUrl || "/placeholder-avatar.jpg"}
-                    alt="@username"
-                  />
-                  <AvatarFallback>
-                    <User className="h-5 w-5" />
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href="/perfil" className="flex w-full items-center gap-2">
-                  <User className="w-4 h-4" /> Perfil
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link
-                  href="/pedidos"
-                  className="flex w-full items-center gap-2"
-                >
-                  <ShoppingCart className="w-4 h-4" /> Pedidos
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link
-                  href="/configuracion"
-                  className="flex w-full items-center gap-2"
-                >
-                  <Settings className="w-4 h-4" /> Configuración
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href="/auth/login" className="flex w-full items-center gap-2">
-                  <Button
-                    className="flex w-full items-center gap-2"
-                    onClick={() => console.log("Cerrar sesión")}
-                  >
-                    <LogOut className="w-4 h-4" /> Cerrar sesión
-                  </Button>
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* toggle theme */}
-          <div className="hidden md:block">
-            <ThemeToggle />
+          <div className=" flex flex-row items-center gap-2">
+            {/* avatar */}
+            <AvatarDropdown avatarUrl={session?.user?.image} />
+            {/* toggle theme */}
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
+            <ButtonLogin session={session}></ButtonLogin>
           </div>
         </div>
       </div>
     </Card>
   );
 }
-
-export const SearchBar = () => {
-  const [cartCount, setCartCount] = React.useState(3);
-  const [searchQuery, setSearchQuery] = React.useState("");
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implementar la lógica de búsqueda aquí
-    console.log("Searching for:", searchQuery);
-  };
-  return (
-    <div className="ml-auto flex items-center  ">
-      <form onSubmit={handleSearch} className=" flex items-center gap-2 mr-4">
-        <Input
-          type="search"
-          placeholder="Buscar productos..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-[200px] lg:w-[300px]"
-        />
-        <Button type="submit" size="icon" variant="ghost">
-          <Search className="h-4 w-4" />
-          <span className="sr-only">Buscar</span>
-        </Button>
-      </form>
-
-      {/* button cart */}
-      {/* <Button variant="ghost" size="icon" className="relative">
-        <ShoppingCart className="h-6 w-6" />
-        <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full">
-          {cartCount}
-        </Badge>
-        <span className="sr-only">Ver carrito de compras</span>
-      </Button> */}
-
-      {/* Carrito con dropdown */}
-      <CartDropdown />
-    </div>
-  );
-};

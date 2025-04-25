@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { HeaderShop } from "@/components/layout/header/header";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { SessionProvider } from "next-auth/react";
 
 
 export const metadata: Metadata = {
@@ -23,8 +24,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <SessionProvider>
+
           <HeaderShop />
           {children}
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

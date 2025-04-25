@@ -3,11 +3,11 @@ import { MainCarousel } from "@/modules/common/components/main-carousel/main-car
 import { ProductCarousel } from "@/modules/common/components/product-carousel/product-carousel";
 import { MainCarouselItem } from "@/modules/common/interface/main-carousel";
 import { getCategorias } from "@/services/categories/categories-services";
-import { getProducts } from "@/services/products/products-services";
+import { getAllProducts } from "@/services/products/products-services";
 
 export default async function Home() {
   // fetch product
-  const resultProducts = await getProducts();
+  const resultProducts = await getAllProducts();
   const resultcategorias = await getCategorias();
   const banners: MainCarouselItem[] = [
     {
@@ -26,14 +26,14 @@ export default async function Home() {
     },
     {
       id: "3",
-      imageUrl: "/imgs/carrucel/main-carrucel-6.jpg",
+      imageUrl: "/imgs/carrucel/main-carrucel-5.webp",
       link: "/ofertas",
       title: "",
       subtitle: "",
     },
     {
       id: "4",
-      imageUrl: "/imgs/carrucel/main-carrucel-7.jpg",
+      imageUrl: "/imgs/carrucel/main-carrucel-7.webp",
       link: "/ofertas",
       title: "Hasta 15 MSI pagando con...",
       subtitle: "",

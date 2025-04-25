@@ -19,7 +19,7 @@ export const HeaderShop = async () => {
           informacionTienda={informacionTiendaResult.data}
           marcas={marcasResult.data}
           categorias={categoriaResult.data}
-          avatarUrl={sesion?.user?.image}
+          session={sesion}
         ></Navbar>
         <div className="container mx-auto  pt-20">
           <BreadcrumbNav></BreadcrumbNav>

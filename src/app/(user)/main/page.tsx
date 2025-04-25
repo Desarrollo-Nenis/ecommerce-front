@@ -2,17 +2,15 @@ import { ProductGrid } from "@/modules/main/components/productCart/ProductGrid";
 import { StoreFilters } from "@/modules/shop/StoreFilters";
 import {
   getCategorias,
-  getSubCategorias,
 } from "@/services/categories/categories-services";
 import { getMarcas } from "@/services/marcas/marcas-services";
-import { getProducts } from "@/services/products/products-services";
+import { getAllProducts } from "@/services/products/products-services";
 
 export default async function MainPage() {
 
   // fetch 
-  const resultProducts = await getProducts();
+  const resultProducts = await getAllProducts();
   const resultCategorias = await getCategorias();
-  const resultSubCategorias = await getSubCategorias();
   const resultMarcas = await getMarcas();
 
   return (
@@ -24,7 +22,6 @@ export default async function MainPage() {
           <StoreFilters
             marcas={resultMarcas.data}
             categorias={resultCategorias.data}
-            subCategorias={resultSubCategorias.data}
           />
         </aside>
 

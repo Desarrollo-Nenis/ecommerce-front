@@ -1,4 +1,4 @@
-import { Img } from "../data/Img.interface";
+import { Img } from "../data/img.interface";
 
 export interface Categoria {
     id:             number;
@@ -7,7 +7,7 @@ export interface Categoria {
     createdAt:      Date;
     updatedAt:      Date;
     publishedAt:    Date;
-    subcategorias?: Categoria[];
+    subcategorias?: SubCategoria[];
     img?:           Img;
 }
 
@@ -18,7 +18,6 @@ export interface SubCategoria {
     createdAt:      Date;
     updatedAt:      Date;
     publishedAt:    Date;
-    subcategorias?: Categoria[];
     img?:           Img;
 }
 

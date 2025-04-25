@@ -1,4 +1,4 @@
-import { Categoria } from "../categories/categories.interface";
+import { Categoria, SubCategoria } from "../categories/categories.interface";
 
 
 export interface Products {
@@ -12,10 +12,12 @@ export interface Products {
     precioUnitario: number;
     precioVenta:    number;
     categorias:     Categoria[];
+    subcategorias:     SubCategoria[];
     unidad_medida:  UnidadMedida;
     cover?:          Cover;
     galeria?:        Cover[];
     coverUrl: string
+    galleryUrls?: string[]
 }
 
 export interface UnidadMedida {
