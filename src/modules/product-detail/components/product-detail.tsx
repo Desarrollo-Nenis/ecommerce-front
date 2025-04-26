@@ -13,6 +13,7 @@ import {
 import { TabsContent, Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { useCartStore } from "@/store/products-cart";
 
 interface ProductDetailProps {
   product: Products;
@@ -47,6 +48,7 @@ function renderDescription(descripcion: Descripcion[]) {
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter();
+  const { addToCart } = useCartStore();
 
   return (
     <div>
@@ -102,8 +104,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <div>
               <p className="text-sm text-muted-foreground">
                 Unidad de medida:{" "}
-                {product.unidad_medida.nombreUnidad ||
-                  product.unidad_medida.nombre}
+                {/* {product.unidad_medida.nombre} */}
               </p>
             </div>
 
@@ -111,7 +112,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
             <div className="flex flex-col gap-4">
               <div className="flex gap-4">
-                <Button className="flex-1" size="lg">
+                <Button className="flex-1 cursor-pointer" size="lg" onClick={() => addToCart(product) }>
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   Agregar al carrito
                 </Button>
@@ -157,8 +158,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                         Unidad de medida:
                       </div>
                       <div className="text-sm">
-                        {product.unidad_medida.nombreUnidad ||
-                          product.unidad_medida.nombre}
+                        {/* {product.unidad_medida.nombre} */}
                       </div>
 
                       <div className="text-sm text-muted-foreground">

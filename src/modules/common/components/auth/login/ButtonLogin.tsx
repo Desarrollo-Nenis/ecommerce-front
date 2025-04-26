@@ -1,7 +1,7 @@
 "use client"
 
 import { Session } from "next-auth"
-import { LoginModal } from "./LoginModal"
+import { ModalAuth } from '../modalAuth';
 
 interface ButtonLoginProps {
   session: Session | null
@@ -9,7 +9,7 @@ interface ButtonLoginProps {
 
 export const ButtonLogin = ({ session }: ButtonLoginProps) => {
   if (!session) {
-    return <LoginModal />
+    return <ModalAuth />
   }
 
   return null
