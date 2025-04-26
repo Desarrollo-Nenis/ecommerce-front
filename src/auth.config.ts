@@ -74,7 +74,7 @@ export const authOptions = {
       }
       return false;
     }
-    
+    ,
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
