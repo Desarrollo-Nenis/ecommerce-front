@@ -1,10 +1,13 @@
+import { AuthProvider } from "./auth-providers.enum";
+
 export interface User {
   id: number;
   documentId: string;
-  nombre: string | null;
-  apellidos: string;
-  correo: string | null;
-  contrasena: string;
+  name: string | null;
+  lastName: string;
+  email: string | null;
+  password: string;
+  authProvider:AuthProvider;
   rol: string;
   createdAt: Date;
   updatedAt: Date;
@@ -17,14 +20,17 @@ export interface UserToken {
   user: User;
 }
 
-export interface RegisterData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
+// export interface RegisterData {
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   password: string;
+// }
 
-export interface LoginData {
-  email: string;
-  password: string;
-}
+// export interface LoginData {
+//   provider: AuthProvider;
+//   email: string;
+//   password: string;
+// }
+
+

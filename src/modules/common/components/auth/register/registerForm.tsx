@@ -5,6 +5,7 @@ import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
 import { FcGoogle } from "react-icons/fc"
+import { Eye, EyeOff } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,7 +27,9 @@ import {
 } from "@/components/ui/form"
 import Alert from "@/components/ui/alertSwal"
 
-import { RegisterFormData, registerFormSchema } from "./schema"
+import { RegisterFormData, registerFormSchema } from "./register-schema"
+import { registerUser } from "@/services/auth/auth-services"
+import { AuthProvider } from "@/interfaces/auth/auth-providers.enum"
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void
@@ -35,6 +38,13 @@ interface RegisterFormProps {
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
   const methods = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
+    defaultValues: {
+      name: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   })
 
   const {
@@ -48,20 +58,42 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
     type: "error" | "success" | "info" | "warning"
   } | null>(null)
 
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   const onSubmit = async (data: RegisterFormData) => {
-    console.log(data)
+    try {
+      const payload: RegisterFormData = {
+        email: data.email,
+        password: data.password,
+        authProvider: AuthProvider.Credentials,
+        name: data.name,
+        lastName: data.lastName,
+        confirmPassword: "",
+      }
 
-    setAlert({
-      message: "¡Registro exitoso! Tu cuenta ha sido creada correctamente",
-      type: "success",
-    })
+      const userToken = await registerUser(payload)
 
-    reset() // Limpia el formulario después de registrar
+      setAlert({
+        message: "¡Registro exitoso! Tu cuenta ha sido creada correctamente",
+        type: "success",
+      })
+
+      reset()
+      console.log(userToken)
+    } catch (error) {
+      console.error(error)
+
+      setAlert({
+        message: "Hubo un error al registrarte. Intenta de nuevo.",
+        type: "error",
+      })
+    }
   }
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <Card className="w-[400px] mx-auto">
+    <div className=" flex items-center justify-center">
+      <Card className="mx-auto max-w-[400px]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Crear cuenta</CardTitle>
           <CardDescription>Ingresa tus datos para registrarte</CardDescription>
@@ -119,26 +151,54 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                   )}
                 />
 
+                {/* Password Field con Eye Icon */}
                 <FormField
                   name="password"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Contraseña</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="********" {...field} />
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="********"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
+                {/* Confirm Password Field con Eye Icon */}
                 <FormField
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Confirmar contraseña</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="********" {...field} />
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="********"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                            onClick={() => setShowConfirmPassword((prev) => !prev)}
+                          >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -157,7 +217,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">O continúa con</span>
+              <span className="bg-background px-2 text-muted-foreground">
+                O continúa con
+              </span>
             </div>
           </div>
 
