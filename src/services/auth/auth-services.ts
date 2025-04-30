@@ -1,17 +1,57 @@
-import { LoginData, RegisterData } from "@/interfaces/auth/user.interface";
-import { query } from "@/lib/api/server/strapi";
+import {UserToken } from "@/interfaces/auth/user.interface";
 import { BACKEND_ROUTES } from '../../contants/backend-routes/routes';
+import { RegisterPartialData } from "@/modules/common/components/auth/register/register-schema";
 
-export async function registerUser(data: RegisterData): Promise<any> {
-  return await query<any>(BACKEND_ROUTES.REGISTER, { 
-    method: "POST",
-    body: data,
-  });
+
+const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
+// const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_TOKEN;
+
+export async function registerUser(data: RegisterPartialData): Promise<UserToken> {
+  try {
+    const response = await fetch(`${STRAPI_HOST}/api/${BACKEND_ROUTES.REGISTER}`, {
+      method:"POST",
+      headers: {
+        "Content-Type": "application/json",
+       
+      },
+      body: data ? JSON.stringify(data) : undefined, // Solo se incluye el cuerpo si existe
+    });
+
+    if (!response.ok) {
+      console.log(await response.json());
+      
+      throw new Error(`Error en la solicitud: ${response.statusText}`);
+      
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error al realizar la solicitud:", error);
+    throw error;
+  }
 }
 
-export async function loginUser(data: LoginData): Promise<any> {
-  return await query<any>(BACKEND_ROUTES.LOGIN, {
-    method: "POST",
-    body: data,
-  });
+export async function loginUser(data: RegisterPartialData): Promise<UserToken> {
+  try {
+    const response = await fetch(`${STRAPI_HOST}/api/${BACKEND_ROUTES.LOGIN}`, {
+      method:"POST",
+      headers: {
+        "Content-Type": "application/json",
+        
+      },
+      body: data ? JSON.stringify(data) : undefined, // Solo se incluye el cuerpo si existe
+    });
+
+    if (!response.ok) {
+      console.log(await response.json());
+      
+      throw new Error(`Error en la solicitud: ${response.statusText}`);
+      
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error al realizar la solicitud:", error);
+    throw error;
+  }
 }
