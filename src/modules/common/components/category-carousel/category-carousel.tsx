@@ -8,10 +8,9 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { Categoria } from "@/interfaces/categories/categories.interface";
-import { SubCategoria } from "../../../../interfaces/categories/categories.interface";
 
 interface CategoryCarouselProps {
-  categorias: Categoria[] | SubCategoria[];
+  categorias: Categoria[] 
   className?: string;
 }
 
