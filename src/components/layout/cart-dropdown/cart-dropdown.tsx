@@ -1,27 +1,43 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { ShoppingCart, Plus, Minus, Trash } from "lucide-react"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ShoppingCart, Plus, Minus, Trash } from "lucide-react";
 
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { useCartStore } from "@/store/products-cart"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useCartStore } from "@/store/products-cart.store";
 
 const CartContent = () => {
-  const { cart, increaseQuantity, decreaseQuantity, removeFromCart } = useCartStore()
+  const { cart, increaseQuantity, decreaseQuantity, removeFromCart } =
+    useCartStore();
 
   // Calcular el total del carrito
-  const cartTotal = cart.reduce((total, item) => total + item.precioVenta * item.quantity, 0)
+  const cartTotal = cart.reduce((total, item) => {
+    if (item.inventario?.precioVenta) {
+      return total + item.inventario.precioVenta * item.quantity;
+    }
+    return total;
+  }, 0);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h4 className="font-medium">Mi Carrito</h4>
-        <span className="text-sm text-muted-foreground">{cart.length} artículos</span>
+        <span className="text-sm text-muted-foreground">
+          {cart.length} artículos
+        </span>
       </div>
 
       <Separator />
@@ -40,17 +56,36 @@ const CartContent = () => {
               <div className="flex-1 space-y-1">
                 <p className="text-sm font-medium">{item.nombre}</p>
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>${(item.precioVenta * item.quantity).toFixed(2)}</span>
+                  {item.inventario?.precioVenta && (
+                    <span>
+                      $
+                      {(item.inventario?.precioVenta * item.quantity).toFixed(
+                        2
+                      )}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button size="icon" variant="outline" onClick={() => decreaseQuantity(item.id)}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => decreaseQuantity(item.id)}
+                  >
                     <Minus size={16} />
                   </Button>
                   <span className="w-6 text-center">{item.quantity}</span>
-                  <Button size="icon" variant="outline" onClick={() => increaseQuantity(item.id)}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => increaseQuantity(item.id)}
+                  >
                     <Plus size={16} />
                   </Button>
-                  <Button size="icon" variant="outline" onClick={() => removeFromCart(item.id)}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => removeFromCart(item.id)}
+                  >
                     <Trash size={16} />
                   </Button>
                 </div>
@@ -78,22 +113,22 @@ const CartContent = () => {
         <Link href="/carrito">Ir al carrito</Link>
       </Button>
     </div>
-  )
-}
+  );
+};
 
 export default function CartDropdown() {
-  const [isMobile, setIsMobile] = useState(false)
-  const cart = useCartStore((state) => state.cart)
+  const [isMobile, setIsMobile] = useState(false);
+  const cart = useCartStore((state) => state.cart);
 
   useEffect(() => {
     const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
+      setIsMobile(window.innerWidth < 768);
+    };
 
-    checkIfMobile()
-    window.addEventListener("resize", checkIfMobile)
-    return () => window.removeEventListener("resize", checkIfMobile)
-  }, [])
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
 
   const CartIcon = () => (
     <div className="relative">
@@ -104,7 +139,7 @@ export default function CartDropdown() {
         </span>
       )}
     </div>
-  )
+  );
 
   if (isMobile) {
     return (
@@ -118,7 +153,7 @@ export default function CartDropdown() {
           <CartContent />
         </DropdownMenuContent>
       </DropdownMenu>
-    )
+    );
   }
 
   return (
@@ -132,5 +167,5 @@ export default function CartDropdown() {
         <CartContent />
       </HoverCardContent>
     </HoverCard>
-  )
+  );
 }
