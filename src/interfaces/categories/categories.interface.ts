@@ -4,7 +4,7 @@ import { Descuento } from "../products/products.interface";
 export interface Categoria {
     id: number;
     nombre: string;
-    img?: string;
+    img?: Img;
     principal?: Categoria;
     subcategorias: Categoria[];
     descuento?: Descuento;
