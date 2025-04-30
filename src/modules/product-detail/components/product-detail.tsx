@@ -2,40 +2,40 @@
 
 import { ChevronLeft, Heart, ShoppingCart } from "lucide-react";
 import ProductImageGallery from "./product-image-galery";
-import { formatCurrency } from "@/lib/formatCurrency";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Descripcion,
+  GrupoAtributo,
   Products,
+  ProductType,
 } from "@/interfaces/products/products.interface";
 import { TabsContent, Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { useCartStore } from "@/store/products-cart";
+import { useCartStore } from "@/store/products-cart.store";
+import { useState, useEffect } from "react";
+import { ProductPriceDetail } from "./product-price";
 
 interface ProductDetailProps {
   product: Products;
+  selectedSlug: string;
 }
 
-// Función para renderizar el contenido de la descripción
 function renderDescription(descripcion: Descripcion[]) {
   return descripcion.map((block, blockIndex) => {
     if (block.type === "paragraph") {
       return (
         <p key={blockIndex} className="mb-4">
-          {block.children.map((child, childIndex: number) => {
+          {block.children.map((child, childIndex) => {
             if (child.type === "text") {
-              // Manejar saltos de línea en el texto
-              return child.text
-                .split("\n")
-                .map((line: string, lineIndex: number) => (
-                  <span key={`${childIndex}-${lineIndex}`}>
-                    {line}
-                    {lineIndex < child.text.split("\n").length - 1 && <br />}
-                  </span>
-                ));
+              return child.text.split("\n").map((line, lineIndex) => (
+                <span key={`${childIndex}-${lineIndex}`}>
+                  {line}
+                  {lineIndex < child.text.split("\n").length - 1 && <br />}
+                </span>
+              ));
             }
             return null;
           })}
@@ -46,13 +46,172 @@ function renderDescription(descripcion: Descripcion[]) {
   });
 }
 
-export function ProductDetail({ product }: ProductDetailProps) {
+export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
   const router = useRouter();
   const { addToCart } = useCartStore();
 
+  const [selectionError, setSelectionError] = useState<string | null>(null);
+
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >({});
+  const [availableAttributes, setAvailableAttributes] = useState<
+    Record<string, string[]>
+  >({});
+  const [selectedVariant, setSelectedVariant] = useState<Products | null>(null);
+
+  // Agrupar los atributos por tipo (como color, tamaño)
+  const groupVariantAttributes = (product: Products): GrupoAtributo[] => {
+    const atributosPorGrupo: { [key: string]: GrupoAtributo } = {};
+    product.variantes.forEach((variante) => {
+      variante.atributos?.forEach((atributo) => {
+        if (!atributosPorGrupo[atributo.tipoAtributo]) {
+          atributosPorGrupo[atributo.tipoAtributo] = {
+            nombre: atributo.tipoAtributo,
+            values: [],
+          };
+        }
+        if (
+          !atributosPorGrupo[atributo.tipoAtributo].values?.includes(
+            atributo.valor
+          )
+        ) {
+          atributosPorGrupo[atributo.tipoAtributo].values?.push(atributo.valor);
+        }
+      });
+    });
+    return Object.values(atributosPorGrupo);
+  };
+
+  // Filtrar variantes en base a los atributos seleccionados
+  const getAvailableAttributes = (
+    selectedAttributes: Record<string, string>
+  ) => {
+    const filteredVariants = product.variantes.filter((variante) => {
+      return Object.entries(selectedAttributes).every(([tipoAtributo, valor]) =>
+        variante.atributos?.some(
+          (atributo) =>
+            atributo.tipoAtributo === tipoAtributo && atributo.valor === valor
+        )
+      );
+    });
+
+    const newAvailableAttributes: Record<string, string[]> = {};
+
+    filteredVariants.forEach((variante) => {
+      variante.atributos?.forEach((atributo) => {
+        if (!newAvailableAttributes[atributo.tipoAtributo]) {
+          newAvailableAttributes[atributo.tipoAtributo] = [];
+        }
+        if (
+          !newAvailableAttributes[atributo.tipoAtributo].includes(
+            atributo.valor
+          )
+        ) {
+          newAvailableAttributes[atributo.tipoAtributo].push(atributo.valor);
+        }
+      });
+    });
+
+    // Asegurar que todos los tipos de atributos estén presentes, incluso si vacíos
+    const allAttributeTypes = new Set<string>();
+    product.variantes.forEach((variante) => {
+      variante.atributos?.forEach((atributo) => {
+        allAttributeTypes.add(atributo.tipoAtributo);
+      });
+    });
+    allAttributeTypes.forEach((tipo) => {
+      if (!newAvailableAttributes[tipo]) {
+        newAvailableAttributes[tipo] = [];
+      }
+    });
+
+    setAvailableAttributes(newAvailableAttributes);
+  };
+
+  useEffect(() => {
+    getAvailableAttributes(selectedAttributes);
+  }, [selectedAttributes]);
+
+  // Inicializar atributos seleccionados si hay un slug seleccionado
+  useEffect(() => {
+    if (!selectedSlug || !product.variantes?.length) return;
+
+    const matchedVariant = product.variantes.find(
+      (v) => v.slug === selectedSlug
+    );
+
+    if (matchedVariant && matchedVariant.atributos) {
+      const atributosIniciales: Record<string, string> = {};
+      matchedVariant.atributos.forEach((atributo) => {
+        atributosIniciales[atributo.tipoAtributo] = atributo.valor;
+      });
+
+      setSelectedAttributes(atributosIniciales);
+    }
+  }, [selectedSlug, product.variantes]);
+
+  // Obtener la variante seleccionada en base a los atributos seleccionados
+  useEffect(() => {
+    const variantMatch = product.variantes.find((variante) => {
+      if (!variante.atributos) return false;
+
+      // Checar cantidad de atributos (match exacto con los seleccionados)
+      if (
+        variante.atributos.length !== Object.keys(selectedAttributes).length
+      ) {
+        return false;
+      }
+
+      return variante.atributos.every(
+        (atributo) =>
+          selectedAttributes[atributo.tipoAtributo] === atributo.valor
+      );
+    });
+
+    setSelectedVariant(variantMatch || null);
+  }, [selectedAttributes, product.variantes]);
+
+  const handleSelectAttribute = (tipoAtributo: string, valor: string) => {
+    setSelectedAttributes((prev) => {
+      const newSelectedAttributes = { ...prev, [tipoAtributo]: valor };
+      getAvailableAttributes(newSelectedAttributes); // Actualiza las opciones disponibles
+      return newSelectedAttributes;
+    });
+  };
+
+  const handleDeselectAttribute = (tipoAtributo: string) => {
+    setSelectedAttributes((prev) => {
+      const newSelectedAttributes = { ...prev };
+      delete newSelectedAttributes[tipoAtributo];
+      getAvailableAttributes(newSelectedAttributes); // Actualiza las opciones disponibles
+      return newSelectedAttributes;
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (product.tipo === ProductType.SIMPLE) {
+      addToCart(product);
+      return;
+    }
+
+    if (!selectedVariant) {
+      setSelectionError("Debes seleccionar todas las opciones disponibles.");
+      return;
+    }
+
+    setSelectionError(null); // limpiar errores
+    addToCart(selectedVariant);
+
+    setSelectionError(null); // limpiar errores
+    addToCart(selectedVariant);
+  };
+
+  const groupedAttributes = groupVariantAttributes(product);
+  console.log(product);
+
   return (
     <div>
-      {/* Navegación de regreso */}
       <div className="mb-6">
         <button
           onClick={() => router.back()}
@@ -64,58 +223,133 @@ export function ProductDetail({ product }: ProductDetailProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Galería de imágenes */}
         <div className="order-2 md:order-1">
-          <ProductImageGallery images={product.galleryUrls} />
+          <ProductImageGallery
+            images={
+              selectedVariant?.galleryUrls?.length
+                ? selectedVariant.galleryUrls
+                : selectedVariant?.coverUrl
+                ? [selectedVariant.coverUrl]
+                : product.galleryUrls?.length
+                ? product.galleryUrls
+                : product?.coverUrl
+                ? [product.coverUrl]
+                : ["/placeholder.svg?height=300&width=300"]
+            }
+          />
         </div>
 
-        {/* Detalles del producto */}
         <div className="order-1 md:order-2">
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold">{product.nombre}</h1>
 
               <div className="flex flex-wrap gap-2 mt-2">
-                {product.categorias.map((categoria) => (
-                  <Badge key={categoria.id}>{categoria.nombre}</Badge>
-                ))}
+                {product.categorias
+                  .filter((c) => !c.principal)
+                  .map((categoria) => (
+                    <Badge key={categoria.id}>{categoria.nombre}</Badge>
+                  ))}
               </div>
 
               <div className="flex flex-wrap gap-2 mt-2">
-                {product.subcategorias.map((subcategoria) => (
-                  <Badge key={subcategoria.id} variant={"outline"}>
-                    {subcategoria.nombre}
-                  </Badge>
-                ))}
+                {product.categorias
+                  .filter((c) => c.principal)
+                  .map((subcategoria) => (
+                    <Badge key={subcategoria.id} variant="outline">
+                      {subcategoria.nombre}
+                    </Badge>
+                  ))}
               </div>
             </div>
 
-            <div className="flex items-baseline gap-4">
-              <span className="text-3xl font-bold text-primary">
-                {formatCurrency(product.precioVenta)}
-              </span>
-              {product.precioUnitario > product.precioVenta && (
-                <span className="text-xl text-muted-foreground line-through">
-                  {formatCurrency(product.precioUnitario)}
-                </span>
-              )}
-            </div>
+            {product.tipo == ProductType.SIMPLE &&
+              ProductPriceDetail({
+                inventario: product.inventario,
+                descuento: product.descuento,
+              })}
 
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Unidad de medida:{" "}
-                {/* {product.unidad_medida.nombre} */}
-              </p>
+            {product.tipo == ProductType.BASE && selectedVariant && (
+              <ProductPriceDetail
+                inventario={selectedVariant.inventario}
+                descuento={selectedVariant.descuento}
+              />
+            )}
+
+            <div className="space-y-6">
+              {/* Sección atributos dinámicos           -------------------------------*/}
+              {product.variantes.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-2xl font-bold mb-4">
+                    Selecciona atributos
+                  </h2>
+
+                  {groupedAttributes.map(({ nombre, values }) => {
+                    // Solo habilitar los valores que coinciden con los atributos disponibles
+                    const availableValues =
+                      availableAttributes[nombre] || values;
+
+                    return (
+                      <div key={nombre} className="mb-6">
+                        <h3 className="font-semibold mb-2">{nombre}</h3>
+                        <div className="flex gap-2 flex-wrap">
+                          {values?.map((valor) => {
+                            const isSelected =
+                              selectedAttributes[nombre] === valor;
+                            const isDisabled = !availableValues.includes(valor);
+
+                            return (
+                              <Button
+                                key={valor}
+                                variant="outline"
+                                className={`text-sm ${
+                                  isSelected
+                                    ? "border-2 border-primary"
+                                    : "border"
+                                } ${
+                                  isDisabled
+                                    ? "cursor-not-allowed opacity-50"
+                                    : ""
+                                }`}
+                                onClick={() => {
+                                  if (isDisabled) return; // Si está desactivado, no hacer nada
+                                  if (isSelected) {
+                                    handleDeselectAttribute(nombre); // Deseleccionar
+                                  } else {
+                                    handleSelectAttribute(nombre, valor); // Seleccionar
+                                  }
+                                }}
+                              >
+                                {valor}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <Separator />
 
             <div className="flex flex-col gap-4">
+              {selectionError && (
+                <p className="text-sm text-red-500">{selectionError}</p>
+              )}
               <div className="flex gap-4">
-                <Button className="flex-1 cursor-pointer" size="lg" onClick={() => addToCart(product) }>
+                <Button
+                  className="flex-1 cursor-pointer"
+                  size="lg"
+                  onClick={() => {
+                    handleAddToCart();
+                  }}
+                >
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   Agregar al carrito
                 </Button>
+
                 <Button variant="outline" size="icon" className="h-12 w-12">
                   <Heart className="h-5 w-5" />
                 </Button>
@@ -144,21 +378,14 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="text-sm text-muted-foreground">ID:</div>
-                      <div className="text-sm">{product.documentId}</div>
+                      <div className="text-sm text-muted-foreground">slug:</div>
+                      <div className="text-sm">{product.slug}</div>
 
                       <div className="text-sm text-muted-foreground">
                         Categorías:
                       </div>
                       <div className="text-sm">
                         {product.categorias.map((cat) => cat.nombre).join(", ")}
-                      </div>
-
-                      <div className="text-sm text-muted-foreground">
-                        Unidad de medida:
-                      </div>
-                      <div className="text-sm">
-                        {/* {product.unidad_medida.nombre} */}
                       </div>
 
                       <div className="text-sm text-muted-foreground">
