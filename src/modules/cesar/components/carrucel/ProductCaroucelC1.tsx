@@ -22,8 +22,6 @@ export function ProductCaroucelC1({ products }: ProductCarouselProps) {
     const autoScroll = setInterval(() => {
       if (sliderRef.current) {
         sliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-        console.log(sliderRef.current.scrollLeft);
-        console.log(sliderRef.current.clientWidth);
 
         if (
           sliderRef.current.scrollLeft + sliderRef.current.clientWidth >=

@@ -11,6 +11,7 @@
   overflow: hidden;
   overflow-x: auto;
   gap: 15px;
+  scrollbar-width: none;
 }
 
 .caroucel1ContentCesar::-webkit-scrollbar {
