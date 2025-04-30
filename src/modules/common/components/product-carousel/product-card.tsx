@@ -6,8 +6,12 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Products } from "@/interfaces/products/products.interface";
-import { useCartStore } from "@/store/products-cart";
+import {
+  Products,
+  ProductType,
+} from "@/interfaces/products/products.interface";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { getPrecioConDescuento, isOfertaActiva } from "@/lib/price-descuento";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,7 +21,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addToCart } = useCartStore();
   const { data: session } = useSession(); // <-- Hook de NextAuth
 
   const renderDescription = () => {
@@ -39,10 +42,19 @@ export function ProductCard({ product }: ProductCardProps) {
         : "")
     );
   };
+  // console.log(product);
 
   return (
-    <Link href={`/producto/${product.id}`} className="w-full h-full">
+    <Link href={`/producto/${product.slug}`} className="w-full h-full">
       <Card className="h-full flex flex-col hover:cursor-pointer hover:shadow-xl transition-transform duration-300 transform hover:scale-105">
+        {/* Etiqueta de oferta */}
+
+        {isOfertaActiva(product.descuento) && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
+            ¡OFERTA!
+          </div>
+        )}
+
         <div className="relative bg-white aspect-square w-full overflow-hidden rounded-t-lg">
           <Image
             src={product.coverUrl || "/placeholder.svg?height=300&width=300"}
@@ -63,15 +75,66 @@ export function ProductCard({ product }: ProductCardProps) {
           </p>
         </CardContent>
         <CardFooter className="px-3 pt-0 flex justify-between items-center">
-          {session ? (
-            <span className="font-bold ">
-              ${product.precioVenta.toFixed(2)}
-            </span>
-          ) : (
-            <span className="text-sm text-muted-foreground">
-              Inicia sesión para ver el precio
-            </span>
-          )}
+          <CardFooter className="px-3 pt-0 flex justify-between items-center">
+            {session ? (
+              product.tipo === ProductType.SIMPLE ||
+              product.tipo === ProductType.VARIANT ? (
+                (() => {
+                  const { finalPrice, hasDiscount } = getPrecioConDescuento(
+                    product.inventario,
+                    product.descuento
+                  );
+
+                  return finalPrice !== null ? (
+                    <div className="flex flex-col items-start">
+                      <span className="font-bold text-primary">
+                        {formatCurrency(finalPrice)}
+                      </span>
+                      {hasDiscount && (
+                        <span className="text-sm text-muted-foreground line-through">
+                          {formatCurrency(product.inventario!.precioVenta)}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">
+                      No disponible
+                    </span>
+                  );
+                })()
+              ) : product.tipo === ProductType.BASE ? (
+                (() => {
+                  const precios = product.variantes
+                    .map((v) => v.inventario?.precioVenta)
+                    .filter((v): v is number => typeof v === "number");
+
+                  if (precios.length === 0) {
+                    return (
+                      <span className="text-sm text-muted-foreground">
+                        No disponible
+                      </span>
+                    );
+                  }
+
+                  const precioMin = Math.min(...precios);
+
+                  return (
+                    <span className="font-bold text-primary">
+                      desde {formatCurrency(precioMin)}
+                    </span>
+                  );
+                })()
+              ) : (
+                <span className="text-sm text-muted-foreground">
+                  No disponible
+                </span>
+              )
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                Inicia sesión para ver el precio
+              </span>
+            )}
+          </CardFooter>
         </CardFooter>
       </Card>
     </Link>
