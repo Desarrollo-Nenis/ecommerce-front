@@ -20,7 +20,7 @@ export default function CategoryCarousel({
 }: CategoryCarouselProps) {
   return (
     <Carousel
-      className={`w-full pt-4 lg:w-1/2 mx-auto flex justify-center ${
+      className={`w-full pt-4 md:w-2/3 mx-auto flex justify-center ${
         className || ""
       }`}
       opts={{
