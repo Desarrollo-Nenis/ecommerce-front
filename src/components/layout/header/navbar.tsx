@@ -38,8 +38,8 @@ import { AvatarDropdown } from "../avatar-dropdown/AvatarDropdown";
 import { ButtonLogin } from "@/modules/common/components/auth/login/ButtonLogin";
 import { Session } from "next-auth";
 import { FRONTEND_ROUTES } from "../../../contants/frontend-routes/routes";
-import { useCartStore } from "@/store/products-cart";
 import { useEffect } from "react";
+import { useCartStore } from "@/store/products-cart.store";
 
 interface NavbarProps {
   marcas: Marca[];
@@ -245,8 +245,8 @@ export default function Navbar({
               </NavigationMenuItem>
 
                <NavigationMenuItem>
-                <Link href="/main" legacyBehavior passHref>
-                  <NavigationMenuLink className="font-semibold">ubicacion</NavigationMenuLink>
+                <Link href="/nosotros" legacyBehavior passHref>
+                  <NavigationMenuLink className="font-semibold">Sobre Nosotros</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
             </NavigationMenuList>
