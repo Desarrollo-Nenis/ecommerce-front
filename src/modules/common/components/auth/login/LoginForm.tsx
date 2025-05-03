@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
+import { ECOMMERCE_PRIVADO } from "@/contants/auth/ecommerce-privado.constant";
 
 export default function LoginForm({
   onSwitchToRegister,
@@ -43,7 +44,7 @@ export default function LoginForm({
       window.location.href = "/"; // O donde quieras
     }
   };
-
+  
   return (
     <Card className="mx-auto max-w-[400px]">
       <CardHeader className="space-y-1">
@@ -118,15 +119,27 @@ export default function LoginForm({
               ¿Olvidaste tu contraseña?
             </a>
           </p>
-          <p className="mt-2 text-sm">
-            ¿No tienes una cuenta?{" "}
-            <span
-              onClick={onSwitchToRegister}
-              className="cursor-pointer font-medium text-primary hover:underline"
-            >
-              Regístrate aquí
-            </span>
-          </p>
+          {ECOMMERCE_PRIVADO ? (
+            <div>
+              <p className="mt-2 text-sm">¿No tienes una cuenta? </p>
+              <span
+                // onClick={onSwitchToRegister}
+                className="cursor-pointer font-medium text-primary hover:underline"
+              >
+                Comunicate con soporte
+              </span>
+            </div>
+          ) : (
+            <p className="mt-2 text-sm">
+              ¿No tienes una cuenta?{" "}
+              <span
+                onClick={onSwitchToRegister}
+                className="cursor-pointer font-medium text-primary hover:underline"
+              >
+                Regístrate aquí
+              </span>
+            </p>
+          )}
         </div>
       </CardFooter>
     </Card>

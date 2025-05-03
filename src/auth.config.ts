@@ -7,12 +7,16 @@ import { UserToken } from "./interfaces/auth/user.interface";
 import { AuthProvider } from "@/interfaces/auth/auth-providers.enum";
 import { ExtendedJWT, ExtendedUser } from "./next-auth";
 import { LoginPartialData, RegisterPartialData } from "./modules/common/components/auth/register/register-schema";
+import { ECOMMERCE_PRIVADO } from "./contants/auth/ecommerce-privado.constant";
+
+const CLIENT_ID = process.env.AUTH_WEBAPP_GOOGLE_CLIENT_ID!;
+const CLIENT_SECRET = process.env.AUTH_WEBAPP_GOOGLE_CLIENT_SECRET!;
 
 const authConfig: NextAuthConfig = {
   providers: [
     Google({
-      clientId: process.env.AUTH_WEBAPP_GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.AUTH_WEBAPP_GOOGLE_CLIENT_SECRET!,
+      clientId: CLIENT_ID,
+      clientSecret: CLIENT_SECRET,
     }),
     Credentials({
       name: "Credentials",
@@ -33,16 +37,17 @@ const authConfig: NextAuthConfig = {
 
         try {
           const userToken = await loginUser(loginData);
-          return userToken; // Devolvemos el UserToken directamente
+          return userToken;
         } catch (error) {
           console.error("Error en login manual:", error);
-          throw new Error("Credenciales inválidas");
+          throw new Error("Credenciales inválidas. Comunícate con soporte para obtener tu acceso.");
         }
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
+      
       if (!account) return false;
 
       if (account.provider === "google" && user.email) {
@@ -53,17 +58,23 @@ const authConfig: NextAuthConfig = {
           };
 
           let userToken: UserToken;
+
           try {
             userToken = await loginUser(loginData);
           } catch {
+            if (ECOMMERCE_PRIVADO) {
+              console.error("Registro deshabilitado en modo privado");
+             
+              return false;
+
+            }
+
             const registerData: RegisterPartialData = {
               email: user.email,
               authProvider: AuthProvider.Google,
               name: user.name || "",
             };
 
-            // console.log("registerData",registerData);
-            
             userToken = await registerUser(registerData);
           }
 
@@ -92,14 +103,14 @@ const authConfig: NextAuthConfig = {
     },
 
     async session({ session, token }) {
-      const extendedToken = token as ExtendedJWT; // CAST CORRECTO
+      const extendedToken = token as ExtendedJWT;
       if (extendedToken.user) {
         session.user = {
           ...extendedToken.user,
-          id: extendedToken.user.user.id.toString(), // Convertir a string si es necesario
+          id: extendedToken.user.user.id.toString(),
           email: extendedToken.user.user.email || "",
-          emailVerified: null, // Set to null or appropriate value
-        }; // OK
+          emailVerified: null,
+        };
       }
       return session;
     },
