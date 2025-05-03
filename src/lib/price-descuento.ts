@@ -3,6 +3,7 @@ import {
   Descuento,
   DescuentoTipo,
   Inventario,
+  Products,
 } from "@/interfaces/products/products.interface";
 
 
@@ -57,3 +58,15 @@ export const getPrecioConDescuento = (
 
 
 
+
+export function getPrecioMinimoVariantes(product: Products): number | null {
+  if (!product.variantes || product.variantes.length === 0) return null;
+
+  const precios = product.variantes
+    .map((v) => v.inventario?.precioVenta)
+    .filter((v): v is number => typeof v === "number");
+
+  if (precios.length === 0) return null;
+
+  return Math.min(...precios);
+}

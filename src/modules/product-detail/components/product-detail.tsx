@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/products-cart.store";
 import { useState, useEffect } from "react";
 import { ProductPriceDetail } from "./product-price";
+import { useSession } from "next-auth/react";
+import { getPrecioMinimoVariantes } from "@/lib/price-descuento";
 
 interface ProductDetailProps {
   product: Products;
@@ -49,6 +51,7 @@ function renderDescription(descripcion: Descripcion[]) {
 export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
   const router = useRouter();
   const { addToCart } = useCartStore();
+  const { data } = useSession();
 
   const [selectionError, setSelectionError] = useState<string | null>(null);
 
@@ -87,6 +90,7 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
   const getAvailableAttributes = (
     selectedAttributes: Record<string, string>
   ) => {
+    // 1. Filtrar variantes que coincidan parcialmente con los atributos seleccionados
     const filteredVariants = product.variantes.filter((variante) => {
       return Object.entries(selectedAttributes).every(([tipoAtributo, valor]) =>
         variante.atributos?.some(
@@ -96,8 +100,8 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
       );
     });
 
+    // 2. Recolectar atributos disponibles según las variantes filtradas
     const newAvailableAttributes: Record<string, string[]> = {};
-
     filteredVariants.forEach((variante) => {
       variante.atributos?.forEach((atributo) => {
         if (!newAvailableAttributes[atributo.tipoAtributo]) {
@@ -113,25 +117,35 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
       });
     });
 
-    // Asegurar que todos los tipos de atributos estén presentes, incluso si vacíos
+    // 3. Asegurar que todos los tipos de atributos estén presentes
     const allAttributeTypes = new Set<string>();
     product.variantes.forEach((variante) => {
       variante.atributos?.forEach((atributo) => {
         allAttributeTypes.add(atributo.tipoAtributo);
       });
     });
+
     allAttributeTypes.forEach((tipo) => {
       if (!newAvailableAttributes[tipo]) {
         newAvailableAttributes[tipo] = [];
       }
     });
 
+    // 4. Eliminar atributos seleccionados que ya no están disponibles
+    const cleanedSelectedAttributes = { ...selectedAttributes };
+    Object.entries(cleanedSelectedAttributes).forEach(([tipo, valor]) => {
+      if (
+        newAvailableAttributes[tipo] &&
+        !newAvailableAttributes[tipo].includes(valor)
+      ) {
+        delete cleanedSelectedAttributes[tipo];
+      }
+    });
+
+    // 5. Aplicar los cambios
+    setSelectedAttributes(cleanedSelectedAttributes);
     setAvailableAttributes(newAvailableAttributes);
   };
-
-  useEffect(() => {
-    getAvailableAttributes(selectedAttributes);
-  }, [selectedAttributes]);
 
   // Inicializar atributos seleccionados si hay un slug seleccionado
   useEffect(() => {
@@ -199,10 +213,6 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
       setSelectionError("Debes seleccionar todas las opciones disponibles.");
       return;
     }
-
-    setSelectionError(null); // limpiar errores
-    addToCart(selectedVariant);
-
     setSelectionError(null); // limpiar errores
     addToCart(selectedVariant);
   };
@@ -263,16 +273,18 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
               </div>
             </div>
 
-            {product.tipo == ProductType.SIMPLE &&
-              ProductPriceDetail({
-                inventario: product.inventario,
-                descuento: product.descuento,
-              })}
-
-            {product.tipo == ProductType.BASE && selectedVariant && (
+            {(selectedVariant || product.tipo == ProductType.BASE) && (
               <ProductPriceDetail
-                inventario={selectedVariant.inventario}
-                descuento={selectedVariant.descuento}
+                product={selectedVariant}
+                minPrice={getPrecioMinimoVariantes(product)}
+                isLoggedIn={data?.user ? true : false}
+              />
+            )}
+            {product.tipo == ProductType.SIMPLE && (
+              <ProductPriceDetail
+                product={product}
+                minPrice={getPrecioMinimoVariantes(product)}
+                isLoggedIn={data?.user ? true : false}
               />
             )}
 
@@ -302,17 +314,13 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
                               <Button
                                 key={valor}
                                 variant="outline"
-                                className={`text-sm ${
+                                className={`text-sm cursor-pointer ${
                                   isSelected
                                     ? "border-2 border-primary"
                                     : "border"
-                                } ${
-                                  isDisabled
-                                    ? "cursor-not-allowed opacity-50"
-                                    : ""
-                                }`}
+                                } ${isDisabled ? " opacity-50" : ""}`}
                                 onClick={() => {
-                                  if (isDisabled) return; // Si está desactivado, no hacer nada
+                                  // if (isDisabled) return; // Si está desactivado, no hacer nada
                                   if (isSelected) {
                                     handleDeselectAttribute(nombre); // Deseleccionar
                                   } else {
