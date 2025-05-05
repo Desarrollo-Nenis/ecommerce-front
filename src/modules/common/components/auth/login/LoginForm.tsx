@@ -44,6 +44,7 @@ export default function LoginForm({
       window.location.href = "/"; // O donde quieras
     }
   };
+
   
   return (
     <Card className="mx-auto max-w-[400px]">

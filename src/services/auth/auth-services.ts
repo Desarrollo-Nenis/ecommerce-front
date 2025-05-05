@@ -14,15 +14,7 @@ export async function registerUser(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        data: {
-          nombre: data.nombre,
-          apellidos: data.apellidos,
-          correo: data.correo,
-          contrasena: data.contrasena,
-          authProvider: data.authProvider,
-        },
-      }),
+      body: JSON.stringify(data),
     });
 
     const result = await response.json();

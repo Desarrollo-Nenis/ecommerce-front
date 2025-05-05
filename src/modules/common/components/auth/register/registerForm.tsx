@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm, FormProvider, Controller } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
@@ -39,10 +39,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
   const methods = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      nombre: "",
-      apellidos: "",
-      correo: "",
-      contrasena: "",
+      name: "",
+      lastName: "",
+      email: "",
+      password: "",
       confirmPassword: "",
       authProvider: AuthProvider.Credentials,
     },
@@ -52,7 +52,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
     handleSubmit,
     formState: { isSubmitting },
     reset,
-    getValues,
   } = methods;
 
   const [alert, setAlert] = useState<{
@@ -66,11 +65,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       const payload: RegisterFormData = {
-        correo: data.correo,
-        contrasena: data.contrasena,
+        email: data.email,
+        password: data.password,
         authProvider: AuthProvider.Credentials,
-        nombre: data.nombre,
-        apellidos: data.apellidos,
+        name: data.name,
+        lastName: data.lastName,
         confirmPassword: "",
       };
 
@@ -115,7 +114,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    name="nombre"
+                    name="name"
                     render={({ field }) => {
                       return (
                         <FormItem>
@@ -129,7 +128,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                     }}
                   />
                   <FormField
-                    name="apellidos"
+                    name="lastName"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Apellidos</FormLabel>
@@ -143,7 +142,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                 </div>
 
                 <FormField
-                  name="correo"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Correo electrónico</FormLabel>
@@ -156,7 +155,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                 />
 
                 <FormField
-                  name="contrasena"
+                  name="password"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Contraseña</FormLabel>
@@ -172,7 +171,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                             onClick={() => setShowPassword((prev) => !prev)}
                           >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            {showPassword ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
                           </button>
                         </div>
                       </FormControl>
