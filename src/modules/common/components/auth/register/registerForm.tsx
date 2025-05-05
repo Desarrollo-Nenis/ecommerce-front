@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { useForm, FormProvider } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn } from "next-auth/react"
-import { FcGoogle } from "react-icons/fc"
-import { Eye, EyeOff } from "lucide-react"
+import React, { useState } from "react";
+import { useForm, FormProvider, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
+import { Eye, EyeOff } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -16,7 +16,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Form,
   FormField,
@@ -24,75 +24,77 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form"
-import Alert from "@/components/ui/alertSwal"
+} from "@/components/ui/form";
+import Alert from "@/components/ui/alertSwal";
 
-import { RegisterFormData, registerFormSchema } from "./register-schema"
-import { registerUser } from "@/services/auth/auth-services"
-import { AuthProvider } from "@/interfaces/auth/auth-providers.enum"
+import { RegisterFormData, registerFormSchema } from "./register-schema";
+import { registerUser } from "@/services/auth/auth-services";
+import { AuthProvider } from "@/interfaces/auth/auth-providers.enum";
 
 interface RegisterFormProps {
-  onSwitchToLogin: () => void
+  onSwitchToLogin: () => void;
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
   const methods = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      name: "",
-      lastName: "",
-      email: "",
-      password: "",
+      nombre: "",
+      apellidos: "",
+      correo: "",
+      contrasena: "",
       confirmPassword: "",
+      authProvider: AuthProvider.Credentials,
     },
-  })
+  });
 
   const {
     handleSubmit,
     formState: { isSubmitting },
     reset,
-  } = methods
+    getValues,
+  } = methods;
 
   const [alert, setAlert] = useState<{
-    message: string
-    type: "error" | "success" | "info" | "warning"
-  } | null>(null)
+    message: string;
+    type: "error" | "success" | "info" | "warning";
+  } | null>(null);
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
       const payload: RegisterFormData = {
-        email: data.email,
-        password: data.password,
+        correo: data.correo,
+        contrasena: data.contrasena,
         authProvider: AuthProvider.Credentials,
-        name: data.name,
-        lastName: data.lastName,
+        nombre: data.nombre,
+        apellidos: data.apellidos,
         confirmPassword: "",
-      }
+      };
 
-      const userToken = await registerUser(payload)
+      const userToken = await registerUser(payload);
 
       setAlert({
         message: "¡Registro exitoso! Tu cuenta ha sido creada correctamente",
         type: "success",
-      })
+      });
 
-      reset()
-      console.log(userToken)
-    } catch (error) {
-      console.error(error)
-
+      reset();
+      console.log(userToken);
+    } catch (error: any) {
+      console.error(error);
       setAlert({
-        message: "Hubo un error al registrarte. Intenta de nuevo.",
+        message:
+          error?.message || "Hubo un error al registrarte. Intenta de nuevo.",
         type: "error",
-      })
+      });
     }
-  }
+  };
 
   return (
-    <div className=" flex items-center justify-center">
+    <div className="flex items-center justify-center">
       <Card className="mx-auto max-w-[400px]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Crear cuenta</CardTitle>
@@ -113,19 +115,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nombre(s)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Juan" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    name="nombre"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Nombre(s)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Juan" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
                   <FormField
-                    name="lastName"
+                    name="apellidos"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Apellidos</FormLabel>
@@ -139,7 +143,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                 </div>
 
                 <FormField
-                  name="email"
+                  name="correo"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Correo electrónico</FormLabel>
@@ -151,9 +155,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                   )}
                 />
 
-                {/* Password Field con Eye Icon */}
                 <FormField
-                  name="password"
+                  name="contrasena"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Contraseña</FormLabel>
@@ -178,7 +181,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                   )}
                 />
 
-                {/* Confirm Password Field con Eye Icon */}
                 <FormField
                   name="confirmPassword"
                   render={({ field }) => (
@@ -194,9 +196,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                           <button
                             type="button"
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                            onClick={() => setShowConfirmPassword((prev) => !prev)}
+                            onClick={() =>
+                              setShowConfirmPassword((prev) => !prev)
+                            }
                           >
-                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            {showConfirmPassword ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
                           </button>
                         </div>
                       </FormControl>
@@ -205,7 +213,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                   )}
                 />
 
-                <Button className="w-full mt-2" type="submit" disabled={isSubmitting}>
+                <Button
+                  className="w-full mt-2 cursor-pointer"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
                   Registrarse
                 </Button>
               </form>
@@ -230,8 +242,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               setAlert({
                 message: "Iniciando sesión con Google...",
                 type: "info",
-              })
-              signIn("google")
+              });
+              signIn("google");
             }}
             className="flex items-center justify-center gap-2"
           >
@@ -252,7 +264,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
         </CardFooter>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default RegisterForm
+export default RegisterForm;
