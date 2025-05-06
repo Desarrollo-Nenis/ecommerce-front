@@ -12,8 +12,7 @@ export default async function CategoriaPage({
   params: { slug: string };
   searchParams: { [key: string]: string };
 }) {
-  const { slug } = params;
-
+const slug = decodeURIComponent(params.slug);
   const filtros = {
     categoria: [slug],
     subcategoria: searchParams?.subcategoria?.split(","),
@@ -37,19 +36,19 @@ export default async function CategoriaPage({
       <div className="md:hidden mb-4">
         <ResponsiveStoreFilters categorias={categorias} marcas={marcas} />
       </div>
-
+      <div>
+        {categoria?.subcategorias && (
+          <CategoryCarousel categorias={categoria?.subcategorias} />
+        )}
+      </div>
       {/* Grid layout */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Desktop: Filters on the side */}
         <div className="hidden md:block">
           <ResponsiveStoreFilters categorias={categorias} marcas={marcas} />
         </div>
-
         {/* Main content */}
         <div className="md:col-span-3 space-y-4">
-          {categoria?.subcategorias && (
-            <CategoryCarousel categorias={categoria.subcategorias} />
-          )}
           <ProductGrid products={productos} />
         </div>
       </div>

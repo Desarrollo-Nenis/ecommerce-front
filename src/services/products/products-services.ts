@@ -46,7 +46,6 @@ function mapProductsWithImages(products: Products[]): Products[] {
 type ProductFilters = {
   nombre?: string;
   categorias?: string[];
-  subcategorias?: string[];
   marcas?: string[];
   precioMin?: number;
   precioMax?: number;
@@ -58,7 +57,6 @@ export async function searchProducts(search: string): Promise<DataResponse<Produ
   params.append("filters[$or][0][nombre][$containsi]", search);
   params.append("filters[$or][1][descripcion][$containsi]", search);
   params.append("filters[$or][2][categorias][nombre][$containsi]", search);
-  params.append("filters[$or][3][subcategorias][nombre][$containsi]", search);
   params.append("filters[$or][4][marca][nombre][$containsi]", search);
 
   params.append("populate[cover]", "true");
@@ -100,10 +98,12 @@ function buildParams(terms: string[], isStrict: boolean): URLSearchParams {
 
   terms.forEach((term, i) => {
     params.append(`${buildGroupKey(i, 0, isStrict)}[nombre][$containsi]`, term);
-    params.append(`${buildGroupKey(i, 1, isStrict)}[descripcion][$containsi]`, term);
-    params.append(`${buildGroupKey(i, 2, isStrict)}[categorias][nombre][$containsi]`, term);
-    params.append(`${buildGroupKey(i, 3, isStrict)}[subcategorias][nombre][$containsi]`, term);
-    params.append(`${buildGroupKey(i, 4, isStrict)}[marca][nombre][$containsi]`, term);
+
+    if(!isStrict){
+      params.append(`${buildGroupKey(i, 1, isStrict)}[descripcion][$containsi]`, term);
+      params.append(`${buildGroupKey(i, 2, isStrict)}[categorias][nombre][$containsi]`, term);
+      params.append(`${buildGroupKey(i, 3, isStrict)}[marca][nombre][$containsi]`, term);
+    }
   });
 
   params.append("populate[categorias]", "true");
@@ -131,7 +131,6 @@ function normalizeFilters(filters: ProductFilters): ProductFilters {
   return {
     ...filters,
     categorias: filters.categorias?.map(decodeURIComponent),
-    subcategorias: filters.subcategorias?.map(decodeURIComponent),
     marcas: filters.marcas?.map(decodeURIComponent),
   };
 }
@@ -148,9 +147,7 @@ export async function getProductsByFilters(filters: ProductFilters = {}): Promis
     searchParams.append("filters[categorias][nombre][$in]", normalizedFilters.categorias.join(","));
   }
 
-  if (normalizedFilters.subcategorias?.length) {
-    searchParams.append("filters[subcategorias][nombre][$in]", normalizedFilters.subcategorias.join(","));
-  }
+  
 
   if (normalizedFilters.precioMin !== undefined && !isNaN(normalizedFilters.precioMin)) {
     searchParams.append("filters[precioVenta][$gte]", normalizedFilters.precioMin.toString());

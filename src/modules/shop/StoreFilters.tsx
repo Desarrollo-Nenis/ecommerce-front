@@ -15,21 +15,21 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Categoria } from "@/interfaces/categories/categories.interface";
 import { Marca } from "@/interfaces/marcas/marca.interface";
-import { Card } from "@/components/ui/card";
 
 interface StoreFiltersProps {
   categorias: Categoria[];
   marcas: Marca[];
 }
 
-export const StoreFilters = ({
-  categorias,
-  marcas,
-}: StoreFiltersProps) => {
+export const StoreFilters = ({ categorias, marcas }: StoreFiltersProps) => {
   const router = useRouter();
+  const categoriasFiltradas = categorias.filter(cat => !cat.principal);
+
 
   const [selectedCategorias, setSelectedCategorias] = useState<string[]>([]);
-  const [selectedSubcategorias, setSelectedSubcategorias] = useState<string[]>([]);
+  const [selectedSubcategorias, setSelectedSubcategorias] = useState<string[]>(
+    []
+  );
   const [selectedMarcas, setSelectedMarcas] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 105000]);
   const [minPrice, setMinPrice] = useState("0");
@@ -41,24 +41,21 @@ export const StoreFilters = ({
     if (selectedCategorias.length)
       params.set("categoria", selectedCategorias.join(","));
 
-    if (selectedSubcategorias.length)
-      params.set("subcategoria", selectedSubcategorias.join(","));
+    // if (selectedSubcategorias.length)
+    //   params.set("categoria", selectedSubcategorias.join(","));
 
-    if (selectedMarcas.length)
-      params.set("marca", selectedMarcas.join(","));
+    if (selectedMarcas.length) params.set("marca", selectedMarcas.join(","));
 
-    if (minPrice !== "0")
-      params.set("precioMin", minPrice);
+    if (minPrice !== "0") params.set("precioMin", minPrice);
 
-    if (maxPrice !== "105000")
-      params.set("precioMax", maxPrice);
+    if (maxPrice !== "105000") params.set("precioMax", maxPrice);
 
     router.push(`?${params.toString()}`);
   };
 
   useEffect(() => {
     updateURL();
-  }, [selectedCategorias, selectedSubcategorias, selectedMarcas]);
+  }, [selectedCategorias, selectedMarcas]);
 
   const applyPriceFilter = () => {
     updateURL();
@@ -79,7 +76,7 @@ export const StoreFilters = ({
             <ChevronDown className="h-4 w-4" />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-2 space-y-2">
-            {categorias.map((categoria) => (
+            {categoriasFiltradas.map((categoria) => (
               <div key={categoria.id}>
                 <div className="flex items-center gap-2">
                   <Checkbox
@@ -100,14 +97,15 @@ export const StoreFilters = ({
                   {(categoria.subcategorias || []).map((sub) => (
                     <div key={sub.id} className="flex items-center gap-2">
                       <Checkbox
-                        checked={selectedSubcategorias.includes(sub.nombre)}
+                        checked={selectedCategorias.includes(sub.nombre)}
                         onCheckedChange={() =>
-                          setSelectedSubcategorias((prev) =>
+                          setSelectedCategorias((prev) =>
                             toggleItem(prev, sub.nombre)
                           )
                         }
                         id={`sub-${sub.id}`}
                       />
+
                       <Label
                         htmlFor={`sub-${sub.id}`}
                         className="text-sm text-muted-foreground"
@@ -134,9 +132,7 @@ export const StoreFilters = ({
                 <Checkbox
                   checked={selectedMarcas.includes(marca.nombre)}
                   onCheckedChange={() =>
-                    setSelectedMarcas((prev) =>
-                      toggleItem(prev, marca.nombre)
-                    )
+                    setSelectedMarcas((prev) => toggleItem(prev, marca.nombre))
                   }
                   id={`marca-${marca.id}`}
                 />

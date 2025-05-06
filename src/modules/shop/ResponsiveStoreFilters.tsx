@@ -7,6 +7,7 @@ import { StoreFilters } from "./StoreFilters"; // mismo archivo que ya tienes
 import { Categoria } from "@/interfaces/categories/categories.interface";
 import { Marca } from "@/interfaces/marcas/marca.interface";
 import { Card } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 
 interface Props {
   categorias: Categoria[];
@@ -14,10 +15,16 @@ interface Props {
 }
 
 export const ResponsiveStoreFilters = ({ categorias, marcas }: Props) => {
+
+  const {data} =useSession()
+
   return (
     <>
       {/* Mobile: Button to open sheet */}
       <div className="md:hidden mb-4">
+        <div>
+          
+        </div>
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" className="w-full">
