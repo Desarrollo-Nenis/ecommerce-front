@@ -25,27 +25,37 @@ export default function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setErrorMsg("");
+    setLoading(true);
+
+    if (!email || !password) {
+      setErrorMsg("Por favor, completa todos los campos.");
+      setLoading(false);
+      return;
+    }
 
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: false, // importante, no queremos que redirija automáticamente
+      redirect: false,
     });
 
     if (res?.error) {
-      setErrorMsg("Correo o contraseña incorrectos");
+      if (res.error.toLowerCase().includes("credenciales")) {
+        setErrorMsg("Correo o contraseña incorrectos.");
+      } else {
+        setErrorMsg("Error al iniciar sesión. Intenta de nuevo.");
+      }
+      setLoading(false);
     } else {
-      // Aquí puedes redirigir o mostrar éxito
-      window.location.href = "/"; // O donde quieras
+      window.location.href = "/";
     }
   };
 
-  
   return (
     <Card className="mx-auto max-w-[400px]">
       <CardHeader className="space-y-1">
@@ -54,8 +64,14 @@ export default function LoginForm({
           Ingresa tus credenciales para acceder a tu cuenta
         </CardDescription>
       </CardHeader>
+
       <CardContent className="grid gap-4">
-        {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
+        {errorMsg && (
+          <div className="rounded bg-red-100 p-2 text-sm text-red-600">
+            {errorMsg}
+          </div>
+        )}
+
         <div className="grid gap-2">
           <Label htmlFor="email">Correo electrónico</Label>
           <Input
@@ -66,6 +82,7 @@ export default function LoginForm({
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
+
         <div className="grid gap-2">
           <Label htmlFor="password">Contraseña</Label>
           <div className="relative">
@@ -86,8 +103,20 @@ export default function LoginForm({
           </div>
         </div>
 
-        <Button className="w-full" type="button" onClick={handleLogin}>
-          Iniciar sesión
+        <Button
+          className="w-full"
+          type="button"
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+              Iniciando...
+            </div>
+          ) : (
+            "Iniciar sesión"
+          )}
         </Button>
 
         <div className="relative mt-4">
@@ -104,7 +133,7 @@ export default function LoginForm({
         <Button
           variant="outline"
           type="button"
-          onClick={() => signIn("google")}
+          onClick={() => signIn("google", { redirect: false })}
         >
           <FcGoogle className="mr-2" /> Google
         </Button>
@@ -120,14 +149,12 @@ export default function LoginForm({
               ¿Olvidaste tu contraseña?
             </a>
           </p>
+
           {ECOMMERCE_PRIVADO ? (
-            <div>
-              <p className="mt-2 text-sm">¿No tienes una cuenta? </p>
-              <span
-                // onClick={onSwitchToRegister}
-                className="cursor-pointer font-medium text-primary hover:underline"
-              >
-                Comunicate con soporte
+            <div className="mt-2 text-sm">
+              ¿No tienes una cuenta?{" "}
+              <span className="cursor-pointer font-medium text-primary hover:underline">
+                Comunícate con soporte
               </span>
             </div>
           ) : (

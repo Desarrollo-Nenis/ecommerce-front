@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/form";
 import Alert from "@/components/ui/alertSwal";
 
-import { RegisterFormData, registerFormSchema } from "./register-schema";
+import { RegisterFormData, registerFormSchema, RegisterPartialData } from "./register-schema";
 import { registerUser } from "@/services/auth/auth-services";
 import { AuthProvider } from "@/interfaces/auth/auth-providers.enum";
 
@@ -64,13 +64,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const payload: RegisterFormData = {
+      const payload: RegisterPartialData = {
         email: data.email,
         password: data.password,
         authProvider: AuthProvider.Credentials,
         name: data.name,
         lastName: data.lastName,
-        confirmPassword: "",
       };
 
       const userToken = await registerUser(payload);

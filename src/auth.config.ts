@@ -6,13 +6,20 @@ import { loginUser, registerUser } from "./services/auth/auth-services";
 import { UserToken } from "./interfaces/auth/user.interface";
 import { AuthProvider } from "@/interfaces/auth/auth-providers.enum";
 import { ExtendedJWT, ExtendedUser } from "./next-auth";
-import { LoginPartialData, RegisterPartialData } from "./modules/common/components/auth/register/register-schema";
+import {
+  LoginPartialData,
+  RegisterPartialData,
+} from "./modules/common/components/auth/register/register-schema";
 import { ECOMMERCE_PRIVADO } from "./contants/auth/ecommerce-privado.constant";
 
 const CLIENT_ID = process.env.AUTH_WEBAPP_GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.AUTH_WEBAPP_GOOGLE_CLIENT_SECRET!;
 
 const authConfig: NextAuthConfig = {
+  pages: {
+    error: "/auth/error", // Ruta personalizada
+  },
+
   providers: [
     Google({
       clientId: CLIENT_ID,
@@ -26,7 +33,8 @@ const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) {
-          throw new Error("Correo y contraseña son requeridos");
+          // throw new Error("Correo y contraseña son requeridos");
+          return null;
         }
 
         const loginData: RegisterPartialData = {
@@ -40,14 +48,16 @@ const authConfig: NextAuthConfig = {
           return userToken;
         } catch (error) {
           console.error("Error en login manual:", error);
-          throw new Error("Credenciales inválidas. Comunícate con soporte para obtener tu acceso.");
+          // throw new Error(
+          //   "Credenciales inválidas. Comunícate con soporte para obtener tu acceso."
+          // );
+          return null;
         }
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
-      
       if (!account) return false;
 
       if (account.provider === "google" && user.email) {
@@ -64,9 +74,8 @@ const authConfig: NextAuthConfig = {
           } catch {
             if (ECOMMERCE_PRIVADO) {
               console.error("Registro deshabilitado en modo privado");
-             
-              return false;
 
+              return false;
             }
 
             const registerData: RegisterPartialData = {
@@ -75,7 +84,9 @@ const authConfig: NextAuthConfig = {
               name: user.name || "",
             };
 
-            userToken = await registerUser(registerData);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const newUser = await registerUser(registerData);
+            userToken = await loginUser(registerData);
           }
 
           (user as ExtendedUser).jwt = userToken.jwt;
