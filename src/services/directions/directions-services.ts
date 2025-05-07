@@ -8,7 +8,7 @@ const BASE_ENDPOINT: string = "direccions";
 export function getUserDirections(
   userId: string
 ): Promise<DataResponse<Address[]>> {
-  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}&populate[usuario]=false`;
+  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}&populate=*`;
 
   if (!userId) {
     return Promise.reject(new Error("User documentId is required."));
@@ -22,27 +22,31 @@ export function getUserDirections(
     });
 }
 
-// Crear una nueva dirección
-export function createDirection(data: Address): Promise<Address> {
+export function createDirection(
+  data: Address,
+  userId: number
+): Promise<Address> {
   if (
-    !data ||
     !data.calle ||
     !data.ciudad ||
     !data.estado ||
     !data.codigoPostal ||
     !data.numeroExterior ||
-    !data.numeroInterior ||
-    !data.referencia ||
     !data.nombreRecibe
   ) {
     return Promise.reject(new Error("Todos los campos son requeridos."));
   }
 
-  console.log(data);
+  const { id, createdAt, updatedAt, publishedAt, usuario, ...payload } = data;
+
+  const fullPayload = {
+    ...payload,
+    usuario: userId,
+  };
 
   return query<Address>(`${BASE_ENDPOINT}`, {
     method: "POST",
-    body: JSON.stringify({ data }),
+    body: fullPayload,
   })
     .then((res) => res)
     .catch((error) => {

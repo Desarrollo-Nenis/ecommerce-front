@@ -17,7 +17,6 @@ export function getUser(): Promise<User> {
 
 export function getMeInfo( id: string ): Promise<User> {
   const q = `usuarios/${id}?populate=*`;
-  console.log(q);
   return query<User>(q)
     .then((res: User) => {
       return res;

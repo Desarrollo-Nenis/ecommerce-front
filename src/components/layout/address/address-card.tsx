@@ -53,7 +53,7 @@ export function AddressCard({ address }: AddressCardProps) {
               Establecer como principal
             </Button>
           )}
-          <AddressDialog address={address}>
+          <AddressDialog address={address} userId={address.usuario?.id}>
             <Button className="cursor-pointer" variant="outline" size="sm">
               <Edit className="mr-2 h-3.5 w-3.5" />
               Editar

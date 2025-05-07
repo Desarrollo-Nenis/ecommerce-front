@@ -8,7 +8,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -25,20 +24,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Address } from "@/interfaces/directions/directions.interface";
 import { addressFormSchema, AddressFormValues } from "./address-schema";
 import { DialogTrigger } from "@/components/ui/dialog";
-import { createDirection } from "@/services/directions/directions-services";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  createDirection,
+  updateDirection,
+} from "@/services/directions/directions-services";
+import { showToastAlert } from "@/components/ui/altertas/direccionCreada";
 
 interface AddressDialogProps {
   address?: Address | null;
   children: ReactNode;
+  userId?: number | undefined;
+  onCreate?: (newAddress: Address) => void;
 }
 
-export function AddressDialog({ address, children }: AddressDialogProps) {
+export function AddressDialog({
+  address,
+  children,
+  userId,
+  onCreate
+}: AddressDialogProps) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressFormSchema),
     defaultValues: {
@@ -54,6 +58,8 @@ export function AddressDialog({ address, children }: AddressDialogProps) {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     if (address) {
@@ -83,186 +89,194 @@ export function AddressDialog({ address, children }: AddressDialogProps) {
   }, [form.getValues(), address]);
 
   function onSubmit(values: AddressFormValues) {
-    const now = new Date();
-
+    setLoading(true);
     const newAddress: Address = {
       ...values,
-      createdAt: now,
-      updatedAt: now,
-      publishedAt: now,
     };
 
     if (!address) {
       // Crear nueva dirección
-      createDirection(newAddress)
+      createDirection(newAddress, userId!)
         .then((res) => {
-          console.log("Dirección creada:", res);
-          // Aquí podrías cerrar el diálogo, actualizar lista, etc.
+          setLoading(false)
+          form.reset();
+          showToastAlert({
+            title: "Dirección Creada",
+            text: "La dirección se ah agregado correctamente.",
+            icon: "success",
+            position: "bottom-end",
+            toast: true,
+          });
+          if( onCreate ) {
+            onCreate(res)
+          }
         })
         .catch((err: any) => {
           console.error("Error al crear dirección:", err.message);
         });
-    } else {
-      // Lógica para actualizar (puedes implementar una función updateDirection)
-      const { createdAt, ...payload } = newAddress;
-      console.log("Actualizar dirección:", payload);
-    }
+      } else {
+        const { id, ...payload } = newAddress;
+        setLoading(false)
+        updateDirection(id, payload)
+          .then(() => {
+            showToastAlert({
+              title: "Dirección Actualizada",
+              text: "La dirección se ah actualizado correctamente.",
+              icon: "success",
+              position: "bottom-end",
+              toast: true,
+            });
+          })
+      }
   }
 
   const isFormValid = form.formState.isValid;
-  const isButtonDisabled = !isFormValid || !isEditing;
 
   return (
-    <TooltipProvider>
-      <Dialog>
-        <DialogTrigger>
-          <div>{children}</div>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>
-              {address ? "Editar dirección" : "Agregar nueva dirección"}
-            </DialogTitle>
-            <DialogDescription>
-              Completa los datos de la dirección. Los campos marcados con * son
-              obligatorios.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="nombreRecibe"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre del usuario *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre completo" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="calle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Calle *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre de la calle" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="numeroExterior"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Número exterior *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Número exterior" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="numeroInterior"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Número interior</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Número interior (opcional)"
-                          value={field.value || ""}
-                          onChange={(e) =>
-                            field.onChange(e.target.value || null)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="ciudad"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ciudad *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ciudad" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="estado"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Estado *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Estado" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="codigoPostal"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Código postal *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Código postal" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+    <Dialog>
+      <DialogTrigger>
+        <div>{children}</div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>
+            {address ? "Editar dirección" : "Agregar nueva dirección"}
+          </DialogTitle>
+          <DialogDescription>
+            Completa los datos de la dirección. Los campos marcados con * son
+            obligatorios.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
-                name="referencia"
+                name="nombreRecibe"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Referencias adicionales</FormLabel>
+                    <FormLabel>Nombre quien recibe *</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Detalles para facilitar la entrega (color de casa, puntos de referencia, etc.)"
-                        {...field}
+                      <Input placeholder="Nombre completo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="calle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Calle *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre de la calle" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="numeroExterior"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número exterior *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Número exterior" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="numeroInterior"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número interior</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Número interior (opcional)"
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(e.target.value || null)}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <DialogFooter>
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger>
-                    <Button type="submit" disabled={isButtonDisabled}>
-                      {address ? "Actualizar Dirección" : "Guardar dirección"}
-                    </Button>
-                  </TooltipTrigger>
-                  {isButtonDisabled && (
-                    <TooltipContent>
-                      <span>¡No se han modificado los datos!</span>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </TooltipProvider>
+              <FormField
+                control={form.control}
+                name="ciudad"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ciudad *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ciudad" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="estado"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estado *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Estado" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="codigoPostal"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Código postal *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Código postal" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="referencia"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Referencias adicionales</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Detalles para facilitar la entrega (color de casa, puntos de referencia, etc.)"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="cursor-pointer" disabled={loading}>
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                  {address ? "Actualizando..." : "Guardando..."}
+                </div>
+              ) : address ? (
+                "Actualizar Dirección"
+              ) : (
+                "Guardar dirección"
+              )}
+            </Button>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
