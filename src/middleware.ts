@@ -3,24 +3,24 @@ import { NextResponse } from "next/server";
 
 
 export default middleware(async (req) => {
-  const { nextUrl, auth } = req;
-  const isLoggedIn = auth?.user;
-  const LOGIN = "/auth/login";
-  const LOBBY_ROUTE = "/shop";
-  const isLogin = nextUrl.pathname == LOGIN;
+//   const { nextUrl, auth } = req;
+//   const isLoggedIn = auth?.user;
+//   const LOGIN = "/auth/login";
+//   const LOBBY_ROUTE = "/shop";
+//   const isLogin = nextUrl.pathname == LOGIN;
 
-  console.log("isLoggedIn:", isLoggedIn);
-  console.log("nextUrl.pathname:", nextUrl.pathname);
+//   console.log("isLoggedIn:", isLoggedIn);
+//   console.log("nextUrl.pathname:", nextUrl.pathname);
 
-//   if (nextUrl.pathname == "/") {
-//     console.log("Redirecting to LOBBY_ROUTE from /");
+// //   if (nextUrl.pathname == "/") {
+// //     console.log("Redirecting to LOBBY_ROUTE from /");
+// //     return NextResponse.redirect(new URL(LOBBY_ROUTE, nextUrl));
+// //   }
+
+//   if (isLoggedIn && isLogin) {
+//     console.log("Redirecting to LOBBY_ROUTE from LOGIN");
 //     return NextResponse.redirect(new URL(LOBBY_ROUTE, nextUrl));
 //   }
-
-  if (isLoggedIn && isLogin) {
-    console.log("Redirecting to LOBBY_ROUTE from LOGIN");
-    return NextResponse.redirect(new URL(LOBBY_ROUTE, nextUrl));
-  }
 
   
 });

@@ -2,7 +2,6 @@
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_TOKEN;
 
-console.log(STRAPI_HOST);
 
 export async function query<T>(
   url: string,
