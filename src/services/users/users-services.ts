@@ -1,8 +1,8 @@
-import { DataUser, User } from "@/interfaces/users/users.interace";
+import { User } from "@/interfaces/auth/user.interface";
 import { query } from "@/lib/api/server/strapi";
 
-export function getUser(): Promise<DataUser> {
-  return query<DataUser>("usuarios?populate=*")
+export function getUser(): Promise<User> {
+  return query<User>("usuarios?populate=*")
     .then((res) => {
       return res;
     })
@@ -15,8 +15,9 @@ export function getUser(): Promise<DataUser> {
     });
 }
 
-export function getMeInfo(userId: string): Promise<User> {
-  const q = `usuarios?filters[usuario][documentId][$eq]=${userId}`;
+export function getMeInfo( id: string ): Promise<User> {
+  const q = `usuarios/${id}?populate=*`;
+  console.log(q);
   return query<User>(q)
     .then((res: User) => {
       return res;

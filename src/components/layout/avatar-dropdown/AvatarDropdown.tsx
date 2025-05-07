@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Settings, ShoppingCart, User } from "lucide-react";
 import { signOut } from "next-auth/react";
+import {
+  Heart,
+  LogOut,
+  MapPin,
+  Settings,
+  ShoppingCart,
+  User,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -14,13 +21,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { FRONTEND_ROUTES } from "@/contants/frontend-routes/routes";
 
 interface AvatarDropdownProps {
   avatarUrl?: string | null;
 }
 
-export const AvatarDropdown = ({ avatarUrl }: AvatarDropdownProps) => {
+const menuItems = [
+  {
+    href: `${FRONTEND_ROUTES.PROFILE}`,
+    label: "Perfil",
+    icon: User,
+  },
+  {
+    href: `${FRONTEND_ROUTES.DIRECTIONS}`,
+    label: "Direcciones",
+    icon: MapPin,
+  },
+  {
+    href: `${FRONTEND_ROUTES.FAVORITE}`,
+    label: "Favoritos",
+    icon: Heart,
+  },
+  {
+    href: `${FRONTEND_ROUTES.ORDERS}`,
+    label: "Pedidos",
+    icon: ShoppingCart,
+  },
+  {
+    href: `${FRONTEND_ROUTES.SETTINGS}`,
+    label: "Configuración",
+    icon: Settings,
+  },
+];
 
+export const AvatarDropdown = ({ avatarUrl }: AvatarDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -45,32 +80,18 @@ export const AvatarDropdown = ({ avatarUrl }: AvatarDropdownProps) => {
         <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem asChild>
-          <Link href="/perfil" className="flex w-full items-center gap-2">
-            <User className="w-4 h-4" /> Perfil
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link href="/pedidos" className="flex w-full items-center gap-2">
-            <ShoppingCart className="w-4 h-4" /> Pedidos
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link href="/configuracion" className="flex w-full items-center gap-2">
-            <Settings className="w-4 h-4" /> Configuración
-          </Link>
-        </DropdownMenuItem>
+        {menuItems.map(({ href, label, icon: Icon }) => (
+          <DropdownMenuItem asChild key={href}>
+            <Link href={href} className="flex w-full items-center gap-2">
+              <Icon className="w-4 h-4" />
+              {label}
+            </Link>
+          </DropdownMenuItem>
+        ))}
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => {
-            signOut(); // Redirigir tras cerrar sesión
-          }}
-          className="cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
           <LogOut className="w-4 h-4 mr-2" />
           Cerrar sesión
         </DropdownMenuItem>

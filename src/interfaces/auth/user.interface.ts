@@ -1,3 +1,4 @@
+import { Address } from "../directions/directions.interface";
 import { AuthProvider } from "./auth-providers.enum";
 
 export interface User {
@@ -8,6 +9,7 @@ export interface User {
   email: string | null;
   password: string;
   authProvider:AuthProvider;
+  direccions: Address[];
   rol: string;
   createdAt: Date;
   updatedAt: Date;
