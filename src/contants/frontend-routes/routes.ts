@@ -5,8 +5,11 @@ export const FRONTEND_ROUTES = {
     CATEGORIA: "/categoria",
     MARCA: "/marca",
     DASHBOARD: "/dashboard",
-    PROFILE: "/profile",
-    SETTINGS: "/settings",
+    PROFILE: "/perfil",
+    SETTINGS: "/configuracion",
+    DIRECTIONS: "/direcciones",
+    FAVORITE: "/favoritos",
+    ORDERS: "/pedidos",
     ADMIN: {
       USERS: "/admin/users",
       PRODUCTS: "/admin/products",
