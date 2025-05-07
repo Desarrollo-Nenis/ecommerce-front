@@ -9,7 +9,6 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Address } from "@/interfaces/directions/directions.interface";
-import { useUserStore } from "@/store/user";
 import { AddressDialog } from "./address-dialog";
 
 interface AddressCardProps {
@@ -22,8 +21,8 @@ export function AddressCard({ address }: AddressCardProps) {
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
           <Home className="h-4 w-4 text-muted-foreground" />
-          <h3 className="font-medium">{address.usuario || "Dirección"}</h3>
-          {address.isPrimary && (
+          <h3 className="font-medium">{address.nombreRecibe || "Dirección"}</h3>
+          {address.principal && (
             <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
               Principal
             </span>
@@ -49,10 +48,12 @@ export function AddressCard({ address }: AddressCardProps) {
       </CardContent>
       <CardFooter className="flex justify-end">
         <div className="flex gap-2">
-          <Button className="cursor-pointer" variant="outline" size="sm">
-            Establecer como principal
-          </Button>
-          <AddressDialog>
+          {!address.principal && (
+            <Button className="cursor-pointer" variant="outline" size="sm">
+              Establecer como principal
+            </Button>
+          )}
+          <AddressDialog address={address}>
             <Button className="cursor-pointer" variant="outline" size="sm">
               <Edit className="mr-2 h-3.5 w-3.5" />
               Editar

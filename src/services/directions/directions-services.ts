@@ -8,7 +8,7 @@ const BASE_ENDPOINT: string = "direccions";
 export function getUserDirections(
   userId: string
 ): Promise<DataResponse<Address[]>> {
-  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}populate[usuario]=false`;
+  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}&populate[usuario]=false`;
 
   if (!userId) {
     return Promise.reject(new Error("User documentId is required."));
@@ -33,10 +33,12 @@ export function createDirection(data: Address): Promise<Address> {
     !data.numeroExterior ||
     !data.numeroInterior ||
     !data.referencia ||
-    !data.usuario
+    !data.nombreRecibe
   ) {
-    return Promise.reject(new Error("All required fields must be provided."));
+    return Promise.reject(new Error("Todos los campos son requeridos."));
   }
+
+  console.log(data);
 
   return query<Address>(`${BASE_ENDPOINT}`, {
     method: "POST",
@@ -50,21 +52,18 @@ export function createDirection(data: Address): Promise<Address> {
 }
 
 // Actualizar una dirección existente
-export function updateDirection(
-  directionId: number,
-  data: Address
-): Promise<Address> {
-  if (!directionId || !data) {
+export function updateDirection(id: number, data: Address): Promise<Address> {
+  if (!id || !data) {
     return Promise.reject(new Error("Direction ID and data are required."));
   }
 
-  return query<Address>(`${BASE_ENDPOINT}/${directionId}`, {
+  return query<Address>(`${BASE_ENDPOINT}/${id}`, {
     method: "PUT",
     body: JSON.stringify({ data }),
   })
     .then((res: Address) => res)
     .catch((error) => {
-      console.error(`Error updating direction with ID ${directionId}:`, error);
+      console.error(`Error updating direction with ID ${id}:`, error);
       throw new Error("Failed to update the direction.");
     });
 }
@@ -88,5 +87,4 @@ export function deleteDirection(
       console.error(`Error deleting direction with ID ${directionId}:`, error);
       throw new Error("Failed to delete the direction.");
     });
-    
 }
