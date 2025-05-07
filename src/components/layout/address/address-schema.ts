@@ -1,21 +1,25 @@
 import * as z from "zod";
 
 export const addressFormSchema = z.object({
-  id: z.number().optional(),
-  documentId: z.string().optional(),
   calle: z.string().min(1, "La calle es requerida"),
   ciudad: z.string().min(1, "La ciudad es requerida"),
   estado: z.string().min(1, "El estado es requerido"),
   codigoPostal: z
     .string()
-    .min(5, "El código postal debe tener al menos 5 dígitos"),
-  numeroExterior: z.string().min(1, "El número exterior es requerido"),
-  numeroInterior: z.string().nullable(),
+    .min(5, "El código postal debe tener al menos 5 dígitos")
+    .max(5, "El código postal debe tener máximo 5 dígitos")
+    .regex(/^\d+$/, "El código postal debe ser un número"),
+  numeroExterior: z
+    .string()
+    .min(1, "El número exterior es requerido")
+    .regex(/^\d+$/, "El número exterior debe ser un número"),
+  numeroInterior: z
+    .string()
+    .regex(/^\d*$/, "El número interior debe ser un número")
+    .nullable()
+    .optional(),
   referencia: z.string().optional(),
-  usuario: z.string().min(1, "El nombre del usuario es requerido"),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
-  publishedAt: z.date().optional(),
+  nombreRecibe: z.string().min(1, "El nombre del quien recibe es requerido"),
 });
 
 export type AddressFormValues = z.infer<typeof addressFormSchema>;

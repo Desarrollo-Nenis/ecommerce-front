@@ -62,7 +62,7 @@ export const AvatarDropdown = ({ avatarUrl }: AvatarDropdownProps) => {
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full hidden md:flex justify-center items-center"
+          className="cursor-pointer rounded-full hidden md:flex justify-center items-center"
         >
           <Avatar>
             <AvatarImage

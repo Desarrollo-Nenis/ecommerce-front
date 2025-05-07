@@ -11,27 +11,13 @@ export interface Address {
     numeroExterior: string;
     numeroInterior: string | null;
     referencia: string | null;
-    usuario?: string;
+    nombreRecibe: string;
     // Campos adicionales que pueden no venir de la API pero son necesarios para la interfaz
     userId?: string | number;
-    isPrimary?: boolean;
-  }
-  
-  export interface User {
-    id: number | string;
-    documentId: string;
-    createdAt: string | Date;
-    updatedAt: string | Date;
-    publishedAt: string | Date;
-    name: string | null;
-    lastName: string | null;
-    role: string;
-    email: string;
-    authProvider: string;
-    direccions: Address[];
+    principal?: boolean;
   }
   
   export interface ApiResponse {
-    data: User;
+    data: Address;
     meta: Record<string, any>;
   }
