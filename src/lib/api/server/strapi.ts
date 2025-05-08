@@ -16,7 +16,7 @@ export async function query<T>(
         "Content-Type": "application/json",
         Authorization: `Bearer ${STRAPI_TOKEN}`,
       },
-      body: body ? JSON.stringify({data: body}) : undefined, // Solo se incluye el cuerpo si existe
+      body: body ? JSON.stringify(body) : undefined, // Solo se incluye el cuerpo si existe
     });
 
     if (!response.ok) {

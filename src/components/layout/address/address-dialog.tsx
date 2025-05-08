@@ -28,20 +28,19 @@ import {
   createDirection,
   updateDirection,
 } from "@/services/directions/directions-services";
-import { showToastAlert } from "@/components/ui/altertas/direccionCreada";
+import { showToastAlert } from "@/components/ui/altertas/toast";
+import { useRouter } from "next/navigation";
 
 interface AddressDialogProps {
   address?: Address | null;
   children: ReactNode;
-  userId?: number | undefined;
-  onCreate?: (newAddress: Address) => void;
+  userId?: string | undefined;
 }
 
 export function AddressDialog({
   address,
   children,
   userId,
-  onCreate
 }: AddressDialogProps) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressFormSchema),
@@ -59,6 +58,7 @@ export function AddressDialog({
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
 
   useEffect(() => {
@@ -107,9 +107,7 @@ export function AddressDialog({
             position: "bottom-end",
             toast: true,
           });
-          if( onCreate ) {
-            onCreate(res)
-          }
+          router.refresh();
         })
         .catch((err: any) => {
           console.error("Error al crear dirección:", err.message);
@@ -117,7 +115,7 @@ export function AddressDialog({
       } else {
         const { id, ...payload } = newAddress;
         setLoading(false)
-        updateDirection(id, payload)
+        updateDirection(address.documentId!, payload)
           .then(() => {
             showToastAlert({
               title: "Dirección Actualizada",
@@ -126,6 +124,7 @@ export function AddressDialog({
               position: "bottom-end",
               toast: true,
             });
+            router.refresh();
           })
       }
   }

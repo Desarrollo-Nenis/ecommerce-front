@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import AddressGrid from "@/components/layout/address/address-grid";
 import { getUserDirections } from "@/services/directions/directions-services";
+import { ModalAuth } from "@/modules/common/components/auth/modalAuth";
 
 export default async function Home() {
 
@@ -8,7 +9,7 @@ export default async function Home() {
   if( !session?.user?.user.documentId ){
     return (
       <div>
-        no
+        <ModalAuth></ModalAuth>
       </div>
     )
   }

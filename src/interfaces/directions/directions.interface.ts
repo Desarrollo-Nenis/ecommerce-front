@@ -15,8 +15,13 @@ export interface Address {
     referencia: string | null;
     nombreRecibe: string;
     principal?: boolean;
-    usuario: User
+    usuario?: User
   }
+
+  export interface Principal {
+  mensaje:   string;
+  direccion: Address;
+}
   
   export interface ApiResponse {
     data: Address;

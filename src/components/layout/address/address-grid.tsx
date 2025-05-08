@@ -14,17 +14,14 @@ interface AddressGridProps {
 }
 
 export default function AddressGrid({ address, session }: AddressGridProps) {
-  const [addresses, setAddresses] = useState<Address[]>(address);
+  const [addresses] = useState<Address[]>(address);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Mis direcciones</h1>
         <AddressDialog
-          userId={session.user?.user.id}
-          onCreate={(newAddress) =>
-            setAddresses((prev) => [...prev, newAddress])
-          }
+          userId={session.user?.user.documentId}
         >
           <Button className="flex items-center gap-2 cursor-pointer">
             <PlusCircle className="h-4 w-4" />
@@ -39,10 +36,7 @@ export default function AddressGrid({ address, session }: AddressGridProps) {
             No tienes direcciones guardadas
           </p>
           <AddressDialog 
-            userId={session.user?.user.id}
-            onCreate={(newAddress) =>
-              setAddresses( (prev) => [...prev, newAddress])
-            }  
+            userId={session.user?.user.documentId}
           >
             <Button variant="link" className="mt-2 cursor-pointer">
               Agregar una dirección

@@ -1,5 +1,8 @@
 import { DataResponse } from "@/interfaces/data/response.interface";
-import { Address } from "@/interfaces/directions/directions.interface";
+import {
+  Address,
+  Principal,
+} from "@/interfaces/directions/directions.interface";
 import { query } from "@/lib/api/server/strapi";
 
 const BASE_ENDPOINT: string = "direccions";
@@ -46,7 +49,7 @@ export function createDirection(
 
   return query<Address>(`${BASE_ENDPOINT}`, {
     method: "POST",
-    body: fullPayload,
+    body: {data: fullPayload},
   })
     .then((res) => res)
     .catch((error) => {
@@ -56,14 +59,14 @@ export function createDirection(
 }
 
 // Actualizar una dirección existente
-export function updateDirection(id: number, data: Address): Promise<Address> {
+export function updateDirection(id: string, data: Address): Promise<Address> {
   if (!id || !data) {
     return Promise.reject(new Error("Direction ID and data are required."));
   }
 
   return query<Address>(`${BASE_ENDPOINT}/${id}`, {
     method: "PUT",
-    body: JSON.stringify({ data }),
+    body: data,
   })
     .then((res: Address) => res)
     .catch((error) => {
@@ -90,5 +93,24 @@ export function deleteDirection(
     .catch((error) => {
       console.error(`Error deleting direction with ID ${directionId}:`, error);
       throw new Error("Failed to delete the direction.");
+    });
+}
+
+export function setPrincipal(
+  documentId: string,
+  usuario: string
+): Promise<Principal> {
+  if (!documentId) {
+    return Promise.reject(new Error("Direction ID is required."));
+  }
+
+  const payload = { documentId, usuario };
+  return query<Principal>(`${BASE_ENDPOINT}/principal`, {
+    method: "POST",
+    body: payload,
+  })
+    .then((res: Principal) => res)
+    .catch((error) => {
+      throw new Error(`Falló en el servidor: ${error}`);
     });
 }
