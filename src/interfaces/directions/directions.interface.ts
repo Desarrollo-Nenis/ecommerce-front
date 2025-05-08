@@ -1,21 +1,27 @@
+import { User } from "../auth/user.interface";
+
 export interface Address {
     id: number;
-    documentId: string;
+    documentId?: string;
     calle: string;
     ciudad: string;
     estado: string;
     codigoPostal: string;
-    createdAt: Date | string;
-    updatedAt: Date | string;
-    publishedAt: Date | string;
+    createdAt?: string;
+    updatedAt?: string;
+    publishedAt?: string;
     numeroExterior: string;
     numeroInterior: string | null;
     referencia: string | null;
     nombreRecibe: string;
-    // Campos adicionales que pueden no venir de la API pero son necesarios para la interfaz
-    userId?: string | number;
     principal?: boolean;
+    usuario?: User
   }
+
+  export interface Principal {
+  mensaje:   string;
+  direccion: Address;
+}
   
   export interface ApiResponse {
     data: Address;

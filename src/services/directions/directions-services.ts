@@ -1,5 +1,8 @@
 import { DataResponse } from "@/interfaces/data/response.interface";
-import { Address } from "@/interfaces/directions/directions.interface";
+import {
+  Address,
+  Principal,
+} from "@/interfaces/directions/directions.interface";
 import { query } from "@/lib/api/server/strapi";
 
 const BASE_ENDPOINT: string = "direccions";
@@ -8,7 +11,7 @@ const BASE_ENDPOINT: string = "direccions";
 export function getUserDirections(
   userId: string
 ): Promise<DataResponse<Address[]>> {
-  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}&populate[usuario]=false`;
+  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}&populate=*`;
 
   if (!userId) {
     return Promise.reject(new Error("User documentId is required."));
@@ -22,27 +25,31 @@ export function getUserDirections(
     });
 }
 
-// Crear una nueva dirección
-export function createDirection(data: Address): Promise<Address> {
+export function createDirection(
+  data: Address,
+  userId: number
+): Promise<Address> {
   if (
-    !data ||
     !data.calle ||
     !data.ciudad ||
     !data.estado ||
     !data.codigoPostal ||
     !data.numeroExterior ||
-    !data.numeroInterior ||
-    !data.referencia ||
     !data.nombreRecibe
   ) {
     return Promise.reject(new Error("Todos los campos son requeridos."));
   }
 
-  console.log(data);
+  const { id, createdAt, updatedAt, publishedAt, usuario, ...payload } = data;
+
+  const fullPayload = {
+    ...payload,
+    usuario: userId,
+  };
 
   return query<Address>(`${BASE_ENDPOINT}`, {
     method: "POST",
-    body: JSON.stringify({ data }),
+    body: {data: fullPayload},
   })
     .then((res) => res)
     .catch((error) => {
@@ -52,14 +59,14 @@ export function createDirection(data: Address): Promise<Address> {
 }
 
 // Actualizar una dirección existente
-export function updateDirection(id: number, data: Address): Promise<Address> {
+export function updateDirection(id: string, data: Address): Promise<Address> {
   if (!id || !data) {
     return Promise.reject(new Error("Direction ID and data are required."));
   }
 
   return query<Address>(`${BASE_ENDPOINT}/${id}`, {
     method: "PUT",
-    body: JSON.stringify({ data }),
+    body: data,
   })
     .then((res: Address) => res)
     .catch((error) => {
@@ -86,5 +93,24 @@ export function deleteDirection(
     .catch((error) => {
       console.error(`Error deleting direction with ID ${directionId}:`, error);
       throw new Error("Failed to delete the direction.");
+    });
+}
+
+export function setPrincipal(
+  documentId: string,
+  usuario: string
+): Promise<Principal> {
+  if (!documentId) {
+    return Promise.reject(new Error("Direction ID is required."));
+  }
+
+  const payload = { documentId, usuario };
+  return query<Principal>(`${BASE_ENDPOINT}/principal`, {
+    method: "POST",
+    body: payload,
+  })
+    .then((res: Principal) => res)
+    .catch((error) => {
+      throw new Error(`Falló en el servidor: ${error}`);
     });
 }
