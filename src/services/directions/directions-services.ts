@@ -11,7 +11,7 @@ const BASE_ENDPOINT: string = "direccions";
 export function getUserDirections(
   userId: string
 ): Promise<DataResponse<Address[]>> {
-  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}&populate=*`;
+  const queryDireccions: string = `${BASE_ENDPOINT}?filters[usuario][documentId][$eq]=${userId}&filters[activo][$eq]=true&sort=createdAt:desc&populate=*`;
 
   if (!userId) {
     return Promise.reject(new Error("User documentId is required."));
@@ -27,7 +27,7 @@ export function getUserDirections(
 
 export function createDirection(
   data: Address,
-  userId: number
+  userId: string
 ): Promise<Address> {
   if (
     !data.calle ||
@@ -49,7 +49,7 @@ export function createDirection(
 
   return query<Address>(`${BASE_ENDPOINT}`, {
     method: "POST",
-    body: {data: fullPayload},
+    body: { data: fullPayload },
   })
     .then((res) => res)
     .catch((error) => {
@@ -58,7 +58,6 @@ export function createDirection(
     });
 }
 
-// Actualizar una dirección existente
 export function updateDirection(id: string, data: Address): Promise<Address> {
   if (!id || !data) {
     return Promise.reject(new Error("Direction ID and data are required."));
@@ -66,32 +65,31 @@ export function updateDirection(id: string, data: Address): Promise<Address> {
 
   return query<Address>(`${BASE_ENDPOINT}/${id}`, {
     method: "PUT",
-    body: data,
+    body: { data },
   })
-    .then((res: Address) => res)
-    .catch((error) => {
-      console.error(`Error updating direction with ID ${id}:`, error);
-      throw new Error("Failed to update the direction.");
-    });
+  .then((res: Address) => res)
+  .catch((error) => {
+    console.error(`Error updating direction with ID ${id}:`, error);
+    throw new Error("Failed to update the direction.");
+  });
 }
 
-// Eliminar una dirección por su ID
-export function deleteDirection(
-  directionId: number
-): Promise<DataResponse<Address>> {
-  if (!directionId) {
+export function deleteDirection(documentId: string): Promise<Address> {
+  if (!documentId) {
     return Promise.reject(new Error("Direction ID is required."));
   }
 
-  return query<DataResponse<DataResponse<Address>>>(
-    `${BASE_ENDPOINT}/${directionId}`,
-    {
-      method: "DELETE",
-    }
-  )
-    .then((res) => res.data)
+  return query<Address>(`${BASE_ENDPOINT}/eliminar`, {
+    method: "PUT",
+    body: {
+      data: {
+        documentId,
+      },
+    },
+  })
+    .then((res) => res)
     .catch((error) => {
-      console.error(`Error deleting direction with ID ${directionId}:`, error);
+      console.error(`Error deleting direction with ID ${documentId}:`, error);
       throw new Error("Failed to delete the direction.");
     });
 }

@@ -26,6 +26,6 @@ export function showToastAlert({
     timer,
     toast: toast,
     position,
-    showConfirmButton: true,
+    showConfirmButton: false,
   })
 }

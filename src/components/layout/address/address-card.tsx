@@ -8,24 +8,29 @@ import {
 } from "@/components/ui/card";
 import { Address } from "@/interfaces/directions/directions.interface";
 import { AddressDialog } from "./address-dialog";
-import { setPrincipal } from "@/services/directions/directions-services";
+import {
+  deleteDirection,
+  setPrincipal,
+} from "@/services/directions/directions-services";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { showToastAlert } from "@/components/ui/altertas/toast";
+import Swal from "sweetalert2";
 
 interface AddressCardProps {
   address: Address;
+  onRefreshCards?: () => void;
+  onAddressDefault?: () => void;
 }
 
-export function AddressCard({ address }: AddressCardProps) {
+export function AddressCard({ address, onRefreshCards, onAddressDefault }: AddressCardProps) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const handleSetPrincipal = () => {
     if (address.id && address.usuario?.id) {
       setLoading(true);
       setPrincipal(address.documentId!, address.usuario.documentId)
-        .then((res) => {
+        .then(() => {
           showToastAlert({
             title: "Dirección Principal",
             text: "Dirección establecida como principal correctamente.",
@@ -33,20 +38,54 @@ export function AddressCard({ address }: AddressCardProps) {
             position: "bottom-end",
             toast: true,
           });
-          window.location.reload();
+          onAddressDefault?.();
         })
         .catch((error) => {
-          console.error(
-            "Error al establecer la dirección como principal:",
-            error
-          );
+          console.error("Error al establecer como principal:", error);
         })
         .finally(() => {
           setLoading(false);
         });
-    } else {
-      console.error("ID de dirección o usuario no encontrado.");
     }
+  };
+
+  const handleDelete = () => {
+    if (!address.documentId) return;
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará la dirección. ¿Deseas continuar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setLoadingDelete(true);
+        deleteDirection(address.documentId!)
+          .then(() => {
+            showToastAlert({
+              title: "Dirección eliminada",
+              text: "La dirección se ha eliminado correctamente.",
+              icon: "success",
+              position: "bottom-end",
+              toast: true,
+            });
+            onRefreshCards?.();
+          })
+          .catch((error) => {
+            console.error("Error al eliminar dirección:", error);
+            showToastAlert({
+              title: "Error",
+              text: "No se pudo eliminar la dirección.",
+              icon: "error",
+              position: "bottom-end",
+              toast: true,
+            });
+          })
+          .finally(() => setLoadingDelete(false));
+      }
+    });
   };
 
   return (
@@ -89,7 +128,7 @@ export function AddressCard({ address }: AddressCardProps) {
         <div className="flex flex-wrap gap-2">
           {!address.principal && (
             <Button
-              onClick={handleSetPrincipal} // Llamar a la función con los parámetros
+              onClick={handleSetPrincipal}
               className="cursor-pointer"
               variant="outline"
               size="sm"
@@ -104,15 +143,28 @@ export function AddressCard({ address }: AddressCardProps) {
               )}
             </Button>
           )}
-          <AddressDialog address={address} userId={address.usuario?.documentId}>
+          <AddressDialog address={address} userId={address.usuario?.documentId} onRefreshCard={onRefreshCards}>
             <Button className="cursor-pointer" variant="outline" size="sm">
               <Edit className="mr-2 h-3.5 w-3.5" />
               Editar
             </Button>
           </AddressDialog>
-          <Button className="cursor-pointer" variant="outline" size="sm">
+          <Button
+            onClick={handleDelete}
+            className="cursor-pointer"
+            variant="outline"
+            size="sm"
+            disabled={loadingDelete}
+          >
             <Trash2 className="mr-2 h-3.5 w-3.5" />
-            Eliminar
+            {loadingDelete ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                Eliminando...
+              </div>
+            ) : (
+              "Eliminar"
+            )}
           </Button>
         </div>
       </CardFooter>

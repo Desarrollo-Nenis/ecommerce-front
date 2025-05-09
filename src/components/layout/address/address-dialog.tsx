@@ -35,12 +35,14 @@ interface AddressDialogProps {
   address?: Address | null;
   children: ReactNode;
   userId?: string | undefined;
+  onRefreshCard?: () => void;
 }
 
 export function AddressDialog({
   address,
   children,
   userId,
+  onRefreshCard,
 }: AddressDialogProps) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressFormSchema),
@@ -59,7 +61,6 @@ export function AddressDialog({
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
 
   useEffect(() => {
     if (address) {
@@ -98,7 +99,7 @@ export function AddressDialog({
       // Crear nueva dirección
       createDirection(newAddress, userId!)
         .then((res) => {
-          setLoading(false)
+          setLoading(false);
           form.reset();
           showToastAlert({
             title: "Dirección Creada",
@@ -107,35 +108,32 @@ export function AddressDialog({
             position: "bottom-end",
             toast: true,
           });
-          router.refresh();
+          onRefreshCard();
         })
         .catch((err: any) => {
           console.error("Error al crear dirección:", err.message);
         });
-      } else {
-        const { id, ...payload } = newAddress;
-        setLoading(false)
-        updateDirection(address.documentId!, payload)
-          .then(() => {
-            showToastAlert({
-              title: "Dirección Actualizada",
-              text: "La dirección se ah actualizado correctamente.",
-              icon: "success",
-              position: "bottom-end",
-              toast: true,
-            });
-            router.refresh();
-          })
-      }
+    } else {
+      const { id, updatedAt, createdAt, publishedAt, ...payload } = newAddress;
+      setLoading(false);
+      updateDirection(address.documentId!, payload).then(() => {
+        showToastAlert({
+          title: "Dirección Actualizada",
+          text: "La dirección se ah actualizado correctamente.",
+          icon: "success",
+          position: "bottom-end",
+          toast: true,
+        });
+        onRefreshCard();
+      });
+    }
   }
 
   const isFormValid = form.formState.isValid;
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <div>{children}</div>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>

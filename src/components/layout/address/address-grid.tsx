@@ -7,6 +7,7 @@ import { AddressCard } from "./address-card";
 import { AddressDialog } from "./address-dialog";
 import { Address } from "@/interfaces/directions/directions.interface";
 import { Session } from "next-auth";
+import { getUserDirections } from "@/services/directions/directions-services";
 
 interface AddressGridProps {
   address: Address[];
@@ -14,15 +15,30 @@ interface AddressGridProps {
 }
 
 export default function AddressGrid({ address, session }: AddressGridProps) {
-  const [addresses] = useState<Address[]>(address);
+  const [addresses, setAddresses] = useState<Address[]>(address);
+
+  const fetchAddresses = async () => {
+    try {
+      const res = await getUserDirections(session.user?.user.documentId!);
+      setAddresses(res.data);
+    } catch (error) {
+      console.error("Error actualizando direcciones:", error);
+    }
+  };
+
+  const handleSetPrincipal = (id: string) => {
+    const updated = addresses.map((addr) => ({
+      ...addr,
+      principal: addr.documentId === id, // solo esta será principal
+    }));
+    setAddresses(updated);
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Mis direcciones</h1>
-        <AddressDialog
-          userId={session.user?.user.documentId}
-        >
+        <AddressDialog userId={session.user?.user.documentId} onRefreshCard={fetchAddresses}>
           <Button className="flex items-center gap-2 cursor-pointer">
             <PlusCircle className="h-4 w-4" />
             Agregar nueva dirección
@@ -35,9 +51,7 @@ export default function AddressGrid({ address, session }: AddressGridProps) {
           <p className="text-muted-foreground">
             No tienes direcciones guardadas
           </p>
-          <AddressDialog 
-            userId={session.user?.user.documentId}
-          >
+          <AddressDialog userId={session.user?.user.documentId} onRefreshCard={fetchAddresses}>
             <Button variant="link" className="mt-2 cursor-pointer">
               Agregar una dirección
             </Button>
@@ -46,7 +60,12 @@ export default function AddressGrid({ address, session }: AddressGridProps) {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {addresses.map((address) => (
-            <AddressCard key={address.id} address={address} />
+            <AddressCard
+              key={address.id}
+              address={address}
+              onRefreshCards={fetchAddresses}
+              onAddressDefault={() => handleSetPrincipal(address.documentId!)}
+            />
           ))}
         </div>
       )}
