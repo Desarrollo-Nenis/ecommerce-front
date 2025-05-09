@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AddressCard } from "./address-card";
-import { AddressDialog } from "./address-dialog";
+import { AddressDialog } from "./form/address-dialog";
 import { Address } from "@/interfaces/directions/directions.interface";
 import { Session } from "next-auth";
 import { getUserDirections } from "@/services/directions/directions-services";
