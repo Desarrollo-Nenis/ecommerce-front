@@ -6,7 +6,7 @@ export interface Categoria {
     nombre: string;
     img?: Img;
     principal?: Categoria;
-    subcategorias: Categoria[];
+    subcategorias?: Categoria[];
     descuento?: Descuento;
     slug: string;
   }

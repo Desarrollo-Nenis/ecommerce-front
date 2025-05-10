@@ -32,7 +32,7 @@ export enum ProductType {
 
 
 export interface Inventario {
-  stock: string;
+  stock: number;
   precioCompra: number;
   precioVenta: number;
 }
