@@ -1,3 +1,4 @@
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 import { DataResponse } from "@/interfaces/data/response.interface";
 import {
   Address,
@@ -5,7 +6,7 @@ import {
 } from "@/interfaces/directions/directions.interface";
 import { query } from "@/lib/api/server/strapi";
 
-const BASE_ENDPOINT: string = "direccions";
+const BASE_ENDPOINT: string = BACKEND_ROUTES.ADDRESS;
 
 // Obtener direcciones de un usuario específico
 export function getUserDirections(

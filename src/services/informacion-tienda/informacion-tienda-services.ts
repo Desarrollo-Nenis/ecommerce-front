@@ -1,8 +1,9 @@
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 import { DataResponse } from "@/interfaces/data/response.interface";
 import { InformacionTienda } from "@/interfaces/informacion-tienda/informacion-tienda";
 import { query } from "@/lib/api/server/strapi";
 
-const BASE_ENDPOINT: string = "informacion-tienda";
+const BASE_ENDPOINT: string = BACKEND_ROUTES.INFORMATION_ECOMMERCE;
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 
 export function getInformacionTienda(): Promise<

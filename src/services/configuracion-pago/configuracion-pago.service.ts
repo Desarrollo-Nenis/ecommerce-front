@@ -2,8 +2,9 @@ import { ConfiguracionPago, ConfiguracionPagoStrapi } from "@/interfaces/configu
 import { DataResponse } from "@/interfaces/data/response.interface"
 import { query } from "@/lib/api/server/strapi"
 import { CANTIDAD_MIN_ENVIO_GRATIS, COSTO_ENVIO, PORCENTAJE_IMPUESTOS } from "@/contants/precio-taxes-envio.constant";
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 
-const BASE_ENDPOINT = "configuracion-pago"
+const BASE_ENDPOINT = BACKEND_ROUTES.PAYMENTS_CONFIGURATION;
 
 const ENV_DEFAULTS: ConfiguracionPago = {
     

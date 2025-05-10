@@ -1,8 +1,11 @@
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 import { User } from "@/interfaces/auth/user.interface";
 import { query } from "@/lib/api/server/strapi";
 
+const BASE_ENDPOINT = BACKEND_ROUTES.USERS;
+
 export function getUser(): Promise<User> {
-  return query<User>("usuarios?populate=*")
+  return query<User>(`${BASE_ENDPOINT}?populate=*`)
     .then((res) => {
       return res;
     })
@@ -16,7 +19,7 @@ export function getUser(): Promise<User> {
 }
 
 export function getMeInfo( id: string ): Promise<User> {
-  const q = `usuarios/${id}?populate=*`;
+  const q = `${BASE_ENDPOINT}/${id}?populate=*`;
   return query<User>(q)
     .then((res: User) => {
       return res;

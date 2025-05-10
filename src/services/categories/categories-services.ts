@@ -1,11 +1,12 @@
 
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 import { Categoria, SubCategoria } from "@/interfaces/categories/categories.interface";
 import { DataResponse } from "@/interfaces/data/response.interface";
 import { query } from "@/lib/api/server/strapi";
 import { formatStrapiImageUrl } from "@/lib/FormatUrlImgStrapi";
 
 
-const BASE_ENDPOINT: string = "categorias" 
+const BASE_ENDPOINT: string = BACKEND_ROUTES.CATEGORIES; 
 
 
 type CategoryFilters = {

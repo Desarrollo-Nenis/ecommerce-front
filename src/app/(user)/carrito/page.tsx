@@ -15,11 +15,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CartItem, useCartStore } from "@/store/products-cart.store";
 import { ChevronLeft, ChevronRight, Minus, Plus, Trash2 } from "lucide-react";
-import { CheckoutStepper } from "./checkout-stepper";
-import { AddressForm } from "./address-form";
-import { PaymentForm } from "./payment-form";
+import { CheckoutStepper } from "../../../components/layout/cart/checkout-stepper";
+import { PaymentForm } from "../../../components/layout/cart/payment-form";
 import { getPrecioConDescuento } from "@/lib/price-descuento";
 import { useConfigStore } from "@/store/config-pago.store";
+import { AddressStep } from "@/components/layout/cart/address-step";
 
 export default function CartPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -198,7 +198,7 @@ export default function CartPage() {
                 <CardTitle>Dirección de envío</CardTitle>
               </CardHeader>
               <CardContent>
-                <AddressForm />
+                <AddressStep />
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button variant="outline" onClick={prevStep}>

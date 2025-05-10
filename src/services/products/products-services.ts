@@ -1,10 +1,11 @@
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 import { DataResponse } from "@/interfaces/data/response.interface";
 import { Products } from "@/interfaces/products/products.interface";
 import { query } from "@/lib/api/server/strapi";
 import { formatStrapiImageUrl } from "@/lib/FormatUrlImgStrapi";
 
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
-const BASE_ENDPOINT: string = "productos";
+const BASE_ENDPOINT: string = BACKEND_ROUTES.PRODUCTS;
 
 //? ====================** FUNCION PARA MAPEAR PRODUCTOS CON IMÁGENES **====================
 function mapProductsWithImages(products: Products[]): Products[] {

@@ -1,7 +1,8 @@
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 import { query } from "@/lib/api/server/strapi";
 
 
-const BASE_ENDPOINT = "inventarios";
+const BASE_ENDPOINT = BACKEND_ROUTES.INVENTORY;
 
 export const getInventarios = async (): Promise<any> => {
   try {

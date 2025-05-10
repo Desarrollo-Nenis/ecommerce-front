@@ -1,8 +1,9 @@
+import { BACKEND_ROUTES } from "@/contants/backend-routes/routes";
 import { DataResponse } from "@/interfaces/data/response.interface";
 import { Marca } from "@/interfaces/marcas/marca.interface";
 import { query } from "@/lib/api/server/strapi";
 
-const BASE_ENDPOINT: string = "marcas";
+const BASE_ENDPOINT: string = BACKEND_ROUTES.BRANCH;
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 
 type MarcaFilters = {
