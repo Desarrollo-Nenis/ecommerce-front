@@ -253,6 +253,7 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold">{product.nombre}</h1>
+              <Badge variant={"outline"}>{product.marca?.nombre}</Badge>
 
               <div className="flex flex-wrap gap-2 mt-2">
                 {product.categorias
@@ -394,6 +395,12 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
                       </div>
                       <div className="text-sm">
                         {product.categorias.map((cat) => cat.nombre).join(", ")}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Marca:
+                      </div>
+                      <div className="text-sm">
+                        {product.marca?.nombre}
                       </div>
 
                       <div className="text-sm text-muted-foreground">
