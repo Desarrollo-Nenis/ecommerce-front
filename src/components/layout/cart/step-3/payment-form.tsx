@@ -31,7 +31,7 @@ const formSchema = z.object({
   paymentMethod: z.enum(["credit", "debit"]),
 })
 
-export function PaymentForm() {
+export function PaymentStep() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
