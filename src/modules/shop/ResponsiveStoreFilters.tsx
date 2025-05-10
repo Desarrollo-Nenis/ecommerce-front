@@ -1,30 +1,39 @@
 "use client";
 
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { StoreFilters } from "./StoreFilters"; // mismo archivo que ya tienes
 import { Categoria } from "@/interfaces/categories/categories.interface";
 import { Marca } from "@/interfaces/marcas/marca.interface";
 import { Card } from "@/components/ui/card";
-import { useSession } from "next-auth/react";
+import { ProductFilters } from "@/services/products/products-services";
 
 interface Props {
   categorias: Categoria[];
   marcas: Marca[];
+  selectedFilters?: ProductFilters;
+  marcaBase?: string;
+  categoriaBase?: string;
 }
 
-export const ResponsiveStoreFilters = ({ categorias, marcas }: Props) => {
-
-  const {data} =useSession()
-
+export const ResponsiveStoreFilters = ({
+  categorias,
+  marcas,
+  marcaBase,
+  categoriaBase,
+  selectedFilters,
+}: Props) => {
   return (
     <>
       {/* Mobile: Button to open sheet */}
       <div className="md:hidden mb-4">
-        <div>
-          
-        </div>
+        <div></div>
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" className="w-full">
@@ -34,14 +43,26 @@ export const ResponsiveStoreFilters = ({ categorias, marcas }: Props) => {
           </SheetTrigger>
           <SheetContent side="left" className="overflow-y-auto max-h-screen">
             <SheetTitle></SheetTitle>
-            <StoreFilters categorias={categorias} marcas={marcas} />
+            <StoreFilters
+              marcaBase={marcaBase}
+              categoriaBase={categoriaBase}
+              categorias={categorias}
+              marcas={marcas}
+              selectedFilters={selectedFilters}
+            />
           </SheetContent>
         </Sheet>
       </div>
 
       {/* Desktop: Show filters as static card */}
       <Card className="hidden md:block">
-        <StoreFilters categorias={categorias} marcas={marcas} />
+        <StoreFilters
+          marcaBase={marcaBase}
+          categoriaBase={categoriaBase}
+          categorias={categorias}
+          marcas={marcas}
+          selectedFilters={selectedFilters}
+        />
       </Card>
     </>
   );
