@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import RegisterForm from "./register/registerForm"
 import LoginForm from "./login/LoginForm"
+import RegisterForm from "./register/registerForm"
 
 export const ModalAuth = () => {
   const [showRegister, setShowRegister] = useState(false)

@@ -1,16 +1,29 @@
-export interface Directions {
-    id:             number;
-    documentId:     string;
-    calle:          string;
-    ciudad:         string;
-    estado:         string;
-    codigoPostal:   string;
-    createdAt:      Date;
-    updatedAt:      Date;
-    publishedAt:    Date;
-    numeroExterior: string;
-    numeroInterior: null;
-    referencia:     string;
-    usuario:        string;
-}
+import { User } from "../auth/user.interface";
 
+export interface Address {
+    id: number;
+    documentId?: string;
+    calle: string;
+    ciudad: string;
+    estado: string;
+    codigoPostal: string;
+    createdAt?: string;
+    updatedAt?: string;
+    publishedAt?: string;
+    numeroExterior: string;
+    numeroInterior: string | null;
+    referencia: string | null;
+    nombreRecibe: string;
+    principal?: boolean;
+    usuario?: User
+  }
+
+  export interface Principal {
+  mensaje:   string;
+  direccion: Address;
+}
+  
+  export interface ApiResponse {
+    data: Address;
+    meta: Record<string, any>;
+  }

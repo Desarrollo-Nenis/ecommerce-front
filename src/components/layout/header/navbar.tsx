@@ -279,7 +279,7 @@ export default function Navbar({
                         <NavigationMenuLink asChild>
                           <Link
                             href={`${FRONTEND_ROUTES.MARCA}/${marca.nombre}`}
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            className="cursor-pointer block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             {/* <div className="text-sm font-medium leading-none">
                             {marca.nombre}
@@ -315,7 +315,7 @@ export default function Navbar({
           </NavigationMenu>
           {/* search */}
           <SearchBar />
-          <div className=" flex flex-row items-center gap-2">
+          <div className="flex flex-row items-center gap-2">
             {/* avatar */}
             <AvatarDropdown avatarUrl={session?.user?.image} />
             {/* toggle theme */}
