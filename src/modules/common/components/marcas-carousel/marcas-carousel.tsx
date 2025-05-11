@@ -6,18 +6,16 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Categoria } from "@/interfaces/categories/categories.interface";
-import {  TagsIcon } from "lucide-react";
+import { Marca } from "@/interfaces/marcas/marca.interface";
 
 interface CategoryCarouselProps {
-  categorias: Categoria[];
+  marcas: Marca[];
   className?: string;
 }
 
-export default function CategoryCarousel({
-  categorias,
+export default function MarcasCarousel({
+  marcas,
   className,
 }: CategoryCarouselProps) {
   return (
@@ -31,25 +29,23 @@ export default function CategoryCarousel({
       }}
     >
       <CarouselContent className="flex justify-center items-center -ml-2 md:-ml-4">
-        {categorias.map((item, index) => (
+        {marcas.map((item, index) => (
           <CarouselItem
             key={index}
             className="pl-2 md:pl-4 basis-[140px] md:basis-[150px] flex justify-center"
           >
             <Link
-              href={`/categoria/${item.slug}`}
+              href={`/categoria/${item.nombre}`}
               className="flex flex-col items-center"
             >
               <div className="relative w-[120px] h-[120px] rounded-full overflow-hidden bg-gray-100">
-                {item.img?.url ? (
+                {item.img?.url && (
                   <Image
                     src={item.img?.url}
                     alt={item.nombre}
                     fill
                     className="object-cover"
                   />
-                ) : (
-                  <TagsIcon size={50} className=" absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-400" />
                 )}
               </div>
               <span className="mt-2 text-center text-sm font-medium">
@@ -59,8 +55,7 @@ export default function CategoryCarousel({
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="absolute left-0 md:-left-9 top-1/2 md:top-1/2 -translate-y-1/2 " />
-      <CarouselNext className="absolute right-0 md:-right-9 top-1/2 md:top-1/2 -translate-y-1/2 " />
+      <CarouselNext className="absolute -right-3 top-1/2 -translate-y-1/2" />
     </Carousel>
   );
 }

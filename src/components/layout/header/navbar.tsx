@@ -53,16 +53,15 @@ export default function Navbar({
   informacionTienda,
   session,
 }: NavbarProps) {
-
   const { loadCart } = useCartStore();
-
+  const categoriasFiltradas = categorias.filter((cat) => !cat.principal);
   useEffect(() => {
     loadCart();
   }, []);
-  
+
   return (
-    <Card className="border  fixed top-0 left-0 w-full z-50 ">
-      <div className="container flex h-16 items-center px-4">
+    <Card  className="border  fixed top-0 left-0 w-full z-5 bg-primary">
+      <div className="container flex h-16 items-center px-4 ">
         {/* sidebar movil */}
         <Sheet>
           <SheetTrigger asChild>
@@ -109,9 +108,66 @@ export default function Navbar({
                         variant="ghost"
                         className="w-full justify-start pl-4"
                       >
-                        <Link href={marca.nombre}>{marca.nombre}</Link>
+                        <Link href={`/marca/${marca.nombre}`}>
+                          <p className="text-foreground ">{marca.nombre}</p>
+                        </Link>
                       </Button>
                     ))}
+                  </CollapsibleContent>
+                </Collapsible>
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-between">
+                      Categorias
+                      <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2 mt-2">
+                    {categorias.map((categoria) => {
+                      if (!categoria.principal || categoria.subcategorias?.length) {
+                        return (
+                          <Collapsible key={categoria.nombre}>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                className="w-full justify-between"
+                              >
+                                {categoria.nombre}
+                                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                              </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="space-y-2 mt-2">
+                              {categoria.subcategorias?.map((subcategoria) => (
+                                <Button
+                                  key={subcategoria.nombre}
+                                  asChild
+                                  variant="ghost"
+                                  className="w-full justify-start pl-4"
+                                >
+                                  <Link href={`/categoria/${subcategoria.nombre}`}>
+                                    <p className="text-foreground ">
+                                      {subcategoria.nombre}
+                                    </p>
+                                  </Link>
+                                </Button>
+                              ))}
+                            </CollapsibleContent>
+                          </Collapsible>
+                        );
+                      }
+                      return (
+                        <Button
+                          key={categoria.nombre}
+                          asChild
+                          variant="ghost"
+                          className="w-full justify-start pl-4"
+                        >
+                          <Link href={`/categoria/${categoria.nombre}`}>
+                            <p className="text-foreground ">{categoria.nombre}</p>
+                          </Link>
+                        </Button>
+                      );
+                    })}
                   </CollapsibleContent>
                 </Collapsible>
               </nav>
@@ -189,7 +245,7 @@ export default function Navbar({
                 <NavigationMenuTrigger>Categorias</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    {categorias.map((categoria) => (
+                    {categoriasFiltradas.map((categoria) => (
                       <li key={categoria.nombre}>
                         <NavigationMenuLink asChild>
                           <Link
@@ -228,13 +284,17 @@ export default function Navbar({
                             {/* <div className="text-sm font-medium leading-none">
                             {marca.nombre}
                           </div> */}
-                            {marca.img && (
+                            {marca.img ? (
                               <Image
                                 src={marca.img?.url}
                                 width={100}
                                 height={100}
                                 alt={marca.nombre}
                               />
+                            ) : (
+                              <div className="text-sm font-medium leading-none">
+                                {marca.nombre}
+                              </div>
                             )}
                           </Link>
                         </NavigationMenuLink>
@@ -244,9 +304,11 @@ export default function Navbar({
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-               <NavigationMenuItem>
+              <NavigationMenuItem>
                 <Link href="/nosotros" legacyBehavior passHref>
-                  <NavigationMenuLink className="font-semibold">Sobre Nosotros</NavigationMenuLink>
+                  <NavigationMenuLink className="font-semibold">
+                    Sobre Nosotros
+                  </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
             </NavigationMenuList>

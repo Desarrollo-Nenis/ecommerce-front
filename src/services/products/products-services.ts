@@ -9,6 +9,8 @@ const BASE_ENDPOINT: string = BACKEND_ROUTES.PRODUCTS;
 
 //? ====================** FUNCION PARA MAPEAR PRODUCTOS CON IMÁGENES **====================
 function mapProductsWithImages(products: Products[]): Products[] {
+  console.log(products);
+  
   return products.map((product) => {
     const coverUrl = product.cover
       ? `${STRAPI_HOST}${product.cover.url}`
@@ -17,20 +19,21 @@ function mapProductsWithImages(products: Products[]): Products[] {
     const galleryUrls =
       product.galeria?.map((image) => formatStrapiImageUrl(image.url)) || [];
 
-    const variantes = product.variantes?.map((variante) => {
-      const varianteCoverUrl = variante.cover
-        ? `${STRAPI_HOST}${variante.cover.url}`
-        : "/images/products/default-img.png";
+    const variantes =
+      product.variantes?.map((variante) => {
+        const varianteCoverUrl = variante.cover
+          ? `${STRAPI_HOST}${variante.cover.url}`
+          : "/images/products/default-img.png";
 
-      const varianteGalleryUrls =
-        variante.galeria?.map((img) => formatStrapiImageUrl(img.url)) || [];
+        const varianteGalleryUrls =
+          variante.galeria?.map((img) => formatStrapiImageUrl(img.url)) || [];
 
-      return {
-        ...variante,
-        coverUrl: varianteCoverUrl,
-        galleryUrls: varianteGalleryUrls,
-      };
-    }) || [];
+        return {
+          ...variante,
+          coverUrl: varianteCoverUrl,
+          galleryUrls: varianteGalleryUrls,
+        };
+      }) || [];
 
     return {
       ...product,
@@ -41,18 +44,11 @@ function mapProductsWithImages(products: Products[]): Products[] {
   });
 }
 
-
 //? ====================** OBTENER TODOS LOS PRODUCTOS **=================
 
-type ProductFilters = {
-  nombre?: string;
-  categorias?: string[];
-  marcas?: string[];
-  precioMin?: number;
-  precioMax?: number;
-};
-
-export async function searchProducts(search: string): Promise<DataResponse<Products[]>> {
+export async function searchProducts(
+  search: string
+): Promise<DataResponse<Products[]>> {
   const params = new URLSearchParams();
 
   params.append("filters[$or][0][nombre][$containsi]", search);
@@ -74,21 +70,31 @@ export async function searchProducts(search: string): Promise<DataResponse<Produ
   }
 }
 
-export async function searchProductsWithFallback(search: string): Promise<Products[]> {
+export async function searchProductsWithFallback(
+  search: string
+): Promise<Products[]> {
   const searchTerms = search.trim().split(/\s+/);
 
   const strictParams = buildParams(searchTerms, true);
-  const strictResults = await fetchProductsByUrl(`productos?${strictParams.toString()}`);
+  const strictResults = await fetchProductsByUrl(
+    `productos?${strictParams.toString()}`
+  );
 
   if (strictResults.length > 0) return strictResults;
 
   const looseParams = buildParams(searchTerms, false);
-  const looseResults = await fetchProductsByUrl(`productos?${looseParams.toString()}`);
+  const looseResults = await fetchProductsByUrl(
+    `productos?${looseParams.toString()}`
+  );
 
   return looseResults;
 }
 
-function buildGroupKey(indexTerm: number, indexFilter: number, isStrict: boolean) {
+function buildGroupKey(
+  indexTerm: number,
+  indexFilter: number,
+  isStrict: boolean
+) {
   return isStrict
     ? `filters[$and][${indexTerm + indexFilter}]`
     : `filters[$or][${indexTerm + indexFilter}]`;
@@ -100,10 +106,19 @@ function buildParams(terms: string[], isStrict: boolean): URLSearchParams {
   terms.forEach((term, i) => {
     params.append(`${buildGroupKey(i, 0, isStrict)}[nombre][$containsi]`, term);
 
-    if(!isStrict){
-      params.append(`${buildGroupKey(i, 1, isStrict)}[descripcion][$containsi]`, term);
-      params.append(`${buildGroupKey(i, 2, isStrict)}[categorias][nombre][$containsi]`, term);
-      params.append(`${buildGroupKey(i, 3, isStrict)}[marca][nombre][$containsi]`, term);
+    if (!isStrict) {
+      params.append(
+        `${buildGroupKey(i, 1, isStrict)}[descripcion][$containsi]`,
+        term
+      );
+      params.append(
+        `${buildGroupKey(i, 2, isStrict)}[categorias][nombre][$containsi]`,
+        term
+      );
+      params.append(
+        `${buildGroupKey(i, 3, isStrict)}[marca][nombre][$containsi]`,
+        term
+      );
     }
   });
 
@@ -136,36 +151,105 @@ function normalizeFilters(filters: ProductFilters): ProductFilters {
   };
 }
 
-export async function getProductsByFilters(filters: ProductFilters = {}): Promise<DataResponse<Products[]>> {
-  const searchParams = new URLSearchParams();
+export interface ProductFilters {
+  nombre?: string;
+  categorias?: string[];
+  marcas?: string[];
+  precioMin?: number;
+  precioMax?: number;
+  sortBy?: "precio-asc" | "precio-desc" | "nombre-asc" | "nombre-desc";
+  page?: number;
+  pageSize?: number;
+}
+
+export async function getProductsByFilters(
+  filters: ProductFilters = {}
+): Promise<DataResponse<Products[]>> {
+  const params = new URLSearchParams();
   const normalizedFilters = normalizeFilters(filters);
 
   if (normalizedFilters.nombre) {
-    searchParams.append("filters[nombre][$containsi]", normalizedFilters.nombre);
+    params.append("filters[nombre][$containsi]", normalizedFilters.nombre);
   }
 
   if (normalizedFilters.categorias?.length) {
-    searchParams.append("filters[categorias][nombre][$in]", normalizedFilters.categorias.join(","));
-  }
-
-  
-
-  if (normalizedFilters.precioMin !== undefined && !isNaN(normalizedFilters.precioMin)) {
-    searchParams.append("filters[precioVenta][$gte]", normalizedFilters.precioMin.toString());
-  }
-
-  if (normalizedFilters.precioMax !== undefined && !isNaN(normalizedFilters.precioMax)) {
-    searchParams.append("filters[precioVenta][$lte]", normalizedFilters.precioMax.toString());
+    normalizedFilters.categorias.forEach((cat, i) => {
+      params.append(
+        `${buildGroupKey(i, 0, false)}[categorias][nombre][$containsi]`,
+        cat
+      );
+    });
   }
 
   if (normalizedFilters.marcas?.length) {
-    searchParams.append("filters[marca][nombre][$in]", normalizedFilters.marcas.join(","));
+    normalizedFilters.marcas.forEach((cat, i) => {
+      params.append(
+        `${buildGroupKey(i, 1, false)}[marca][nombre][$containsi]`,
+        cat
+      );
+    });
   }
 
-  const populate = ["cover", "galeria"];
-  populate.forEach((field) => searchParams.append("populate", field));
+  if (
+    normalizedFilters.precioMin !== undefined &&
+    !isNaN(normalizedFilters.precioMin)
+  ) {
+    params.append(
+      "filters[precioVenta][$gte]",
+      normalizedFilters.precioMin.toString()
+    );
+  }
 
-  const queryString = searchParams.toString();
+  if (
+    normalizedFilters.precioMax !== undefined &&
+    !isNaN(normalizedFilters.precioMax)
+  ) {
+    params.append(
+      "filters[precioVenta][$lte]",
+      normalizedFilters.precioMax.toString()
+    );
+  }
+
+  // Paginación
+  if (normalizedFilters.page) {
+    params.append("pagination[page]", normalizedFilters.page.toString());
+  }
+  if (normalizedFilters.pageSize) {
+    params.append(
+      "pagination[pageSize]",
+      normalizedFilters.pageSize.toString()
+    );
+  }
+
+  if (normalizedFilters.sortBy) {
+    let sortValue = "";
+    switch (normalizedFilters.sortBy) {
+      case "precio-asc":
+        sortValue = "inventario.precioVenta:asc";
+        break;
+      case "precio-desc":
+        sortValue = "inventario.precioVenta:desc";
+        break;
+      case "nombre-asc":
+        sortValue = "nombre:asc";
+        break;
+      case "nombre-desc":
+        sortValue = "nombre:desc";
+        break;
+    }
+
+    if (sortValue) params.append("sort", sortValue);
+  }
+
+  const populate = [
+    "[cover]",
+    "[galeria]",
+    "[inventario]",
+    "[variantes][populate][inventario]",
+  ];
+  populate.forEach((field) => params.append(`populate${field}`, "true"));
+
+  const queryString = params.toString();
   const url = `${BASE_ENDPOINT}?${queryString}`;
 
   try {
@@ -178,11 +262,12 @@ export async function getProductsByFilters(filters: ProductFilters = {}): Promis
 }
 
 export async function getAllProducts(): Promise<DataResponse<Products[]>> {
-
   const params = new URLSearchParams();
+  params.append("fields[0]", "nombre");
+  params.append("fields[1]", "slug");
   params.append("populate[categorias]", "true");
   params.append("populate[marca]", "true");
-  params.append("populate[cover]", "true");
+  params.append("populate[cover][fields][0]", "url");
   params.append("populate[inventario]", "true");
   params.append("populate[descuento]", "true");
   params.append("populate[variantes][populate][inventario]", "true");
@@ -226,13 +311,13 @@ export async function getProductBySlug(slug: string): Promise<Products> {
   params.append("populate[descuento]", "true");
 
   // Populate variantes y sus atributos
-  params.append("populate[variantes][populate][atributos]", "true"); 
-  params.append("populate[variantes][populate][inventario]", "true"); 
-  params.append("populate[variantes][populate][descuento]", "true"); 
-  params.append("populate[variantes][populate][cover]", "true"); 
-  params.append("populate[variantes][populate][galeria]", "true"); 
-  params.append("populate[variantes][populate][marca]", "true"); 
-  params.append("populate[variantes][populate][categorias]", "true"); 
+  params.append("populate[variantes][populate][atributos]", "true");
+  params.append("populate[variantes][populate][inventario]", "true");
+  params.append("populate[variantes][populate][descuento]", "true");
+  params.append("populate[variantes][populate][cover]", "true");
+  params.append("populate[variantes][populate][galeria]", "true");
+  params.append("populate[variantes][populate][marca]", "true");
+  params.append("populate[variantes][populate][categorias]", "true");
 
   const url = `${BASE_ENDPOINT}?${params.toString()}`;
 
@@ -243,11 +328,12 @@ export async function getProductBySlug(slug: string): Promise<Products> {
       throw error;
     });
 
-  return products.data[0]|| null;
+  return products.data[0] || null;
 }
 
-
-export async function getProductWithVariantesBySlug(slug: string): Promise<Products> {
+export async function getProductWithVariantesBySlug(
+  slug: string
+): Promise<Products> {
   const product = await getProductBySlug(slug);
 
   if (product?.tipo == "variante" && product.principal) {
