@@ -15,5 +15,5 @@ export default async function CartPage() {
     );
   }
 
-  return <BasketGrid session={session} addresses={address} />;
+  return <BasketGrid session={session} addresses={address.data} />;
 }

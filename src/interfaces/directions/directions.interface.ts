@@ -15,6 +15,7 @@ export interface Address {
     referencia: string | null;
     nombreRecibe: string;
     principal?: boolean;
+    telefono: string;
     usuario?: User
   }
 

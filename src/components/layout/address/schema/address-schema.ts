@@ -19,7 +19,10 @@ export const addressFormSchema = z.object({
     .nullable()
     .optional(),
   referencia: z.string().optional(),
-  nombreRecibe: z.string().min(1, "El nombre del quien recibe es requerido"),
+  nombreRecibe: z.string().min(1, "El nombre de quien recibe es requerido"),
+  telefono: z
+    .string()
+    .regex(/^(\+52\s?)?(\d{10})$/, "El teléfono debe tener 10 dígitos, con o sin prefijo +52"),
 });
 
 export type AddressFormValues = z.infer<typeof addressFormSchema>;
