@@ -6,8 +6,8 @@ import {
   Heart,
   LogOut,
   MapPin,
+  Package,
   Settings,
-  ShoppingCart,
   User,
 } from "lucide-react";
 
@@ -45,8 +45,8 @@ const menuItems = [
   },
   {
     href: `${FRONTEND_ROUTES.ORDERS}`,
-    label: "Pedidos",
-    icon: ShoppingCart,
+    label: "Mis Pedidos",
+    icon: Package,
   },
   {
     href: `${FRONTEND_ROUTES.SETTINGS}`,
