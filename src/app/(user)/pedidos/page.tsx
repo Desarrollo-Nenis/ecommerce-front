@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import { OrdersClient } from "@/components/layout/orders/orders-client"
 
 export default async function PedidosPage() {
   const pedidos = await getPedidos()

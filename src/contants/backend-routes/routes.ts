@@ -2,7 +2,7 @@ export const BACKEND_ROUTES = {
     LOGIN: "usuarios/login",
     REGISTER: "usuarios/register",
     ADDRESS: "direccions",
-    CATEGORIES: "direccions",
+    CATEGORIES: "categorias",
     PAYMENTS_CONFIGURATION: "configuracion-pago",
     INFORMATION_ECOMMERCE: "informacion-tienda",
     INVENTORY: "inventarios",

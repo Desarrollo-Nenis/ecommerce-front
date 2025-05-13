@@ -1,5 +1,5 @@
-import { OrderItem } from "@/components/orders/order-item"
 import { Pedido } from "@/interfaces/orders/pedido"
+import { OrderItem } from "./order-item"
 
 interface OrderListProps {
   pedidos: Pedido[]

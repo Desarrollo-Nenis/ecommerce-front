@@ -1,12 +1,13 @@
 "use client"
 import Image from "next/image"
-import { formatCurrency, formatDate } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { Package, Truck, CheckCircle, Clock, MapPin, Calendar, DollarSign, Info } from "lucide-react"
 import { Pedido } from "@/interfaces/orders/pedido"
+import { formatDate } from "@/lib/formatDate"
+import { formatCurrency } from "@/lib/formatCurrency"
 
 interface OrderItemProps {
   pedido: Pedido
@@ -89,7 +90,7 @@ export function OrderItem({ pedido }: OrderItemProps) {
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="items" className="border-b-0">
-            <AccordionTrigger className="py-2 text-sm font-medium">Ver detalles del pedido</AccordionTrigger>
+            <AccordionTrigger className="py-2 text-sm font-medium cursor-pointer">Ver detalles del pedido</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4 pt-2">
                 {pedido.productos.map((producto) => (
