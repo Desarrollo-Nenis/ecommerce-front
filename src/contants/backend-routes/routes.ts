@@ -4,6 +4,7 @@ export const BACKEND_ROUTES = {
     ADDRESS: "direccions",
     CATEGORIES: "categorias",
     PAYMENTS_CONFIGURATION: "configuracion-pago",
+    PAYMENTS: "payments",
     INFORMATION_ECOMMERCE: "informacion-tienda",
     INVENTORY: "inventarios",
     BRANCH: "marcas",

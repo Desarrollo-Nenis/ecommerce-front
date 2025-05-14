@@ -6,7 +6,7 @@ import { query } from "@/lib/api/server/strapi";
 import { formatStrapiImageUrl } from "@/lib/FormatUrlImgStrapi";
 
 
-const BASE_ENDPOINT: string = BACKEND_ROUTES.CATEGORIES; 
+const BASE_ENDPOINT: string = BACKEND_ROUTES.CATEGORIES
 
 
 type CategoryFilters = {
@@ -17,18 +17,16 @@ type CategoryFilters = {
 export function getCategorias(filters: CategoryFilters = {}): Promise<DataResponse<Categoria[]>> {
   const searchParams = new URLSearchParams();
 
-  
-
-
-
-  // Aseguramos cargar relaciones como imagen y subcategorías
-  searchParams.append("populate[img]", "true");
-  searchParams.append("populate[principal]", "true");
-  searchParams.append("populate[subcategorias][populate][img]", "true");
   // Agregar filtros si existen
   if (filters.nombre) {
     searchParams.append("filters[nombre][$containsi]", filters.nombre);
   }
+
+
+
+  // Aseguramos cargar relaciones como imagen y subcategorías
+  searchParams.append("populate", "*");
+
   const url = `${BASE_ENDPOINT}?${searchParams.toString()}`;
 
   return query<DataResponse<Categoria[]>>(url)

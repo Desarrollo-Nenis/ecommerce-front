@@ -5,14 +5,12 @@ import { BreadcrumbNav } from "./BreadcrumbNav";
 import { getCategorias } from "@/services/categories/categories-services";
 import { getInfoEcommerce } from "@/services/informacion-tienda/informacion-tienda-services";
 import { auth } from "@/auth";
-import { Categoria } from "@/interfaces/categories/categories.interface";
 
 export const HeaderShop = async () => {
   const informacionTiendaResult = await getInfoEcommerce();
   const marcasResult = await getMarcas();
   const categoriaResult = await getCategorias();
   const sesion = await auth();
-
 
   return (
     <header className="">
