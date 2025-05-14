@@ -6,7 +6,7 @@ import type { Address } from "@/interfaces/directions/directions.interface"
 import { Button } from "@/components/ui/button"
 import CartStep from "./step-1/cart-step"
 import { AddressStep } from "./step-2/address-step"
-import { PaymentStep } from "./step-3/payment-form"
+import { PaymentStep } from "./step-3/payment-step"
 import { CheckoutStepper } from "./checkout-stepper"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -20,9 +20,31 @@ interface BasketGridProps {
 }
 
 export function BasketGrid({ session, addresses }: BasketGridProps) {
-  const [step, setStep] = useState(1) // ← importante: empieza en 1 para coincidir con el ID del step
-  const { getCartSummary } = useCartStore()
+  const [step, setStep] = useState(1)
+  const { getCartSummary, cart } = useCartStore()
   const { subtotal, total, impuestos, envio, finalAmount } = getCartSummary()
+
+  // Transformar los productos del carrito al formato que espera PaymentStep
+  const paymentItems = cart.map((item) => {
+    // Manejar el caso cuando description es un array
+    let description = ""
+    if (typeof item.descripcion === "string") {
+      description = item.descripcion
+    } else if (Array.isArray(item.descripcion)) {
+      // Intentar extraer texto del array de descripción
+      description = `${item.nombre} - ${item.categoria?.nombre || "Producto"}`
+    } else {
+      description = `${item.nombre} - ${item.categoria?.nombre || "Producto"}`
+    }
+
+    return {
+      id: item.id.toString(),
+      title: item.nombre,
+      description: description,
+      quantity: item.quantity,
+      unitPrice: item.inventario?.precioVenta || 0,
+    }
+  })
 
   const handleNext = () => {
     if (step < 3) setStep((prev) => prev + 1)
@@ -39,7 +61,7 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
       case 2:
         return <AddressStep userId={session.user?.user.documentId!} addresses={addresses} />
       case 3:
-        return <PaymentStep />
+        return <PaymentStep items={paymentItems} />
       default:
         return null
     }
@@ -56,24 +78,24 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
         <div className="lg:col-span-2">
           {renderStepContent()}
 
-          <div className="flex justify-between mt-6">
+          <div className="cursor-pointer flex justify-between mt-6">
             {step === 1 ? (
               <Button variant="outline" asChild>
                 <Link href="/">
-                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  <ChevronLeft className="cursor-pointer mr-2 h-4 w-4" />
                   Seguir comprando
                 </Link>
               </Button>
             ) : (
               <Button variant="outline" onClick={handleBack}>
-                <ChevronLeft className="mr-2 h-4 w-4" />
+                <ChevronLeft className="cursor-pointer mr-2 h-4 w-4" />
                 {step === 2 ? "Volver al carrito" : "Volver a la dirección"}
               </Button>
             )}
 
             <Button onClick={step === 3 ? () => alert("¡Pago completado!") : handleNext}>
               {step === 3 ? "Finalizar pago" : "Continuar"}
-              {step !== 3 && <ChevronRight className="ml-2 h-4 w-4" />}
+              {step !== 3 && <ChevronRight className="cursor-pointer ml-2 h-4 w-4" />}
             </Button>
           </div>
         </div>
