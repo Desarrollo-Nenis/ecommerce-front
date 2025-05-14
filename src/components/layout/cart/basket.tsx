@@ -1,49 +1,70 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import type { Session } from "next-auth"
-import type { Address } from "@/interfaces/directions/directions.interface"
-import { Button } from "@/components/ui/button"
-import CartStep from "./step-1/cart-step"
-import { AddressStep } from "./step-2/address-step"
-import { PaymentStep } from "./step-3/payment-form"
-import { CheckoutStepper } from "./checkout-stepper"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { useCartStore } from "@/store/products-cart.store"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import Link from "next/link"
+import { useEffect, useState } from "react";
+import type { Session } from "next-auth";
+import type { Address } from "@/interfaces/directions/directions.interface";
+import { Button } from "@/components/ui/button";
+import CartStep from "./step-1/cart-step";
+import { AddressStep } from "./step-2/address-step";
+import { PaymentStep } from "./step-3/payment-form";
+import { CheckoutStepper } from "./checkout-stepper";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useCartStore } from "@/store/products-cart.store";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { useConfigStore } from "@/store/config-pago.store";
 
 interface BasketGridProps {
-  session: Session
-  addresses: Address[]
+  session: Session;
+  addresses: Address[];
 }
 
 export function BasketGrid({ session, addresses }: BasketGridProps) {
-  const [step, setStep] = useState(1) // ← importante: empieza en 1 para coincidir con el ID del step
-  const { getCartSummary } = useCartStore()
-  const { subtotal, total, impuestos, envio, finalAmount } = getCartSummary()
+  const [step, setStep] = useState(1); // ← importante: empieza en 1 para coincidir con el ID del step
+  const { getCartSummary, setConfig } = useCartStore();
+  const {
+    loadConfig,
+    cantidadMinEnvioGratis,
+    costoEnvio,
+    porcentajeImpuestos,
+  } = useConfigStore();
 
+  const { subtotal, total, impuestos, envio, finalAmount } = getCartSummary();
+
+  useEffect(() => {
+    loadConfig();
+    setConfig({
+      cantidadMinEnvioGratis,
+      costoEnvio,
+      porcentajeImpuestos,
+    });
+  }, []);
   const handleNext = () => {
-    if (step < 3) setStep((prev) => prev + 1)
-  }
+    if (step < 3) setStep((prev) => prev + 1);
+  };
 
   const handleBack = () => {
-    if (step > 1) setStep((prev) => prev - 1)
-  }
+    if (step > 1) setStep((prev) => prev - 1);
+  };
 
   const renderStepContent = () => {
     switch (step) {
       case 1:
-        return <CartStep />
+        return <CartStep />;
       case 2:
-        return <AddressStep userId={session.user?.user.documentId!} addresses={addresses} />
+        return (
+          <AddressStep
+            userId={session.user?.user.documentId!}
+            addresses={addresses}
+          />
+        );
       case 3:
-        return <PaymentStep />
+        return <PaymentStep />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -71,7 +92,11 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
               </Button>
             )}
 
-            <Button onClick={step === 3 ? () => alert("¡Pago completado!") : handleNext}>
+            <Button
+              onClick={
+                step === 3 ? () => alert("¡Pago completado!") : handleNext
+              }
+            >
               {step === 3 ? "Finalizar pago" : "Continuar"}
               {step !== 3 && <ChevronRight className="ml-2 h-4 w-4" />}
             </Button>
@@ -115,5 +140,5 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
