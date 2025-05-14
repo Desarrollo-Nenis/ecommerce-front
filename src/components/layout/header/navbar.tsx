@@ -30,7 +30,7 @@ import type { Marca } from "@/interfaces/marcas/marca.interface"
 import Image from "next/image"
 import type { Categoria } from "@/interfaces/categories/categories.interface"
 import { Card } from "@/components/ui/card"
-import type { InformacionTienda } from "@/interfaces/informacion-tienda/informacion-tienda"
+import type { InfoEcommerce } from "@/interfaces/informacion-tienda/informacion-tienda.interface"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SearchBar } from "../search-bar/SearchBar"
@@ -46,7 +46,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 interface NavbarProps {
   marcas: Marca[]
   categorias: Categoria[]
-  informacionTienda: InformacionTienda
+  informacionTienda: InfoEcommerce
   session: Session | null
 }
 
