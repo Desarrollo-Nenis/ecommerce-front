@@ -15,12 +15,8 @@ import type { Payment, PaymentRequest, PaymentItem } from "@/interfaces/payment/
 import { createPayment } from "@/services/payments/payments"
 import { useCartStore } from "@/store/products-cart.store"
 import { showToastAlert } from "@/components/ui/altertas/toast"
-
-const formSchema = z.object({
-  paymentProvider: z.enum(["STRIPE", "MERCADO_PAGO"], {
-    required_error: "Por favor selecciona un método de pago",
-  }),
-})
+import { formSchema } from "./schema"
+import { generatePaymentDescription } from "@/lib/generateDescription"
 
 export function PaymentStep({ items }: { items: PaymentItem[] }) {
   const [isLoading, setIsLoading] = useState(false)
@@ -88,16 +84,14 @@ export function PaymentStep({ items }: { items: PaymentItem[] }) {
 
       // Combinar los items del carrito con los items de impuestos y envío
       const allItems = [...sanitizedItems, ...(taxItem ? [taxItem] : []), ...(shippingItem ? [shippingItem] : [])]
-
       const paymentRequest: PaymentRequest = {
         currency: "MXN",
-        description: "Compra de productos",
+        description: generatePaymentDescription(allItems),
         callbackUrl: "http://localhost:3000/pedidos",
         provider: values.paymentProvider,
         items: allItems,
         totalAmount: finalAmount,
       }
-
       const userId = session?.user?.user?.documentId
       const userEmail = session?.user?.user.email
       const payment: Payment = await createPayment(paymentRequest, userId, userEmail!)
