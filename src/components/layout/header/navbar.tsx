@@ -304,7 +304,7 @@ export default function Navbar({ marcas, categorias, informacionTienda, session 
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Categorias</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="bg-transparent text-white">Categorias</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {categoriasFiltradas.map((categoria) => (
@@ -329,7 +329,9 @@ export default function Navbar({ marcas, categorias, informacionTienda, session 
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Marcas</NavigationMenuTrigger>
+                <NavigationMenuTrigger  className="bg-transparent  text-white">
+                  Marcas
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {marcas.map((marca) => (
@@ -359,7 +361,7 @@ export default function Navbar({ marcas, categorias, informacionTienda, session 
 
               <NavigationMenuItem>
                 <Link href="/nosotros" legacyBehavior passHref>
-                  <NavigationMenuLink className="font-semibold">Sobre Nosotros</NavigationMenuLink>
+                  <Button variant={"ghost"} className=" text-white">Sobre Nosotros</Button>
                 </Link>
               </NavigationMenuItem>
             </NavigationMenuList>

@@ -35,7 +35,7 @@ export default async function MarcaPage({
       : undefined,
   };
 
-  const { data: productos } = await getProductsByFilters(filtros);
+  const productFilteredData = await getProductsByFilters(filtros);
  
   return (
     <main className="container mx-auto px-4 py-8">
@@ -56,7 +56,7 @@ export default async function MarcaPage({
         </div>
         {/* Main content */}
         <div className="md:col-span-3 space-y-4">
-          <ProductGrid products={productos} />
+          <ProductGrid products={productFilteredData} />
         </div>
       </div>
     </main>

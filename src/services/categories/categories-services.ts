@@ -25,7 +25,8 @@ export function getCategorias(filters: CategoryFilters = {}): Promise<DataRespon
 
 
   // Aseguramos cargar relaciones como imagen y subcategorías
-  searchParams.append("populate", "*");
+  searchParams.append("populate[subcategorias][populate][img][fields][0]", "url");
+  searchParams.append("populate[img][fields][0]", "url");
 
   const url = `${BASE_ENDPOINT}?${searchParams.toString()}`;
 

@@ -17,7 +17,7 @@ export interface InfoEcommerce {
 }
 
 interface Nosotros{
-    slogan:string;
+    eslogan:string;
     historia:string;
     nombreEmpresa:string
     imagenHistoria:Img

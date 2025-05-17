@@ -10,7 +10,7 @@ const BASE_ENDPOINT: string = BACKEND_ROUTES.PRODUCTS;
 //? ====================** FUNCION PARA MAPEAR PRODUCTOS CON IMÁGENES **====================
 function mapProductsWithImages(products: Products[]): Products[] {
   console.log(products);
-  
+
   return products.map((product) => {
     const coverUrl = product.cover
       ? `${STRAPI_HOST}${product.cover.url}`
@@ -72,7 +72,7 @@ export async function searchProducts(
 
 export async function searchProductsWithFallback(
   search: string
-): Promise<Products[]> {
+): Promise<DataResponse<Products[]>> {
   const searchTerms = search.trim().split(/\s+/);
 
   const strictParams = buildParams(searchTerms, true);
@@ -80,7 +80,7 @@ export async function searchProductsWithFallback(
     `productos?${strictParams.toString()}`
   );
 
-  if (strictResults.length > 0) return strictResults;
+  if (strictResults.data.length > 0) return strictResults;
 
   const looseParams = buildParams(searchTerms, false);
   const looseResults = await fetchProductsByUrl(
@@ -125,7 +125,7 @@ function buildParams(terms: string[], isStrict: boolean): URLSearchParams {
   params.append("populate[categorias]", "true");
   params.append("populate[marca]", "true");
   params.append("populate[cover]", "true");
-  params.append("populate[galeria]", "true");
+  params.append("populate[galeria][fields][0]", "url");
   params.append("populate[principal]", "true");
   params.append("populate[inventario]", "true");
   params.append("populate[descuento]", "true");
@@ -133,14 +133,11 @@ function buildParams(terms: string[], isStrict: boolean): URLSearchParams {
   return params;
 }
 
-async function fetchProductsByUrl(url: string): Promise<Products[]> {
-  try {
-    const res = await query<DataResponse<Products[]>>(url);
-    return mapProductsWithImages(res.data);
-  } catch (error) {
-    console.error("❌ Error al buscar productos:", error);
-    return [];
-  }
+async function fetchProductsByUrl(
+  url: string
+): Promise<DataResponse<Products[]>> {
+  const res = await query<DataResponse<Products[]>>(url);
+  return { ...res, data: mapProductsWithImages(res.data) };
 }
 
 function normalizeFilters(filters: ProductFilters): ProductFilters {

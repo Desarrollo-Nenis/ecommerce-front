@@ -20,7 +20,7 @@ console.log(infoEcommerce.direcciones[0].imagenes);
                 {infoEcommerce.nosotros.nombreEmpresa}
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                {infoEcommerce.nosotros.slogan}
+                {infoEcommerce.nosotros.eslogan}
               </p>
             </div>
           </div>

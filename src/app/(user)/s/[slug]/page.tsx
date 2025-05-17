@@ -14,8 +14,8 @@ export default async function SearchSlugPage({
   const { slug } = await params;
   const searchDecode = decodeURIComponent(slug );
 
-  const productos = await searchProductsWithFallback(searchDecode);
-  console.log("productos", productos);
+  const productData = await searchProductsWithFallback(searchDecode);
+  console.log("productos", productData);
     const { data: categorias } = await getCategorias();
     const { data: marcas } = await getMarcas();
 
@@ -31,8 +31,8 @@ export default async function SearchSlugPage({
         Resultados para: <span className="text-primary">{searchDecode}</span>
       </h2>
 
-      {productos.length > 0 ? (
-        <ProductGrid products={productos} />
+      {productData.data.length > 0 ? (
+        <ProductGrid products={productData} />
       ) : (
         <p>No se encontraron productos para esta búsqueda.</p>
       )}
