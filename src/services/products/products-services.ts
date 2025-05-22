@@ -90,6 +90,149 @@ export async function searchProductsWithFallback(
   return looseResults;
 }
 
+export async function searchProductsWithParams(
+  filters: ProductFilters
+): Promise<DataResponse<Products[]>> {
+  // Primero intenta con búsqueda estricta
+  const strictParams = buildParamsWithFilters(filters, true);
+  const strictResults = await fetchProductsByUrl(
+    `productos?${strictParams.toString()}`
+  );
+
+  if (strictResults.data.length > 0) return strictResults;
+
+  // Luego intenta con búsqueda relajada
+  const looseParams = buildParamsWithFilters(filters, false);
+  const looseResults = await fetchProductsByUrl(
+    `productos?${looseParams.toString()}`
+  );
+
+  return looseResults;
+}
+
+function buildParamsWithFilters(
+  filters: ProductFilters,
+  isStrict: boolean
+): URLSearchParams {
+  console.log(filters);
+
+  const params = new URLSearchParams();
+  const searchTerms = filters.search?.trim().split(/\s+/) || [];
+
+  let filterIndex = 0;
+
+  // 1. Búsqueda textual (nombre, categorías, marcas)
+  searchTerms.forEach((term) => {
+    params.append(
+      `${buildGroupKey(filterIndex++, 0, isStrict)}[nombre][$containsi]`,
+      term
+    );
+    if (!isStrict) {
+      params.append(
+        `${buildGroupKey(
+          filterIndex++,
+          0,
+          isStrict
+        )}[categorias][nombre][$containsi]`,
+        term
+      );
+      params.append(
+        `${buildGroupKey(
+          filterIndex++,
+          0,
+          isStrict
+        )}[marca][nombre][$containsi]`,
+        term
+      );
+    }
+  });
+
+  // 2. Filtros adicionales (categorías seleccionadas, marcas, precio)
+  if (filters.categorias?.length) {
+    filters.categorias.forEach((cat) => {
+      params.append(
+        `${buildGroupKey(
+          filterIndex++,
+          1,
+          isStrict
+        )}[categorias][nombre][$containsi]`,
+        cat
+      );
+    });
+  }
+
+  if (filters.marcas?.length) {
+    filters.marcas.forEach((marca) => {
+      params.append(
+        `${buildGroupKey(
+          filterIndex++,
+          1,
+          isStrict
+        )}[marca][nombre][$containsi]`,
+        marca
+      );
+    });
+  }
+
+  if (filters.precioMin !== undefined && !isNaN(filters.precioMin)) {
+    params.append(
+      "filters[inventario][precioVenta][$gte]",
+      filters.precioMin.toString()
+    );
+  }
+
+  if (filters.precioMax !== undefined && !isNaN(filters.precioMax)) {
+    params.append(
+      "filters[inventario][precioVenta][$lte]",
+      filters.precioMax.toString()
+    );
+  }
+
+  // Paginación
+  if (filters.page) {
+    params.append("pagination[page]", filters.page.toString());
+  }
+  if (filters.pageSize) {
+    params.append("pagination[pageSize]", filters.pageSize.toString());
+  }
+
+  // Ordenamiento
+  if (filters.sortBy) {
+    let sortValue: string | null = "";
+    switch (filters.sortBy) {
+      case "featured":
+        sortValue = null;
+        break;
+      case "price-asc":
+        sortValue = "inventario.precioVenta:asc";
+        break;
+      case "price-desc":
+        sortValue = "inventario.precioVenta:desc";
+        break;
+      case "name-asc":
+        sortValue = "nombre:asc";
+        break;
+      case "name-desc":
+        sortValue = "nombre:desc";
+        break;
+    }
+    if (sortValue) params.append("sort", sortValue);
+  }
+
+  // Relaciones necesarias
+ params.append("[fields][0]", "nombre");
+  params.append("[fields][1]", "slug");
+  params.append("[fields][2]", "tipo");
+  params.append("populate[categorias]", "true");
+  params.append("populate[marca]", "true");
+  params.append("populate[cover][fields][0]", "url");
+  params.append("populate[galeria][fields][0]", "url");
+  params.append("populate[principal]", "true");
+  params.append("populate[inventario]", "true");
+  params.append("populate[descuento]", "true");
+  return params;
+}
+
 function buildGroupKey(
   indexTerm: number,
   indexFilter: number,
@@ -108,10 +251,6 @@ function buildParams(terms: string[], isStrict: boolean): URLSearchParams {
 
     if (!isStrict) {
       params.append(
-        `${buildGroupKey(i, 1, isStrict)}[descripcion][$containsi]`,
-        term
-      );
-      params.append(
         `${buildGroupKey(i, 2, isStrict)}[categorias][nombre][$containsi]`,
         term
       );
@@ -122,9 +261,12 @@ function buildParams(terms: string[], isStrict: boolean): URLSearchParams {
     }
   });
 
+  params.append("[fields][0]", "nombre");
+  params.append("[fields][1]", "slug");
+  params.append("[fields][2]", "tipo");
   params.append("populate[categorias]", "true");
   params.append("populate[marca]", "true");
-  params.append("populate[cover]", "true");
+  params.append("populate[cover][fields][0]", "url");
   params.append("populate[galeria][fields][0]", "url");
   params.append("populate[principal]", "true");
   params.append("populate[inventario]", "true");
@@ -149,119 +291,145 @@ function normalizeFilters(filters: ProductFilters): ProductFilters {
 }
 
 export interface ProductFilters {
-  nombre?: string;
+  search?: string;
   categorias?: string[];
   marcas?: string[];
   precioMin?: number;
   precioMax?: number;
-  sortBy?: "precio-asc" | "precio-desc" | "nombre-asc" | "nombre-desc";
+  sortBy?:SortOption
   page?: number;
   pageSize?: number;
 }
+export type SortOption = "featured" | "price-asc" | "price-desc" | "name-asc" | "name-desc"
 
 export async function getProductsByFilters(
   filters: ProductFilters = {}
 ): Promise<DataResponse<Products[]>> {
-  const params = new URLSearchParams();
   const normalizedFilters = normalizeFilters(filters);
 
-  if (normalizedFilters.nombre) {
-    params.append("filters[nombre][$containsi]", normalizedFilters.nombre);
+  // Intento estricto
+  const strictParams = buildFilterParams(normalizedFilters, true);
+  const strictUrl = `${BASE_ENDPOINT}?${strictParams.toString()}`;
+  const strictRes = await query<DataResponse<Products[]>>(strictUrl);
+
+  if (strictRes.data.length > 0) {
+    return {
+      data: mapProductsWithImages(strictRes.data),
+      meta: strictRes.meta,
+    };
   }
 
-  if (normalizedFilters.categorias?.length) {
-    normalizedFilters.categorias.forEach((cat, i) => {
-      params.append(
-        `${buildGroupKey(i, 0, false)}[categorias][nombre][$containsi]`,
-        cat
-      );
-    });
-  }
+  // Intento no estricto
+  const looseParams = buildFilterParams(normalizedFilters, false);
+  const looseUrl = `${BASE_ENDPOINT}?${looseParams.toString()}`;
+  const looseRes = await query<DataResponse<Products[]>>(looseUrl);
 
-  if (normalizedFilters.marcas?.length) {
-    normalizedFilters.marcas.forEach((cat, i) => {
-      params.append(
-        `${buildGroupKey(i, 1, false)}[marca][nombre][$containsi]`,
-        cat
-      );
-    });
-  }
+  return { data: mapProductsWithImages(looseRes.data), meta: looseRes.meta };
+}
 
-  if (
-    normalizedFilters.precioMin !== undefined &&
-    !isNaN(normalizedFilters.precioMin)
-  ) {
+function buildFilterParams(
+  filters: ProductFilters,
+  isStrict: boolean
+): URLSearchParams {
+  const params = new URLSearchParams();
+
+  let filterIndex = 0;
+
+  if (filters.search) {
     params.append(
-      "filters[precioVenta][$gte]",
-      normalizedFilters.precioMin.toString()
+      `${buildGroupKey(filterIndex++, 0, isStrict)}[nombre][$containsi]`,
+      filters.search
     );
   }
 
-  if (
-    normalizedFilters.precioMax !== undefined &&
-    !isNaN(normalizedFilters.precioMax)
-  ) {
+  if (filters.categorias?.length) {
+    filters.categorias.forEach((cat) => {
+      params.append(
+        `${buildGroupKey(
+          filterIndex++,
+          0,
+          isStrict
+        )}[categorias][nombre][$containsi]`,
+        cat
+      );
+    });
+  }
+
+  if (filters.marcas?.length) {
+    filters.marcas.forEach((marca) => {
+      params.append(
+        `${buildGroupKey(
+          filterIndex++,
+          1,
+          isStrict
+        )}[marca][nombre][$containsi]`,
+        marca
+      );
+    });
+  }
+
+  if (filters.precioMin !== undefined && !isNaN(filters.precioMin)) {
     params.append(
-      "filters[precioVenta][$lte]",
-      normalizedFilters.precioMax.toString()
+      "filters[inventario][precioVenta][$gte]",
+      filters.precioMin.toString()
+    );
+  }
+
+  if (filters.precioMax !== undefined && !isNaN(filters.precioMax)) {
+    params.append(
+      "filters[inventario][precioVenta][$lte]",
+      filters.precioMax.toString()
     );
   }
 
   // Paginación
-  if (normalizedFilters.page) {
-    params.append("pagination[page]", normalizedFilters.page.toString());
+  if (filters.page) {
+    params.append("pagination[page]", filters.page.toString());
   }
-  if (normalizedFilters.pageSize) {
-    params.append(
-      "pagination[pageSize]",
-      normalizedFilters.pageSize.toString()
-    );
+  if (filters.pageSize) {
+    params.append("pagination[pageSize]", filters.pageSize.toString());
   }
 
-  if (normalizedFilters.sortBy) {
+  // Ordenamiento
+  if (filters.sortBy) {
     let sortValue = "";
-    switch (normalizedFilters.sortBy) {
-      case "precio-asc":
+    switch (filters.sortBy) {
+      case "price-asc":
         sortValue = "inventario.precioVenta:asc";
         break;
-      case "precio-desc":
+      case "price-desc":
         sortValue = "inventario.precioVenta:desc";
         break;
-      case "nombre-asc":
+      case "name-asc":
         sortValue = "nombre:asc";
         break;
-      case "nombre-desc":
+      case "name-desc":
         sortValue = "nombre:desc";
         break;
     }
-
     if (sortValue) params.append("sort", sortValue);
   }
+
+  // Campos y relaciones
+  params.append("[fields][0]", "nombre");
+  params.append("[fields][1]", "slug");
+  params.append("[fields][2]", "tipo");
 
   const populate = [
     "[cover]",
     "[galeria]",
     "[inventario]",
-    "[variantes][populate][inventario]",
+    // "[variantes][populate][inventario]",
   ];
   populate.forEach((field) => params.append(`populate${field}`, "true"));
 
-  const queryString = params.toString();
-  const url = `${BASE_ENDPOINT}?${queryString}`;
-
-  try {
-    const res = await query<DataResponse<Products[]>>(url);
-    return { data: mapProductsWithImages(res.data), meta: res.meta };
-  } catch (error) {
-    console.error("Error al obtener los productos filtrados:", error);
-    throw error;
-  }
+  return params;
 }
 
 export async function getAllProducts(): Promise<DataResponse<Products[]>> {
   const params = new URLSearchParams();
-  params.append("fields[0]", "nombre");
-  params.append("fields[1]", "slug");
+  params.append("[fields][0]", "nombre");
+  params.append("[fields][1]", "slug");
   params.append("populate[categorias]", "true");
   params.append("populate[marca]", "true");
   params.append("populate[cover][fields][0]", "url");
@@ -277,19 +445,6 @@ export async function getAllProducts(): Promise<DataResponse<Products[]>> {
       console.error("Error al obtener los productos:", error);
       throw error;
     });
-}
-
-export async function getProductById(id: number): Promise<Products> {
-  const url = `${BASE_ENDPOINT}?populate=*&filters[id][$eq]=${id}`;
-
-  const products = await query<DataResponse<Products[]>>(url)
-    .then((res) => ({ data: mapProductsWithImages(res.data), meta: res.meta }))
-    .catch((error) => {
-      console.error("Error al obtener los productos:", error);
-      throw error;
-    });
-
-  return products.data[0] || null;
 }
 
 export async function getProductBySlug(slug: string): Promise<Products> {
@@ -338,4 +493,32 @@ export async function getProductWithVariantesBySlug(
     return principal;
   }
   return product;
+}
+
+//  creador de filtros
+export function parseProductFilters(
+  searchParams: URLSearchParams | Record<string, string | string[] | undefined>
+): ProductFilters {
+  const getParam = (key: string) => {
+    const value =
+      searchParams instanceof URLSearchParams
+        ? searchParams.get(key)
+        : searchParams[key];
+    return typeof value === "string" ? value : undefined;
+  };
+
+  return {
+    search: getParam("search") ? getParam("search") : undefined,
+    categorias: getParam("categorias")?.split(",") || [],
+    marcas: getParam("marcas")?.split(",") || [],
+    precioMin: getParam("precioMin")
+      ? Number(getParam("precioMin"))
+      : undefined,
+    precioMax: getParam("precioMax")
+      ? Number(getParam("precioMax"))
+      : undefined,
+    pageSize: getParam("pageSize") ? Number(getParam("pageSize")) : 10,
+    page: getParam("page") ? Number(getParam("page")) : 1,
+    sortBy: getParam("sort") ? getParam("sort") as SortOption: "featured",
+  };
 }

@@ -4,6 +4,7 @@ import { HeaderShop } from "@/components/layout/header/header";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { WhatsAppButton } from "@/components/layout/whatsapp/whatsapp";
+import {Footer} from "@/components/layout/footer/footer";
 
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export default function RootLayout({
     <>
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body>
+      <body className="min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -31,7 +32,11 @@ export default function RootLayout({
           <WhatsAppButton phoneNumber={`+52${phoneNumber!}`} />
 
           <HeaderShop />
-          {children}
+             {/* El contenido crecerá y empujará el footer hacia abajo */}
+            <main className="flex-grow">
+              {children}
+            </main>
+          <Footer></Footer>
           </SessionProvider>
         </ThemeProvider>
       </body>

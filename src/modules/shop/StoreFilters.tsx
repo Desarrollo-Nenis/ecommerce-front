@@ -52,30 +52,37 @@ export const StoreFilters = ({
     selectedFilters?.precioMin?.toString() ?? "0"
   );
   const [maxPrice, setMaxPrice] = useState(
-    selectedFilters?.precioMax?.toString() ?? "105000"
+    selectedFilters?.precioMax?.toString() ?? "99999"
   );
   const [priceRange, setPriceRange] = useState([
     Number(selectedFilters?.precioMin?.toString() ?? "0"),
-    Number(selectedFilters?.precioMax?.toString() ?? "105000"),
+    Number(selectedFilters?.precioMax?.toString() ?? "99999"),
   ]);
 
-  const updateURL = () => {
-    const params = new URLSearchParams();
+const updateURL = () => {
+  const currentParams = new URLSearchParams(window.location.search);
 
-    if (selectedCategorias.length)
-      params.set("categorias", selectedCategorias.join(","));
+  if (selectedCategorias.length)
+    currentParams.set("categorias", selectedCategorias.join(","));
+  else currentParams.delete("categorias");
 
-    // if (selectedSubcategorias.length)
-    //   params.set("categoria", selectedSubcategorias.join(","));
+  if (selectedMarcas.length)
+    currentParams.set("marcas", selectedMarcas.join(","));
+  else currentParams.delete("marcas");
 
-    if (selectedMarcas.length) params.set("marca", selectedMarcas.join(","));
+  if (minPrice !== "0")
+    currentParams.set("precioMin", minPrice.toString());
+  else currentParams.delete("precioMin");
 
-    if (minPrice !== "0") params.set("precioMin", minPrice.toString());
+  if (maxPrice !== "99999")
+    currentParams.set("precioMax", maxPrice.toString());
+  else currentParams.delete("precioMax");
 
-    if (maxPrice !== "105000") params.set("precioMax", maxPrice.toString());
+  // Resetear la paginación si se aplica un nuevo filtro
+  currentParams.set("page", "1");
 
-    router.push(`?${params.toString()}`);
-  };
+  router.push(`?${currentParams.toString()}`);
+};
 
   useEffect(() => {
     updateURL();
@@ -178,7 +185,7 @@ export const StoreFilters = ({
             <Slider
               value={priceRange}
               min={0}
-              max={105000}
+              max={9999}
               step={1}
               onValueChange={(values) => {
                 setPriceRange(values);

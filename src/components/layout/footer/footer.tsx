@@ -1,172 +1,357 @@
 "use client";
 
-const FooterInfoItem = ({ iconClass, title, lines }) => (
-  <div className="col-lg-3 col-md-6 col-sm-6 col-xs-6 m-b30">
-    <div className="icon-bx-wraper bx-style-1 p-a20 radius-sm br-col-w1">
-      <div className="icon-content">
-        <h5 className="dlab-tilte">
-          <span className="icon-sm">
-            <i className={iconClass} />
-          </span>
-          {title}
-        </h5>
-        {lines.map((line, index) => (
-          <p key={index} className={index === 0 ? "m-b0 op7" : "op7"}>
-            {line}
-          </p>
-        ))}
-      </div>
-    </div>
-  </div>
-);
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  ChevronUp,
+  ChevronDown,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Headphones,
+} from "lucide-react";
+import { useInfoEcommerceStore } from "@/store/info-ecommerce.store";
+import { getGoogleMapsEmbedUrl } from "@/lib/maps/frame";
 
-const FooterQuickLinks = () => (
-  <div className="widget border-0">
-    <h6 className="m-b20 text-white font-weight-300 text-uppercase">Quick Links</h6>
-    <ul className="list-2">
-      {[
-        "Home",
-        "About us",
-        "Our Team",
-        "Hire Developers",
-        "Industries",
-        "Portfolio",
-        "Contact Us",
-        "Blogs",
-        "Testimonials",
-        "Careers",
-      ].map((link, index) => (
-        <li key={index}>
-          <a href="index.html">{link}</a>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+export function Footer() {
+  const [isExpanded, setIsExpanded] = useState(false);
 
-const FooterNewsletter = () => (
-  <div className="widget">
-    <h6 className="m-b20 text-white font-weight-300 text-uppercase">Newsletter</h6>
-    <div className="subscribe-form m-b20 m-t30">
-      <form className="dzSubscribe" action="script/mailchamp.php" method="post">
-        <div className="dzSubscribeMsg" />
-        <div className="input-group">
-          <input
-            name="dzEmail"
-            required
-            className="form-control radius-no"
-            placeholder="Your Email Address"
-            type="email"
-          />
-          <span className="input-group-btn">
-            <button
-              name="submit"
-              value="Submit"
-              type="submit"
-              className="site-button radius-no"
-            >
-              SEND
-            </button>
-          </span>
-        </div>
-      </form>
-    </div>
-    <h6 className="m-b10 text-white font-weight-300 text-uppercase">Connect with us</h6>
-    <ul className="list-inline m-a0">
-      {[
-        { className: "facebook", icon: "fab fa-facebook-f" },
-        { className: "google-plus", icon: "fab fa-google-plus-g" },
-        { className: "linkedin", icon: "fab fa-linkedin-in" },
-        { className: "instagram", icon: "fab fa-instagram" },
-        { className: "twitter", icon: "fab fa-twitter" },
-      ].map(({ className, icon }, index) => (
-        <li key={index}>
-          <a href="javascript:void(0);" className={`site-button ${className} sharp`}>
-            <i className={icon} />
-          </a>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+  const toggleFooter = () => {
+    if (!isExpanded) {
+      setIsExpanded(true);
 
-const FooterCountriesInfo = () => (
-  <div className="icon-bx-wraper bx-style-1 p-a30 radius-sm br-col-w1 bg-tpw1">
-    <h5 className="text-white font-weight-300">
-      Serving in 70+ countries for web, software and mobile app development
-    </h5>
-    <p>
-      United States (USA), United Kingdom (UK), Singapore, Kenya, South Africa
-      Germany, Canada, Australia, Netherlands, Norway, United Arab Emirates
-      (UAE), Finland etc.
-    </p>
-  </div>
-);
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const footer = document.getElementById("expandable-footer");
+          footer?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      });
+    } else {
+      setIsExpanded(false);
+    }
+  };
 
-export default function Footer() {
+  const { infoEcommerce, initInfoEcommerce, loading } = useInfoEcommerceStore();
+
+  useEffect(() => {
+    initInfoEcommerce();
+  }, []);
+
+  if (loading || !infoEcommerce) {
+    <div></div>;
+  }
+
   return (
-    <footer className="site-footer footer-gray-1">
-      <div className="section-full p-t50 p-b20 bg-primary text-white overlay-primary-dark footer-info-bar">
-        <div className="container">
-          <div className="row">
-            <FooterInfoItem
-              iconClass="ti-location-pin"
-              title="Company Address"
-              lines={["Demo address #8901 Marmora Road Chi Minh City, Vietnam"]}
-            />
-            <FooterInfoItem
-              iconClass="ti-email"
-              title="E-mail"
-              lines={["info@example.com", "company@example.com"]}
-            />
-            <FooterInfoItem
-              iconClass="ti-mobile"
-              title="Phone Numbers"
-              lines={["Mobile : +00 234 678 9012", "Phone : +0 1234 5678 90"]}
-            />
-            <FooterInfoItem
-              iconClass="ti-alarm-clock"
-              title="Office Hours"
-              lines={["Mon To Sat - 08.00-18.00", "Sunday - Close"]}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="footer-top">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-3 col-md-6 col-sm-6 wow fadeIn" data-wow-delay="0.2s">
-              <FooterQuickLinks />
-            </div>
-            <div className="col-lg-4 col-md-6 col-sm-6 wow fadeIn" data-wow-delay="0.4s">
-              <FooterNewsletter />
-            </div>
-            <div className="col-lg-5 col-md-12 col-sm-12 wow fadeIn" data-wow-delay="0.6s">
-              <FooterCountriesInfo />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="footer-bottom">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-6 col-sm-6 text-left">
-              <span>Copyright © 2022 DexignZone. all rights reserved.</span>
-            </div>
-            <div className="col-md-6 col-sm-6 text-right">
-              <div className="widget-link">
-                <ul>
-                  <li>
-                    <a href="help-desk.html"> Help Desk</a>
-                  </li>
-                  <li>
-                    <a href="privacy-policy.html"> Refund Policy</a>
-                  </li>
-                </ul>
+    <footer
+      id="expandable-footer"
+      className={`bg-gray-100 dark:bg-gray-900  pb-6  ${
+        isExpanded ? "pt-6" : ""
+      }`}
+    >
+      <div className="container mx-auto px-4">
+        {/* Contenido expandible */}
+        <div
+          id="expandable-footer"
+          className={`transition-all  duration-300 ease-in-out overflow-hidden ${
+            isExpanded ? " opacity-100 mb-8" : "max-h-0 opacity-0"
+          }`}
+          aria-hidden={!isExpanded}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Columna 1: Logo e información */}
+            <div>
+              <div className="flex items-center mb-4">
+                <div className="relative h-10 w-10 mr-2">
+                  <Image
+                    src={infoEcommerce?.logo?.url || "/imgs/default/logo.webp"}
+                    alt="Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <span className="font-bold text-xl text-red-600">
+                  {infoEcommerce?.nombre ?? "ECOMMERCE"}
+                </span>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Distribuidora Industrial Nacional, ofreciendo productos de alta
+                calidad desde 2010.
+              </p>
+              <div className="flex space-x-4 px-2">
+                {infoEcommerce &&
+                  infoEcommerce.redesSociales?.map((red) => {
+                    return (
+                      <Link href={red.url} key={red.url}>
+                        <Image
+                          width={40}
+                          height={40}
+                          src={red.icono.url}
+                          alt={red.nombreRedSocial}
+                          className="w-7 h-7 hover:scale-125 hover:shadow-2xl hover:text-primary duration-300 transition-transform transform"
+                        />
+                      </Link>
+                    );
+                  })}
               </div>
             </div>
+
+            {/* Columna 2: Enlaces rápidos */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">
+                Enlaces Rápidos
+              </h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/"
+                    className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors"
+                  >
+                    Inicio
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/categoria"
+                    className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors"
+                  >
+                    Categorías
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/marcas"
+                    className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors"
+                  >
+                    Marcas
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/ofertas"
+                    className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors"
+                  >
+                    Ofertas
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/nosotros"
+                    className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors"
+                  >
+                    Sobre Nosotros
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 3: Información de contacto */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">
+                Contacto
+              </h3>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <MapPin
+                    className="text-red-600 mr-2 mt-1 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {infoEcommerce?.direcciones[0]?.direccion ||
+                      "Dirección no disponible"}
+                  </span>
+                </li>
+                <li className="flex items-center">
+                  <Phone
+                    className="text-red-600 mr-2 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {infoEcommerce?.numeroGeneral ||
+                      "Número de contacto no disponible"}
+                  </span>
+                </li>
+                <li className="flex items-center">
+                  <Mail className="text-red-600 mr-2 flex-shrink-0" size={20} />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {infoEcommerce?.correoGeneral || "Correo  no disponible"}
+                  </span>
+                </li>
+                <li className="flex items-center">
+                  <Clock
+                    className="text-red-600 mr-2 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {infoEcommerce?.direcciones[0].horario ||
+                      " Horario no disponible"}
+                  </span>
+                </li>
+                <li className="flex items-center">
+                  <Headphones
+                    className="text-red-600 mr-2 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {infoEcommerce?.numeroGeneral ||
+                      "Número de Soporte no disponible"}
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 4: Newsletter */}
+
+            <div className="w-full h-64 rounded-md overflow-hidden shadow">
+              {infoEcommerce &&
+              infoEcommerce?.direcciones[0].urlFrame?.includes("<iframe") ? (
+                <div
+                  className=""
+                  dangerouslySetInnerHTML={{
+                    __html: infoEcommerce.direcciones[0].urlFrame,
+                  }}
+                />
+              ) : (
+                infoEcommerce && (
+                  <iframe
+                    src={
+                      getGoogleMapsEmbedUrl(
+                        infoEcommerce.direcciones[0]?.coordenadas
+                      ) || infoEcommerce.direcciones[0].urlFrame
+                    }
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    className=""
+                  />
+                )
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Botón para desplegar/contraer con separador */}
+        <div className="relative border-t border-gray-200 dark:border-gray-800 my-6">
+          <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-100 dark:bg-gray-900 px-2">
+            <button
+              onClick={toggleFooter}
+              className="flex items-center justify-center space-x-1 px-4 py-1.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md text-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+              aria-expanded={isExpanded}
+              aria-controls="expandable-footer"
+            >
+              <span>
+                {isExpanded ? "Menos información" : "Más información"}
+              </span>
+              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Pie de página - siempre visible */}
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 md:mb-0">
+            © 2025 DIN - Distribuidora Industrial Nacional. Todos los derechos
+            reservados.
+          </p>
+          <div className="flex space-x-4">
+            <Link
+              href="/privacidad"
+              className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 text-sm transition-colors"
+            >
+              Política de Privacidad
+            </Link>
+            <Link
+              href="/terminos"
+              className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 text-sm transition-colors"
+            >
+              Términos y Condiciones
+            </Link>
+            <Link
+              href="/cookies"
+              className="text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 text-sm transition-colors"
+            >
+              Política de Cookies
+            </Link>
+          </div>
+        </div>
+
+        {/* Métodos de pago - siempre visible */}
+        <div className="mt-6 flex flex-wrap justify-center gap-4">
+          <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-credit-card text-gray-600 dark:text-gray-400"
+            >
+              <rect width="20" height="14" x="2" y="5" rx="2" />
+              <line x1="2" x2="22" y1="10" y2="10" />
+            </svg>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-paypal text-gray-600 dark:text-gray-400"
+            >
+              <path d="M7 11.5h2a2.5 2.5 0 1 0 0-5H7v9" />
+              <path d="M17 7.5h-5.5c-.5 0-.5 2 0 2H15c.5 0 2 .5 2 2s-1.5 2-2 2h-3" />
+            </svg>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-banknote text-gray-600 dark:text-gray-400"
+            >
+              <rect width="20" height="12" x="2" y="6" rx="2" />
+              <circle cx="12" cy="12" r="2" />
+              <path d="M6 12h.01M18 12h.01" />
+            </svg>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-landmark text-gray-600 dark:text-gray-400"
+            >
+              <line x1="3" x2="21" y1="22" y2="22" />
+              <line x1="6" x2="6" y1="18" y2="11" />
+              <line x1="10" x2="10" y1="18" y2="11" />
+              <line x1="14" x2="14" y1="18" y2="11" />
+              <line x1="18" x2="18" y1="18" y2="11" />
+              <polygon points="12 2 20 7 4 7" />
+            </svg>
           </div>
         </div>
       </div>

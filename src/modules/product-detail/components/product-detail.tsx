@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 import { ProductPriceDetail } from "./product-price";
 import { useSession } from "next-auth/react";
 import { getPrecioMinimoVariantes } from "@/lib/price-descuento";
+import { useFavoritesStore } from "@/store/product-favorite.store";
 
 interface ProductDetailProps {
   product: Products;
@@ -51,6 +52,7 @@ function renderDescription(descripcion: Descripcion[]) {
 export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
   const router = useRouter();
   const { addToCart } = useCartStore();
+  const { toggleFavorite, isFavorite } = useFavoritesStore();
   const { data } = useSession();
 
   const [selectionError, setSelectionError] = useState<string | null>(null);
@@ -220,6 +222,11 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
   const groupedAttributes = groupVariantAttributes(product);
   console.log(product);
 
+  const handleToggleProduct = () => {
+    if (selectedVariant) {
+      toggleFavorite(selectedVariant);
+    }
+  };
   return (
     <div>
       <div className="mb-6">
@@ -359,7 +366,18 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
                   Agregar al carrito
                 </Button>
 
-                <Button variant="outline" size="icon" className="h-12 w-12">
+                <Button
+                  onClick={handleToggleProduct}
+                  variant={
+                    selectedVariant
+                      ? isFavorite(selectedVariant.id)
+                        ? "default"
+                        : "outline"
+                      : "outline"
+                  }
+                  size="icon"
+                  className="h-12 w-12"
+                >
                   <Heart className="h-5 w-5" />
                 </Button>
               </div>
@@ -399,9 +417,7 @@ export function ProductDetail({ product, selectedSlug }: ProductDetailProps) {
                       <div className="text-sm text-muted-foreground">
                         Marca:
                       </div>
-                      <div className="text-sm">
-                        {product.marca?.nombre}
-                      </div>
+                      <div className="text-sm">{product.marca?.nombre}</div>
 
                       <div className="text-sm text-muted-foreground">
                         Fecha de publicación:

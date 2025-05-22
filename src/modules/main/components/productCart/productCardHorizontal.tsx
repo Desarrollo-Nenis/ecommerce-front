@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { ECOMMERCE_PRIVADO } from "@/contants/auth/ecommerce-privado.constant";
 import {
   Products,
@@ -25,21 +25,6 @@ interface ProductCardHorizontalProps {
 
 export function ProductCardHorizontal({ product }: ProductCardHorizontalProps) {
   const { data: session } = useSession();
-
-  const renderDescription = () => {
-    if (!product.descripcion || product.descripcion.length === 0) {
-      return "No description available";
-    }
-
-    const textoPlano = product.descripcion
-      .flatMap((desc) => desc.children)
-      .map((child) => child.text)
-      .join(" ");
-
-    return (
-      textoPlano.substring(0, 150) + (textoPlano.length > 150 ? "..." : "")
-    );
-  };
 
   const renderPrecio = () => {
     if (!session && ECOMMERCE_PRIVADO) {
@@ -139,16 +124,13 @@ export function ProductCardHorizontal({ product }: ProductCardHorizontalProps) {
                   {product.marca.nombre}
                 </span>
               )}
-              <h3 className="font-semibold text-lg">{product.nombre}</h3>
+              <h3 className="font-semibold text-lg line-clamp-3">
+                {product.nombre}
+              </h3>
             </div>
 
-            {/* Descripción */}
-            <CardDescription className="mb-auto line-clamp-2">
-              {renderDescription()}
-            </CardDescription>
-
             {/* Stock */}
-            <div className="mt-2 mb-3">{renderStock()}</div>
+            <div className="mb-3">{renderStock()}</div>
 
             {/* Precio y botones */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mt-auto">

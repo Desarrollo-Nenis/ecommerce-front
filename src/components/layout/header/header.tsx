@@ -14,16 +14,14 @@ export const HeaderShop = async () => {
 
   return (
     <header className="">
-      <div className="">
-        <Navbar
-          informacionTienda={informacionTiendaResult.data}
-          marcas={marcasResult.data}
-          categorias={categoriaResult.data}
-          session={sesion}
-        ></Navbar>
-        <div className="container mx-auto  pt-20">
-          <BreadcrumbNav></BreadcrumbNav>
-        </div>
+      <Navbar
+        informacionTienda={informacionTiendaResult.data}
+        marcas={marcasResult.data}
+        categorias={categoriaResult.data}
+        session={sesion}
+      ></Navbar>
+      <div className="container mx-auto  pt-20">
+        <BreadcrumbNav></BreadcrumbNav>
       </div>
     </header>
   );

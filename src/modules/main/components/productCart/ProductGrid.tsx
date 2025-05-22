@@ -25,13 +25,13 @@ import { ProductCard } from "@/modules/common/components/product-carousel/produc
 import { ProductCardHorizontal } from "./productCardHorizontal"
 import type { Products } from "@/interfaces/products/products.interface"
 import type { DataResponse } from "@/interfaces/data/response.interface"
+import { SortOption } from "@/services/products/products-services"
 
 export interface ProductGridProps {
   products: DataResponse<Products[]>
 }
 
 type ViewMode = "grid" | "list"
-type SortOption = "featured" | "price-asc" | "price-desc" | "name-asc" | "name-desc"
 
 export function ProductGrid({ products }: ProductGridProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
@@ -44,7 +44,7 @@ export function ProductGrid({ products }: ProductGridProps) {
     () => (searchParams.get("sort") || "featured") as SortOption,
     [searchParams]
   )
-  const pageSize = useMemo(() => Math.max(Number(searchParams.get("pageSize") || 10), 1), [searchParams])
+  const pageSize = useMemo(() => Math.max(Number(searchParams.get("pageSize") || 5), 5), [searchParams])
 
   const totalItems = products.meta?.pagination.total ?? 0
   const totalPages = Math.ceil(totalItems / pageSize)
@@ -56,6 +56,15 @@ export function ProductGrid({ products }: ProductGridProps) {
     current.set(param, value.toString())
     router.push(`?${current.toString()}`)
   }, [router, searchParams])
+
+  const updateMultipleQueryParams = useCallback((updates: Record<string, string | number>) => {
+  const current = new URLSearchParams(Array.from(searchParams.entries()));
+  Object.entries(updates).forEach(([key, value]) => {
+    current.set(key, value.toString());
+  });
+  router.push(`?${current.toString()}`);
+}, [router, searchParams]);
+
 
   const generatePaginationItems = () => {
     const items = []
@@ -125,8 +134,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           <Select
             value={pageSize.toString()}
             onValueChange={(value) => {
-              updateQueryParams("pageSize", value)
-              updateQueryParams("page", 1)
+               updateMultipleQueryParams({ page: "1", pageSize: value });
             }}
           >
             <SelectTrigger className="w-[100px]">
@@ -144,8 +152,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           <Select
             value={sortBy}
             onValueChange={(value) => {
-              updateQueryParams("sort", value)
-              updateQueryParams("page", 1)
+             updateMultipleQueryParams({ page: "1", sort: value });
             }}
           >
             <SelectTrigger className="w-full sm:w-[180px]">

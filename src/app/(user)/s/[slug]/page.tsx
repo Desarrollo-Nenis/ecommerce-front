@@ -1,5 +1,5 @@
 
-import {  searchProductsWithFallback } from "@/services/products/products-services";
+import {  parseProductFilters, searchProductsWithFallback, searchProductsWithParams } from "@/services/products/products-services";
 import { ProductGrid } from "@/modules/main/components/productCart/ProductGrid";
 import { StoreFilters } from "@/modules/shop/StoreFilters";
 import { getCategorias } from "@/services/categories/categories-services";
@@ -7,14 +7,20 @@ import { getMarcas } from "@/services/marcas/marcas-services";
 
 export default async function SearchSlugPage({
   params,
+  searchParams
 }: {
-  params: Promise<{ slug: string }>
+ params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string }>;
 }) {
 
   const { slug } = await params;
   const searchDecode = decodeURIComponent(slug );
+const searhParamsResust = await searchParams 
+const filtered = parseProductFilters(searhParamsResust)
+console.log(searhParamsResust);
+console.log("filtered", filtered);
 
-  const productData = await searchProductsWithFallback(searchDecode);
+  const productData = await searchProductsWithParams(filtered);
   console.log("productos", productData);
     const { data: categorias } = await getCategorias();
     const { data: marcas } = await getMarcas();

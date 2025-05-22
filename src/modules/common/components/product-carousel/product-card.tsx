@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { ECOMMERCE_PRIVADO } from "@/contants/auth/ecommerce-privado.constant";
 import {
   Products,
@@ -28,19 +23,6 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { data: session } = useSession();
 
-  const renderDescription = () => {
-    if (!product.descripcion || product.descripcion.length === 0) {
-      return "No description available";
-    }
-
-    const textoPlano = product.descripcion
-      .flatMap((desc) => desc.children)
-      .map((child) => child.text)
-      .join(" ");
-
-    return textoPlano.substring(0, 100) + (textoPlano.length > 100 ? "..." : "");
-  };
-
   const renderPrecio = () => {
     if (!session && ECOMMERCE_PRIVADO) {
       return (
@@ -50,7 +32,10 @@ export function ProductCard({ product }: ProductCardProps) {
       );
     }
 
-    if (product.tipo === ProductType.SIMPLE || product.tipo === ProductType.VARIANT) {
+    if (
+      product.tipo === ProductType.SIMPLE ||
+      product.tipo === ProductType.VARIANT
+    ) {
       const { finalPrice, hasDiscount } = getPrecioConDescuento(
         product.inventario,
         product.descuento
@@ -84,9 +69,7 @@ export function ProductCard({ product }: ProductCardProps) {
       );
     }
 
-    return (
-      <span className="text-sm text-muted-foreground">No disponible</span>
-    );
+    return <span className="text-sm text-muted-foreground">No disponible</span>;
   };
 
   return (
@@ -108,19 +91,13 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         </div>
 
-        <CardHeader className="p-4 pb-0">
-          <h3 className="font-semibold text-base line-clamp-1">
+        <CardHeader className="p-4">
+          <h3 className="font-semibold text-base line-clamp-3">
             {product.nombre}
           </h3>
         </CardHeader>
 
-        <CardContent className="p-4 pt-2 flex-grow">
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {renderDescription()}
-          </p>
-        </CardContent>
-
-        <CardFooter className="px-3 pt-0 flex justify-between items-center">
+        <CardFooter className="px-4 pb-4 pt-0 mt-auto flex justify-between items-center">
           {renderPrecio()}
         </CardFooter>
       </Card>

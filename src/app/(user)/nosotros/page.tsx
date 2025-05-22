@@ -3,11 +3,11 @@ import { getInfoEcommerce } from "@/services/informacion-tienda/informacion-tien
 import * as Icons from "lucide-react";
 import Link from "next/link";
 import { getGoogleMapsEmbedUrl } from "@/lib/maps/frame";
-import ImageLightbox from './ImageLightbox';
+import ImageLightbox from "./ImageLightbox";
 
 export default async function AboutUsPage() {
   const { data: infoEcommerce } = await getInfoEcommerce();
-console.log(infoEcommerce.direcciones[0].imagenes);
+  console.log(infoEcommerce.direcciones[0].imagenes);
 
   return (
     <main className="container mx-auto flex flex-col min-h-screen">
@@ -20,7 +20,9 @@ console.log(infoEcommerce.direcciones[0].imagenes);
                 {infoEcommerce.nosotros.nombreEmpresa}
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                {infoEcommerce.nosotros.eslogan}
+                {infoEcommerce.nosotros.eslogan
+                  ? infoEcommerce.nosotros.eslogan
+                  : "texto eslogan"}
               </p>
             </div>
           </div>
@@ -36,18 +38,22 @@ console.log(infoEcommerce.direcciones[0].imagenes);
                 Nuestra Historia
               </h2>
               <p className="text-muted-foreground md:text-lg">
-                {infoEcommerce.nosotros.historia}
+                {infoEcommerce.nosotros.historia
+                  ? infoEcommerce.nosotros.historia
+                  : " texto historia Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nam, repudiandae!"}
               </p>
             </div>
             <div className="relative aspect-video overflow-hidden rounded-lg">
-              <Image
-                src={infoEcommerce.nosotros.imagenHistoria.url}
-                alt="Imagen de la empresa"
-                width={1280}
-                height={720}
-                className="object-cover"
-              />
-            </div>
+              {infoEcommerce.nosotros.imagenHistoria.url && (
+                <Image
+                  src={infoEcommerce.nosotros.imagenHistoria.url}
+                  alt="Imagen de la empresa"
+                  width={1280}
+                  height={720}
+                  className="object-cover"
+                />
+              )}
+            </div>infoEcommerce
           </div>
         </div>
       </section>
@@ -120,7 +126,7 @@ console.log(infoEcommerce.direcciones[0].imagenes);
               className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center mt-8"
             >
               <div className="relative aspect-square overflow-hidden rounded-lg">
-               <ImageLightbox images={direccion.imagenes}/>
+                <ImageLightbox images={direccion.imagenes} />
               </div>
 
               <div className="space-y-4">
