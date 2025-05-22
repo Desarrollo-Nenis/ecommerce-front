@@ -30,14 +30,14 @@ export function getInfoEcommerce(): Promise<DataResponse<InfoEcommerce>> {
         })),
         nosotros: {
           ...res.data.nosotros,
-          imagenHistoria: {
-            ...res.data?.nosotros?.imagenHistoria,
-            url: `${STRAPI_HOST}${res.data.nosotros!.imagenHistoria?.url}`,
-          },
-          personal: res.data.nosotros.personal.map((persona) => ({
-            ...persona,
-            img: { ...persona.img, url: `${STRAPI_HOST}${persona.img.url}` },
-          })),
+          // imagenHistoria: {
+          //   ...res.data?.nosotros?.imagenHistoria,
+          //   url: `${STRAPI_HOST}${res.data.nosotros!.imagenHistoria?.url}`,
+          // },
+          // personal: res.data.nosotros.personal.map((persona) => ({
+          //   ...persona,
+          //   img: { ...persona.img, url: `${STRAPI_HOST}${persona.img.url}` },
+          // })),
         },
         direcciones: res.data.direcciones?.map((d) => ({
           ...d,

@@ -10,6 +10,7 @@ export const FRONTEND_ROUTES = {
     DIRECTIONS: "/direcciones",
     FAVORITE: "/favoritos",
     ORDERS: "/pedidos",
+    CALLBACK: "http://localhost:3000/pedidos",
     ADMIN: {
       USERS: "/admin/users",
       PRODUCTS: "/admin/products",

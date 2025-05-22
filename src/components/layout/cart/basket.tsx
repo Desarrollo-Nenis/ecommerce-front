@@ -1,20 +1,21 @@
 "use client";
 
-
-import { useEffect, useState } from "react"
-import type { Session } from "next-auth"
-import type { Address } from "@/interfaces/directions/directions.interface"
-import { Button } from "@/components/ui/button"
-import CartStep from "./step-1/cart-step"
-import { AddressStep } from "./step-2/address-step"
-import { PaymentStep } from "./step-3/payment-step"
-import { CheckoutStepper } from "./checkout-stepper"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { useCartStore } from "@/store/products-cart.store"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import Link from "next/link"
+import { useEffect, useRef, useState } from "react";
+import type { Session } from "next-auth";
+import type { Address } from "@/interfaces/directions/directions.interface";
+import { Button } from "@/components/ui/button";
+import CartStep from "./step-1/cart-step";
+import { AddressStep } from "./step-2/address-step";
+import { PaymentStep } from "./step-3/payment-step";
+import { useSearchParams } from "next/navigation";
+import { CheckoutStepper } from "./checkout-stepper";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useCartStore } from "@/store/products-cart.store";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useConfigStore } from "@/store/config-pago.store";
+import { extractTextFromBlocks } from "@/lib/descriptionProducts";
 
 interface BasketGridProps {
   session: Session;
@@ -22,31 +23,68 @@ interface BasketGridProps {
 }
 
 export function BasketGrid({ session, addresses }: BasketGridProps) {
-  const [step, setStep] = useState(1); // ← importante: empieza en 1 para coincidir con el ID del step
-  const { getCartSummary, setConfig } = useCartStore();
+  const paymentStepRef = useRef<{ handleSubmit: () => void }>(null);
+  const searchParams = useSearchParams();
+  const initialStep = Number.parseInt(searchParams.get("step") || "1", 10);
+  const [step, setStep] = useState(initialStep);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { getCartSummary, setConfig, cart } = useCartStore();
   const {
     loadConfig,
     cantidadMinEnvioGratis,
     costoEnvio,
     porcentajeImpuestos,
   } = useConfigStore();
-
   const { subtotal, total, impuestos, envio, finalAmount } = getCartSummary();
 
+  const paymentItems = cart.map((item) => {
+    let description = "";
+
+    if (Array.isArray(item.descripcion)) {
+      description = extractTextFromBlocks(item.descripcion);
+    }
+
+    if (typeof item.descripcion === "string") {
+      description = item.descripcion;
+    }
+
+    if (!description) {
+      description = `${item.nombre} - ${item.categorias?.nombre || "Producto"}`;
+    }
+
+    if (description && item.categorias?.nombre) {
+      description += ` - ${item.categorias.nombre}`;
+    }
+
+    return {
+      id: item.id.toString(),
+      title: item.nombre,
+      description,
+      quantity: item.quantity,
+      unitPrice: item.inventario?.precioVenta || 0,
+    };
+  });
+
   useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("step", step.toString());
+    window.history.replaceState(null, "", url.toString());
+
     loadConfig();
     setConfig({
       cantidadMinEnvioGratis,
       costoEnvio,
       porcentajeImpuestos,
     });
-  }, []);
-  const handleNext = () => {
-    if (step < 3) setStep((prev) => prev + 1);
-  };
+  }, [step]);
 
   const handleBack = () => {
     if (step > 1) setStep((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (step < 3) setStep((prev) => prev + 1);
   };
 
   const renderStepContent = () => {
@@ -61,7 +99,13 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
           />
         );
       case 3:
-        return <PaymentStep items={paymentItems} />
+        return (
+          <PaymentStep
+            ref={paymentStepRef}
+            items={paymentItems}
+            setIsLoading={setIsLoading}
+          />
+        );
       default:
         return null;
     }
@@ -78,33 +122,55 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
         <div className="lg:col-span-2">
           {renderStepContent()}
 
-          <div className="cursor-pointer flex justify-between mt-6">
+          <div className="flex justify-between mt-6">
             {step === 1 ? (
-              <Button variant="outline" asChild>
+              <Button className="cursor-pointer" variant="outline" asChild>
                 <Link href="/">
-                  <ChevronLeft className="cursor-pointer mr-2 h-4 w-4" />
+                  <ChevronLeft className="mr-2 h-4 w-4" />
                   Seguir comprando
                 </Link>
               </Button>
             ) : (
-              <Button variant="outline" onClick={handleBack}>
-                <ChevronLeft className="cursor-pointer mr-2 h-4 w-4" />
+              <Button
+                className="cursor-pointer"
+                variant="outline"
+                onClick={handleBack}
+              >
+                <ChevronLeft className="mr-2 h-4 w-4" />
                 {step === 2 ? "Volver al carrito" : "Volver a la dirección"}
               </Button>
             )}
 
-            <Button
-              onClick={
-                step === 3 ? () => alert("¡Pago completado!") : handleNext
-              }
-            >
-              {step === 3 ? "Finalizar pago" : "Continuar"}
-              {step !== 3 && <ChevronRight className="cursor-pointer ml-2 h-4 w-4" />}
-            </Button>
+            {step < 3 ? (
+              <Button className="cursor-pointer" onClick={handleNext}>
+                {step === 1 ? "Continuar a dirección" : "Continuar a pago"}
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                className="cursor-pointer"
+                onClick={async () => {
+                  if (paymentStepRef.current) {
+                    setIsLoading(true);
+                    try {
+                      await paymentStepRef.current.handleSubmit();
+                    } catch (err) {
+                      console.error(err);
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }
+                }}
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Finalizar pago
+              </Button>
+            )}
           </div>
         </div>
 
-        {/* Resumen del pedido - Siempre visible */}
+        {/* Resumen del pedido */}
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>

@@ -1,3 +1,5 @@
+import { User } from "../auth/user.interface"
+
 export interface PaymentItem {
   id: string
   title: string
@@ -12,7 +14,7 @@ export interface PaymentRequest {
   callbackUrl: string
   provider: "STRIPE" | "MERCADO_PAGO"
   items: PaymentItem[]
-  totalAmount?: number // Añadido para asegurar que el monto total sea correcto
+  totalAmount?: number
 }
 
 export interface Payment {

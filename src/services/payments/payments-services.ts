@@ -1,12 +1,10 @@
 import { BACKEND_ROUTES } from "@/contants/backend-routes/routes"
-import type { Payment, PaymentRequest } from "@/interfaces/payment/payments"
+import type { Payment, PaymentRequest } from "@/interfaces/payment/payments.interface"
 import { query } from "@/lib/api/server/strapi"
 
 const BASE_ENDPOINT: string = BACKEND_ROUTES.PAYMENTS
 
 export function createPayment(data: PaymentRequest, userId?: string, userEmail?: string): Promise<Payment> {
-  console.log("Datos originales:", data)
-
   // Sanitizar los datos
   const sanitizedRequest = {
     ...data,

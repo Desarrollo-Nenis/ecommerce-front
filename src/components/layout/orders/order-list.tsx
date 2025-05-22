@@ -1,8 +1,8 @@
-import { Pedido } from "@/interfaces/orders/pedido"
+import { SimplifiedOrder } from "@/interfaces/orders/pedido.interface"
 import { OrderItem } from "./order-item"
 
 interface OrderListProps {
-  pedidos: Pedido[]
+  pedidos: SimplifiedOrder[]
 }
 
 export function OrderList({ pedidos }: OrderListProps) {

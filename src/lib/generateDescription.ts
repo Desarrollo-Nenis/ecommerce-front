@@ -5,7 +5,7 @@
  * @param items Lista de productos del carrito
  * @returns Descripción para el proveedor de pago
  */
-import type { PaymentItem } from "@/interfaces/payment/payments"
+import type { PaymentItem } from "@/interfaces/payment/payments.interface"
 
 const MAX_DESCRIPTION_LENGTH = 200
 const DEFAULT_DESCRIPTION = "Compra de productos realizada en la tienda"
