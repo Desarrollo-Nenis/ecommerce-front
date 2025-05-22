@@ -20,8 +20,8 @@ interface Nosotros{
     eslogan:string;
     historia:string;
     nombreEmpresa:string
-    imagenHistoria:Img
-    personal:Personal[]
+    imagenHistoria?:Img
+    personal?:Personal[]
 }
 
 export interface DireccionSucursal {
