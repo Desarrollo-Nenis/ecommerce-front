@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/store/products-cart.store";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useConfigStore } from "@/store/config-pago.store";
+// import { useConfigStore } from "@/store/config-pago.store";
 import { extractTextFromBlocks } from "@/lib/descriptionProducts";
 
 interface BasketGridProps {
@@ -29,14 +29,22 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
   const [step, setStep] = useState(initialStep);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { getCartSummary, setConfig, cart } = useCartStore();
   const {
-    loadConfig,
-    cantidadMinEnvioGratis,
-    costoEnvio,
-    porcentajeImpuestos,
-  } = useConfigStore();
-  const { subtotal, total, impuestos, envio, finalAmount } = getCartSummary();
+    // setConfig,
+    getCartSummary,
+    cart,
+  } = useCartStore();
+  // const {
+  //   loadConfig,
+  //   cantidadMinEnvioGratis,
+  //   costoEnvio,
+  //   porcentajeImpuestos,
+  // } = useConfigStore();
+  const {
+    // impuestos, envio, finalAmount
+    subtotal,
+    total,
+  } = getCartSummary();
 
   const paymentItems = cart.map((item) => {
     let description = "";
@@ -50,11 +58,9 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
     }
 
     if (!description) {
-      description = `${item.nombre} - ${item.categorias?.nombre || "Producto"}`;
-    }
-
-    if (description && item.categorias?.nombre) {
-      description += ` - ${item.categorias.nombre}`;
+      description = `${item.nombre} - ${
+        item.atributos?.map((a) => a.valor).join(", ") || ""
+      }`;
     }
 
     return {
@@ -71,12 +77,12 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
     url.searchParams.set("step", step.toString());
     window.history.replaceState(null, "", url.toString());
 
-    loadConfig();
-    setConfig({
-      cantidadMinEnvioGratis,
-      costoEnvio,
-      porcentajeImpuestos,
-    });
+    // loadConfig();
+    // setConfig({
+    //   cantidadMinEnvioGratis,
+    //   costoEnvio,
+    //   porcentajeImpuestos,
+    // });
   }, [step]);
 
   const handleBack = () => {
@@ -93,19 +99,15 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
         return <CartStep />;
       case 2:
         return (
-          <AddressStep
-            userId={session.user?.user.documentId!}
-            addresses={addresses}
-          />
+          session.user?.user.documentId && (
+            <AddressStep
+              userId={session.user?.user.documentId}
+              addresses={addresses}
+            />
+          )
         );
       case 3:
-        return (
-          <PaymentStep
-            ref={paymentStepRef}
-            items={paymentItems}
-            setIsLoading={setIsLoading}
-          />
-        );
+        return <PaymentStep ref={paymentStepRef} items={paymentItems} />;
       default:
         return null;
     }
@@ -190,16 +192,17 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
                 )}
                 <div className="flex justify-between">
                   <span>Envío</span>
-                  <span>{envio === 0 ? "Gratis" : `$${envio.toFixed(2)}`}</span>
+                  <span>costos de envio extras</span>
+                  {/* <span>{envio === 0 ? "Gratis" : `$${envio.toFixed(2)}`}</span> */}
                 </div>
-                <div className="flex justify-between">
+                {/* <div className="flex justify-between">
                   <span>Impuestos</span>
                   <span>${impuestos.toFixed(2)}</span>
-                </div>
+                </div> */}
                 <Separator />
                 <div className="flex justify-between font-bold">
                   <span>Total</span>
-                  <span>${finalAmount.toFixed(2)}</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>

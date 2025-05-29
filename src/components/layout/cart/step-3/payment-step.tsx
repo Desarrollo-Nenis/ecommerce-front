@@ -17,21 +17,27 @@ import { showToastAlert } from "@/components/ui/altertas/toast"
 import { formSchema } from "./schema"
 import { generatePaymentDescription } from "@/lib/generateDescription"
 import { FRONTEND_ROUTES } from '../../../../contants/frontend-routes/routes';
+import Image from "next/image"
 
 type PaymentStepProps = {
   items: PaymentItem[]
 }
 
+
+
+
 export const PaymentStep = forwardRef<
   { handleSubmit: () => void },
   PaymentStepProps
 >(({ items }, ref) => {
+
+  
   const [isLoading, setIsLoading] = useState(false)
   const [sanitizedItems, setSanitizedItems] = useState<PaymentItem[]>([])
   const [error, setError] = useState<string | null>(null)
   const { data: session } = useSession()
   const { getCartSummary } = useCartStore()
-  const { impuestos, envio, finalAmount } = getCartSummary()
+  const { subtotal,total } = getCartSummary()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,33 +69,9 @@ export const PaymentStep = forwardRef<
     try {
       setIsLoading(true)
       setError(null)
-
-      const taxItem: PaymentItem | null =
-        impuestos > 0
-          ? {
-              id: "tax",
-              title: "Impuestos",
-              description: "Impuestos aplicados a la compra",
-              quantity: 1,
-              unitPrice: impuestos,
-            }
-          : null
-
-      const shippingItem: PaymentItem | null =
-        envio > 0
-          ? {
-              id: "shipping",
-              title: "Costo de envío",
-              description: "Costo de envío de los productos",
-              quantity: 1,
-              unitPrice: envio,
-            }
-          : null
-
       const allItems = [
         ...sanitizedItems,
-        ...(taxItem ? [taxItem] : []),
-        ...(shippingItem ? [shippingItem] : []),
+      
       ]
 
       const paymentRequest: PaymentRequest = {
@@ -98,7 +80,7 @@ export const PaymentStep = forwardRef<
         callbackUrl: FRONTEND_ROUTES.CALLBACK,
         provider: values.paymentProvider,
         items: allItems,
-        totalAmount: finalAmount,
+        totalAmount: total,
       }
 
       const userId = session?.user?.user?.documentId
@@ -181,9 +163,11 @@ export const PaymentStep = forwardRef<
                           </p>
                         </div>
                       </div>
-                      <img
-                        src="https://freelogopng.com/images/all_img/1685814539stripe-icon-png.png"
+                      <Image
+                        src="/icons/stripe.webp"
                         alt="Stripe"
+                        width={32}
+                        height={32}
                         className="h-8"
                       />
                     </label>
@@ -204,9 +188,11 @@ export const PaymentStep = forwardRef<
                           </p>
                         </div>
                       </div>
-                      <img
-                        src="https://logowik.com/content/uploads/images/mercado-pago3162.logowik.com.webp"
+                      <Image
+                        src="/icons/mercado-pago.webp"
                         alt="Mercado Pago"
+                        width={40}
+                        height={30}
                         className="h-8"
                       />
                     </label>
@@ -224,3 +210,4 @@ export const PaymentStep = forwardRef<
 })
 
 PaymentStep.displayName = "PaymentStep"
+

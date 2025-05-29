@@ -2,12 +2,12 @@ import { create } from "zustand";
 import Swal from "sweetalert2";
 import { Products } from "@/interfaces/products/products.interface";
 import { getPrecioConDescuento } from "@/lib/price-descuento";
-import {
-  CANTIDAD_MIN_ENVIO_GRATIS,
-  COSTO_ENVIO,
-  PORCENTAJE_IMPUESTOS,
-} from "@/contants/precio-taxes-envio.constant";
-import { ConfiguracionPago } from "@/interfaces/configuracion-pago/configuracion-pago.interface";
+// import {
+//   CANTIDAD_MIN_ENVIO_GRATIS,
+//   COSTO_ENVIO,
+//   PORCENTAJE_IMPUESTOS,
+// } from "@/contants/precio-taxes-envio.constant";
+// import { ConfiguracionPago } from "@/interfaces/configuracion-pago/configuracion-pago.interface";
 
 export interface CartItem extends Products {
   quantity: number;
@@ -15,12 +15,12 @@ export interface CartItem extends Products {
 
 interface CartStore {
   cart: CartItem[];
-  porcentajeImpuestos: number;
-  costoEnvio: number;
-  cantidadMiniEnvioGratis: number;
+  // porcentajeImpuestos: number;
+  // costoEnvio: number;
+  // cantidadMiniEnvioGratis: number;
 
   loadCart: () => void;
-  setConfig: (configuracionPago: ConfiguracionPago) => void;
+  // setConfig: (configuracionPago: ConfiguracionPago) => void;
 
   addToCart: (product: Products) => void;
   increaseQuantity: (id: number) => void;
@@ -32,9 +32,9 @@ interface CartStore {
   getCartSummary: () => {
     subtotal: number;
     total: number;
-    impuestos: number;
-    envio: number;
-    finalAmount: number;
+    // impuestos: number;
+    // envio: number;
+    // finalAmount: number;
   };
 }
 
@@ -44,17 +44,17 @@ const saveCartToLocalStorage = (cart: CartItem[]) => {
 
 export const useCartStore = create<CartStore>((set, get) => ({
   cart: [],
-  porcentajeImpuestos: PORCENTAJE_IMPUESTOS, // valor por defecto
-  costoEnvio: COSTO_ENVIO, // valor por defecto
-  cantidadMiniEnvioGratis: CANTIDAD_MIN_ENVIO_GRATIS, // valor por defecto
+  // porcentajeImpuestos: PORCENTAJE_IMPUESTOS, // valor por defecto
+  // costoEnvio: COSTO_ENVIO, // valor por defecto
+  // cantidadMiniEnvioGratis: CANTIDAD_MIN_ENVIO_GRATIS, // valor por defecto
   // Cargar config desde API o store externo
-  setConfig: (configuracionPago) => {
-    set({
-      porcentajeImpuestos: configuracionPago.porcentajeImpuestos,
-      costoEnvio: configuracionPago.costoEnvio,
-      cantidadMiniEnvioGratis: configuracionPago.cantidadMinEnvioGratis,
-    });
-  },
+  // setConfig: (configuracionPago) => {
+  //   set({
+  //     porcentajeImpuestos: configuracionPago.porcentajeImpuestos,
+  //     costoEnvio: configuracionPago.costoEnvio,
+  //     cantidadMiniEnvioGratis: configuracionPago.cantidadMinEnvioGratis,
+  //   });
+  // },
 
   // CARGAR EL CARRITO
   loadCart: () => {
@@ -187,28 +187,32 @@ export const useCartStore = create<CartStore>((set, get) => ({
   },
 
   // CALCULAR EL TOTAL DEL CARRITO CON IMPUESTOS
-  getTotalWithTax: () => {
-    const { getTotal, porcentajeImpuestos } = get();
+  // getTotalWithTax: () => {
+  //   const { getTotal, porcentajeImpuestos } = get();
 
-    const total = getTotal();
-    const tax = total * (porcentajeImpuestos / 100);
-    return total + tax;
-  },
+  //   const total = getTotal();
+  //   const tax = total * (porcentajeImpuestos / 100);
+  //   return total + tax;
+  // },
 
   // CALCULAR EL TOTAL DEL CARRITO CON IMPUESTOS Y ENVIO
   getCartSummary: () => {
     const {
       getSubtotal,
       getTotal,
-      porcentajeImpuestos,
-      costoEnvio,
-      cantidadMiniEnvioGratis,
+      // porcentajeImpuestos,
+      // costoEnvio,
+      // cantidadMiniEnvioGratis,
     } = get();
     const subtotal = getSubtotal();
     const total = getTotal();
-    const impuestos = total * (porcentajeImpuestos / 100);
-    const envio = total > cantidadMiniEnvioGratis ? 0 : costoEnvio;
-    const finalAmount = total + impuestos + envio;
-    return { subtotal, total, impuestos, envio, finalAmount };
+    // const impuestos = total * (porcentajeImpuestos / 100);
+    // const envio = total > cantidadMiniEnvioGratis ? 0 : costoEnvio;
+    // const finalAmount = total + impuestos + envio;
+    return {
+      subtotal,
+      total,
+      // impuestos, envio, finalAmount
+    };
   },
 }));
