@@ -12,6 +12,7 @@ export enum PedidosStatus {
 
 export interface Order {
   id:               number;
+  uuid:               string;
   documentId:       string;
   estado:           PedidosStatus;
   fechaPedido:      Date;

@@ -2,13 +2,30 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Package, Truck, CheckCircle, Clock, MapPin, Calendar, DollarSign, Info } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
+  Package,
+  Truck,
+  CheckCircle,
+  Clock,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Info,
+} from "lucide-react";
 import { formatDate } from "@/lib/formatDate";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { Order } from "@/interfaces/orders/pedido.interface";
-import { formatStatusOrder } from "@/lib/formatStatusOrder";
+import { Order, PedidosStatus } from "@/interfaces/orders/pedido.interface";
 
 interface OrderItemProps {
   pedido: Order;
@@ -18,12 +35,13 @@ export function OrderItem({ pedido }: OrderItemProps) {
   console.log(pedido);
   // Función para obtener el icono según el estado del pedido
   const getStatusIcon = (estado: string) => {
-    switch (estado.toLocaleLowerCase()) {
-      case "pending":
+    switch (estado) {
+      case PedidosStatus.PENDIENTE:
         return <Clock className="h-4 w-4" />;
-      case "en camino":
+      case PedidosStatus.ENVIADO:
         return <Truck className="h-4 w-4" />;
-      case "entregado":
+      case PedidosStatus.ENTREGADO:
+      case PedidosStatus.PAGADO:
         return <CheckCircle className="h-4 w-4" />;
       default:
         return <Package className="h-4 w-4" />;
@@ -32,12 +50,13 @@ export function OrderItem({ pedido }: OrderItemProps) {
 
   // Función para obtener el color de la badge según el estado
   const getStatusColor = (estado: string): string => {
-    switch (estado.toLocaleLowerCase()) {
-      case "pending":
+    switch (estado) {
+      case PedidosStatus.PENDIENTE:
         return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300";
-      case "en camino":
+      case PedidosStatus.ENVIADO:
         return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
-      case "entregado":
+      case PedidosStatus.ENTREGADO:
+      case PedidosStatus.PAGADO:
         return "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300";
       default:
         return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300";
@@ -49,37 +68,35 @@ export function OrderItem({ pedido }: OrderItemProps) {
       <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            {pedido.pagos.map((pago) => (
+            {pedido.estado && (
               <div
-                key={pago.id}
                 className={`p-2 rounded-full ${getStatusColor(pedido.estado)}`}
               >
                 {getStatusIcon(pedido.estado)}
               </div>
-            ))}
+            )}
             <div>
-              {pedido.pagos.map((pago) => (
-                <h3 key={pago.id} className="font-semibold">
-                  {pago.orderId}
+              {pedido.uuid && (
+                <h3 key={pedido.uuid} className="font-semibold">
+                  {pedido.uuid}
                 </h3>
-              ))}
+              )}
               <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />{" "}
                 {formatDate(pedido.fechaPedido.toString())}
               </p>
             </div>
           </div>
-          {pedido.pagos.map((pago) => (
+          {pedido.estado && (
             <Badge
-              key={pago.id}
+              key={pedido.estado}
               variant="outline"
-              className={`capitalize ${getStatusColor(
-                pago.estadoPago
-              )} border-0`}
+              className={`capitalize ${getStatusColor(pedido.estado)} border-0 flex gap-2 p-1.5`}
             >
-              {formatStatusOrder(pago.estadoPago)}
+              {getStatusIcon(pedido.estado)}
+              <p>{pedido.estado}</p>
             </Badge>
-          ))}
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="flex items-start gap-2">
@@ -120,9 +137,7 @@ export function OrderItem({ pedido }: OrderItemProps) {
                 Total
               </p>
               <p className="text-sm font-semibold">
-                {pedido.pagos.map( (pago) => (
-                  formatCurrency( pago.monto )
-                ))}
+                {pedido.pagos.map((pago) => formatCurrency(pago.monto))}
               </p>
             </div>
           </div>
