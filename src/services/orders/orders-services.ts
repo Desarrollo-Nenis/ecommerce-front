@@ -1,31 +1,36 @@
 import { BACKEND_ROUTES } from "@/contants/backend-routes/routes"
-import type { Orders, Datum, SimplifiedOrder } from "@/interfaces/orders/pedido.interface"
+import { DataResponse } from "@/interfaces/data/response.interface";
+import type { Order } from "@/interfaces/orders/pedido.interface"
 import { query } from "@/lib/api/server/strapi"
 
-const BASE_ENDPOINT: string = BACKEND_ROUTES.PAYMENTS
+const BASE_ENDPOINT: string = BACKEND_ROUTES.ORDERS;
+const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 
-export async function getUserOrders(userId: string | undefined): Promise<SimplifiedOrder[]> {
+export async function getUserOrders(userId: number | undefined): Promise<DataResponse<Order[]>> {
   try {
-    const res = await query<Orders>(`${BASE_ENDPOINT}/user/${userId}`)
+    const res = await query<DataResponse<Order[]>>(
+      `${BASE_ENDPOINT}?filters[cliente][id][$eq]=${userId}&populate[informacionEnvio][populate][direccion][fields]=calle,ciudad,estado,codigoPostal,numeroExterior,numeroInterior,referencia,nombreRecibe,telefono&populate[pagos][fields]=monto,moneda,estadoPago,orderId`
+    )
 
-    const simplifiedOrders: SimplifiedOrder[] = res.data.map((order: Datum) => ({
-      id: order.id,
-      orderId: order.orderId,
-      createdAt: order.createdAt,
-      monto: order.monto,
-      moneda: order.moneda,
-      estadoPago: order.estadoPago,
-      proveedor: order.proveedor,
-      providerPaymentId: order.providerPaymentId,
-      cliente: order.cliente,
-      items: order.metadata.items.map(item => ({
-        title: item.title,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-      })),
-    }))
+    const orders = res.data.map(order => {
+      // procesamos los coverUrl de los productos
+      const productos = order.metadata?.productos?.map(producto => ({
+        ...producto,
+        coverUrl: producto.coverUrl?.startsWith("http")
+          ? producto.coverUrl
+          : `${STRAPI_HOST}${producto.coverUrl}`,
+      })) ?? [];
 
-    return simplifiedOrders
+      return {
+        ...order,
+        metadata: {
+          ...order.metadata,
+          productos,
+        },
+      };
+    });
+
+    return {...res, data: orders};
   } catch (error) {
     console.error("Error al obtener las órdenes del usuario:", error)
     throw new Error("No se pudieron obtener las órdenes del usuario")

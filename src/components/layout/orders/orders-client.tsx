@@ -1,40 +1,37 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { OrderList } from "./order-list";
-import { OrderFilters } from "./order-filters";
-import { OrderEmpty } from "./order-empty";
-import { OrderSkeleton } from "./order-skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingBag } from "lucide-react";
-import { SimplifiedOrder } from "@/interfaces/orders/pedido.interface";
+import { useState } from "react"
+import { OrderList } from "./order-list"
+import { OrderFilters } from "./order-filters"
+import { OrderEmpty } from "./order-empty"
+import { OrderSkeleton } from "./order-skeleton"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ShoppingBag } from "lucide-react"
+import { Order } from "@/interfaces/orders/pedido.interface"
 
 interface OrdersClientProps {
-  initialPedidos: SimplifiedOrder[];
+  initialPedidos: Order[]
 }
 
 export function OrdersClient({ initialPedidos }: OrdersClientProps) {
-  const [pedidos, setPedidos] = useState<SimplifiedOrder[]>(initialPedidos);
-  const [filteredPedidos, setFilteredPedidos] =
-    useState<SimplifiedOrder[]>(initialPedidos);
-  const [isLoading, setIsLoading] = useState(false);
+  const [pedidos, setPedidos] = useState<Order[]>(initialPedidos)
+  const [filteredPedidos, setFilteredPedidos] = useState<Order[]>(initialPedidos)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Función para filtrar pedidos por estado
   const filterByStatus = (estado: string | null) => {
-    setIsLoading(true);
+    setIsLoading(true)
 
     // Simulamos una carga para mostrar el skeleton
     setTimeout(() => {
       if (!estado || estado === "todos") {
-        setFilteredPedidos(pedidos);
+        setFilteredPedidos(pedidos)
       } else {
-        setFilteredPedidos(
-          pedidos.filter((pedido) => pedido.estadoPago === estado)
-        );
+        setFilteredPedidos(pedidos.filter((pedido) => pedido.estado === estado))
       }
-      setIsLoading(false);
-    }, 500);
-  };
+      setIsLoading(false)
+    }, 500)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
@@ -50,9 +47,7 @@ export function OrdersClient({ initialPedidos }: OrdersClientProps) {
           <Tabs
             defaultValue="todos"
             className="w-full"
-            onValueChange={(value) =>
-              filterByStatus(value === "todos" ? null : value)
-            }
+            onValueChange={(value) => filterByStatus(value === "todos" ? null : value)}
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <TabsList className="h-10">
@@ -125,5 +120,5 @@ export function OrdersClient({ initialPedidos }: OrdersClientProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

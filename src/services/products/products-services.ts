@@ -9,8 +9,6 @@ const BASE_ENDPOINT: string = BACKEND_ROUTES.PRODUCTS;
 
 //? ====================** FUNCION PARA MAPEAR PRODUCTOS CON IMÁGENES **====================
 function mapProductsWithImages(products: Products[]): Products[] {
-  console.log(products);
-
   return products.map((product) => {
     const coverUrl = product.cover
       ? `${STRAPI_HOST}${product.cover.url}`

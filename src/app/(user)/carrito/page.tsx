@@ -9,6 +9,7 @@ import Link from "next/link";
 export default async function CartPage() {
   const session = await auth();
   const  informacionTienda = await getInfoEcommerce()
+  
   if (!session?.user?.user.documentId) {
     return (
      
