@@ -1,9 +1,19 @@
 import { Address } from "../directions/directions.interface";
 
+
+export enum PedidosStatus {
+  PENDIENTE = "PENDIENTE",
+  PAGADO = "PAGADO",
+  CANCELADO = "CANCELADO",
+  ENVIADO = "ENVIADO",
+  DEVOLUCION = "DEVOLUCION",
+  ENTREGADO = "ENTREGADO",
+}
+
 export interface Order {
   id:               number;
   documentId:       string;
-  estado:           string;
+  estado:           PedidosStatus;
   fechaPedido:      Date;
   provider:         string;
   metadata:         Metadata;
