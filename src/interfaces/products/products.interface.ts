@@ -61,34 +61,6 @@ export enum DescuentoTipo {
   MONTO = "$",
 }
 
-// export interface Products {
-//     id:             number;
-//     documentId:     string;
-//     nombre:         string;
-//     descripcion:    Descripcion[];
-//     createdAt:      Date;
-//     updatedAt:      Date;
-//     publishedAt:    Date;
-//     precioUnitario: number;
-//     precioVenta:    number;
-//     categorias:     Categoria[];
-//     subcategorias:     SubCategoria[];
-//     // unidad_medida:  UnidadMedida;
-//     cover?:          Cover;
-//     galeria?:        Cover[];
-//     coverUrl: string
-//     galleryUrls?: string[]
-// }
-
-export interface UnidadMedida {
-  id: number;
-  documentId: string;
-  nombre?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date;
-  nombreUnidad?: string;
-}
 
 export interface Descripcion {
   type: string;
