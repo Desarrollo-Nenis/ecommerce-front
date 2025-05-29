@@ -11,10 +11,17 @@ export const SearchBar = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Debounced search effect
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       const trimmedQuery = searchQuery.trim();
+
+      // Si no hay texto de búsqueda y no hay parámetro "search" existente, no hacer nada
+      const currentSearchParam = searchParams.get("search");
+      const shouldCleanSearch = currentSearchParam && trimmedQuery.length === 0;
+      const shouldUpdateSearch = trimmedQuery.length > 0 && currentSearchParam !== trimmedQuery;
+
+      if (!shouldUpdateSearch && !shouldCleanSearch) return;
+
       const params = new URLSearchParams(searchParams.toString());
 
       if (trimmedQuery.length > 0) {
@@ -26,16 +33,16 @@ export const SearchBar = () => {
         params.set("page", "1");
       }
 
-      router.push(`/s/products?${params.toString()}`);
-    }, 1500); // 1.5 segundos
+      router.push(`${window.location.pathname}?${params.toString()}`);
+    }, 1500);
 
-    return () => clearTimeout(delayDebounce); // limpia el timeout si se sigue escribiendo
-  }, [searchQuery,router]);
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery, router]); // solo depende de searchQuery
 
   return (
     <div className="ml-auto flex items-center">
       <form
-        onSubmit={(e) => e.preventDefault()} // ya no se necesita submit manual
+        onSubmit={(e) => e.preventDefault()}
         className="relative flex items-center gap-2 mr-4 w-[200px] lg:w-[300px]"
       >
         <div className="relative w-full">
