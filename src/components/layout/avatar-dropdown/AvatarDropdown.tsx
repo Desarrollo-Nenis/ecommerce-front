@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import {
-  Heart,
-  LogOut,
-  MapPin,
-  Package,
-  Settings,
-  User,
-} from "lucide-react";
+import { Heart, LogOut, MapPin, Package, Settings, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -66,7 +59,7 @@ export const AvatarDropdown = ({ avatarUrl }: AvatarDropdownProps) => {
         >
           <Avatar>
             <AvatarImage
-              src={avatarUrl || "/placeholder-avatar.jpg"}
+              src={avatarUrl || "/imgs/default/user.webp"}
               alt="@username"
             />
             <AvatarFallback>
@@ -82,7 +75,10 @@ export const AvatarDropdown = ({ avatarUrl }: AvatarDropdownProps) => {
 
         {menuItems.map(({ href, label, icon: Icon }) => (
           <DropdownMenuItem asChild key={href}>
-            <Link href={href} className="flex w-full items-center gap-2">
+            <Link
+              href={href}
+              className="flex w-full items-center gap-2 hover:bg-muted hover:text-primary transition-colors rounded-md px-2 py-1"
+            >
               <Icon className="w-4 h-4" />
               {label}
             </Link>

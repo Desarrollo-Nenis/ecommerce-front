@@ -318,7 +318,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/perfil">
                           <User className="mr-2 h-4 w-4" />
@@ -328,7 +328,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/pedidos">
                           <Package className="mr-2 h-4 w-4" />
@@ -338,7 +338,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/direcciones">
                           <MapPin className="mr-2 h-4 w-4" />
@@ -348,7 +348,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/favoritos">
                           <Heart className="mr-2 h-4 w-4" />
@@ -358,7 +358,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href={session?.user?.user ? "/carrito" : "/"}>
                           <ShoppingCart className="mr-2 h-4 w-4" />
