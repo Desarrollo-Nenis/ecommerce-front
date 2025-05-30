@@ -17,10 +17,8 @@ export function ProfileLayout() {
   return (
     <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8 max-w-7xl">
       <div className="grid gap-6 md:grid-cols-5">
-        {/* Sidebar con información del usuario */}
         <ProfileSidebar />
 
-        {/* Contenido principal */}
         <div className="md:col-span-3 lg:col-span-4 space-y-6">
           <Card>
             <CardHeader>
@@ -43,15 +41,24 @@ function ProfileTabs() {
   return (
     <Tabs defaultValue="settings" className="w-full">
       <TabsList className="grid grid-cols-3 mb-4">
-        <TabsTrigger value="settings" className="flex items-center gap-2">
+        <TabsTrigger
+          value="settings"
+          className="flex items-center gap-2 cursor-pointer hover:bg-muted hover:text-primary transition-colors rounded-md px-2 py-1"
+        >
           <Settings className="h-4 w-4" />
           <span className="hidden sm:inline">Ajustes</span>
         </TabsTrigger>
-        <TabsTrigger value="favorites" className="flex items-center gap-2">
+        <TabsTrigger
+          value="favorites"
+          className="flex items-center gap-2 cursor-pointer hover:bg-muted hover:text-primary transition-colors rounded-md px-2 py-1"
+        >
           <Heart className="h-4 w-4" />
           <span className="hidden sm:inline">Favoritos</span>
         </TabsTrigger>
-        <TabsTrigger value="information" className="flex items-center gap-2">
+        <TabsTrigger
+          value="information"
+          className="flex items-center gap-2 cursor-pointer hover:bg-muted hover:text-primary transition-colors rounded-md px-2 py-1"
+        >
           <Package className="h-4 w-4" />
           <span className="hidden sm:inline">Información</span>
         </TabsTrigger>
