@@ -1,100 +1,107 @@
-"use client"
+"use client";
 
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { CreditCard, AlertCircle } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import type { Payment, PaymentRequest, PaymentItem } from "@/interfaces/payment/payments.interface"
-import { createPayment } from "@/services/payments/payments-services"
-import { useCartStore } from "@/store/products-cart.store"
-import { showToastAlert } from "@/components/ui/altertas/toast"
-import { formSchema } from "./schema"
-import { generatePaymentDescription } from "@/lib/generateDescription"
-import { FRONTEND_ROUTES } from '../../../../contants/frontend-routes/routes';
-import Image from "next/image"
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { CreditCard, AlertCircle } from "lucide-react";
+import { useSession } from "next-auth/react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import type {
+  Payment,
+  PaymentItem,
+} from "@/interfaces/payment/payments.interface";
+import { createPedido } from "@/services/payments/payments-services";
+import { useCartStore } from "@/store/products-cart.store";
+import { showToastAlert } from "@/components/ui/altertas/toast";
+import { formSchema } from "./schema";
+import Image from "next/image";
+import {
+  PedidoCreateDto,
+  ProductoSeleccionadoInput,
+} from "@/interfaces/orders/pedido.interface";
+import { PaymentProvider } from "@/interfaces/payments-providers/payment-prodivers";
 
 type PaymentStepProps = {
-  items: PaymentItem[]
-}
-
-
-
+  items: PaymentItem[];
+};
 
 export const PaymentStep = forwardRef<
   { handleSubmit: () => void },
   PaymentStepProps
 >(({ items }, ref) => {
-
-  
-  const [isLoading, setIsLoading] = useState(false)
-  const [sanitizedItems, setSanitizedItems] = useState<PaymentItem[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const { data: session } = useSession()
-  const { getCartSummary } = useCartStore()
-  const { subtotal,total } = getCartSummary()
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState<
+    ProductoSeleccionadoInput[]
+  >([]);
+  const [error, setError] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const { getCartSummary } = useCartStore();
+  const { subtotal, total } = getCartSummary();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       paymentProvider: undefined,
     },
-  })
+  });
 
   useEffect(() => {
     try {
-      const sanitized = items.map((item) => ({
-        id: item.id,
-        title: item.title,
-        description: typeof item.description === "string"
-          ? item.description
-          : `${item.title} - Producto`,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-      }))
-      setSanitizedItems(sanitized)
-      setError(null)
+      const products: ProductoSeleccionadoInput[] = items.map((item) => ({
+        producto: +item.id, // Asegúrate de que 'productId' es el nombre correcto de la propiedad en PaymentItem
+        cantidad: item.quantity,
+      }));
+      setSelectedProducts(products);
+      setError(null);
     } catch (err) {
-      console.error("Error al sanitizar items:", err)
-      setError("Error al procesar los productos del carrito")
+      console.error("Error al sanitizar items:", err);
+      setError("Error al procesar los productos del carrito");
     }
-  }, [items])
+  }, [items]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setIsLoading(true)
-      setError(null)
-      const allItems = [
-        ...sanitizedItems,
-      
-      ]
+      setIsLoading(true);
+      setError(null);
 
-      const paymentRequest: PaymentRequest = {
-        currency: "MXN",
-        description: generatePaymentDescription(allItems),
-        callbackUrl: FRONTEND_ROUTES.CALLBACK,
-        provider: values.paymentProvider,
-        items: allItems,
-        totalAmount: total,
+      if (!session?.user?.user?.id) {
+        return;
       }
 
-      const userId = session?.user?.user?.documentId
-      const userEmail = session?.user?.user.email
-      const payment: Payment = await createPayment(paymentRequest, userId, userEmail!)
+      const pedidoCreateDto: PedidoCreateDto = {
+        cliente: session?.user?.user?.id,
+        provider: values.paymentProvider as PaymentProvider,
+        productosSeleccionados: selectedProducts,
+        informacionEnvio: {
+          costoEnvio: 0,
+          esLocal: false,
+          direccion: 5,
+        },
+      };
+      console.log(pedidoCreateDto);
 
-      window.open(payment.redirectUrl)
+      // const userId = session?.user?.user?.documentId
+      // const userEmail = session?.user?.user.email
+      const payment: Payment = await createPedido(pedidoCreateDto);
+
+      window.open(payment.redirectUrl);
     } catch (error) {
-      console.error("Error al crear el pago:", error)
+      console.error("Error al crear el pago:", error);
       setError(
         error instanceof Error
           ? error.message
           : "Error desconocido al procesar el pago"
-      )
+      );
       showToastAlert({
         title: "Error al procesar el pago",
         text:
@@ -104,17 +111,17 @@ export const PaymentStep = forwardRef<
         icon: "error",
         position: "top-end",
         toast: true,
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   useImperativeHandle(ref, () => ({
     handleSubmit: async () => {
-      return await form.handleSubmit(onSubmit)()
+      return await form.handleSubmit(onSubmit)();
     },
-  }))
+  }));
 
   return (
     <div className="space-y-6">
@@ -159,7 +166,8 @@ export const PaymentStep = forwardRef<
                         <div>
                           <p className="font-medium">Stripe</p>
                           <p className="text-sm text-muted-foreground">
-                            Paga con tarjeta de crédito o débito a través de Stripe
+                            Paga con tarjeta de crédito o débito a través de
+                            Stripe
                           </p>
                         </div>
                       </div>
@@ -184,7 +192,8 @@ export const PaymentStep = forwardRef<
                         <div>
                           <p className="font-medium">Mercado Pago</p>
                           <p className="text-sm text-muted-foreground">
-                            Paga con tarjeta de crédito, débito o saldo de Mercado Pago
+                            Paga con tarjeta de crédito, débito o saldo de
+                            Mercado Pago
                           </p>
                         </div>
                       </div>
@@ -206,8 +215,7 @@ export const PaymentStep = forwardRef<
         </form>
       </Form>
     </div>
-  )
-})
+  );
+});
 
-PaymentStep.displayName = "PaymentStep"
-
+PaymentStep.displayName = "PaymentStep";

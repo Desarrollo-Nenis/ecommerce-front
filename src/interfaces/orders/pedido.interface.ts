@@ -1,4 +1,5 @@
 import { Address } from "../directions/directions.interface";
+import { PaymentProvider } from "../payments-providers/payment-prodivers";
 
 
 export enum PedidosStatus {
@@ -10,12 +11,12 @@ export enum PedidosStatus {
   ENTREGADO = "ENTREGADO",
 }
 
-export interface Order {
+export interface Pedido {
   id:               number;
   uuid:               string;
   documentId:       string;
   estado:           PedidosStatus;
-  fechaPedido:      Date;
+  fechaPedido?:      Date;
   provider:         string;
   metadata:         Metadata;
   createdAt:        Date;
@@ -65,3 +66,25 @@ export interface Pago {
   estadoPago: string;
   orderId:    string;
 }
+
+
+
+export interface PedidoCreateDto {
+ 
+  cliente: number;
+  productosSeleccionados: ProductoSeleccionadoInput[];
+  informacionEnvio: InformacionEnvioCreateDto;
+  provider: PaymentProvider
+}
+export interface InformacionEnvioCreateDto {
+  esLocal:    boolean;
+  costoEnvio: number;
+  nota?:       null;
+  direccion:  number;
+}
+
+export interface ProductoSeleccionadoInput {
+  producto: number;
+  cantidad: number;
+}
+

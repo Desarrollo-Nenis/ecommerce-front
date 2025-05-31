@@ -30,16 +30,10 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
-    // setConfig,
     getCartSummary,
     cart,
   } = useCartStore();
-  // const {
-  //   loadConfig,
-  //   cantidadMinEnvioGratis,
-  //   costoEnvio,
-  //   porcentajeImpuestos,
-  // } = useConfigStore();
+
   const {
     // impuestos, envio, finalAmount
     subtotal,
@@ -76,13 +70,6 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
     const url = new URL(window.location.href);
     url.searchParams.set("step", step.toString());
     window.history.replaceState(null, "", url.toString());
-
-    // loadConfig();
-    // setConfig({
-    //   cantidadMinEnvioGratis,
-    //   costoEnvio,
-    //   porcentajeImpuestos,
-    // });
   }, [step]);
 
   const handleBack = () => {

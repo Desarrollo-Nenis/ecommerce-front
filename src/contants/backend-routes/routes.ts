@@ -10,5 +10,7 @@ export const BACKEND_ROUTES = {
     BRANCH: "marcas",
     PRODUCTS: "productos",
     USERS: "usuarios",
+    PEDIDOS: "pedidos",
+    PAYMENTS: "payments",
   } as const;
 export type Route = typeof BACKEND_ROUTES[keyof typeof BACKEND_ROUTES];  

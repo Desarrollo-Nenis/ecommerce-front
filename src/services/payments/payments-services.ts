@@ -1,8 +1,10 @@
 import { BACKEND_ROUTES } from "@/contants/backend-routes/routes"
+import { PedidoCreateDto } from "@/interfaces/orders/pedido.interface"
 import type { Payment, PaymentRequest } from "@/interfaces/payment/payments.interface"
 import { query } from "@/lib/api/server/strapi"
 
-const BASE_ENDPOINT: string = BACKEND_ROUTES.PAYMENTS
+const BASE_ENDPOINT_PEDIDOS: string = BACKEND_ROUTES.PEDIDOS
+const BASE_ENDPOINT_PAYMENTS: string = BACKEND_ROUTES.PAYMENTS
 
 export function createPayment(data: PaymentRequest, userId?: string, userEmail?: string): Promise<Payment> {
   // Sanitizar los datos
@@ -57,7 +59,7 @@ export function createPayment(data: PaymentRequest, userId?: string, userEmail?:
   }
 
   // Usar los datos sanitizados en la llamada a la API
-  return query<Payment>(BASE_ENDPOINT, {
+  return query<Payment>(BASE_ENDPOINT_PAYMENTS, {
     method: "POST",
     body: sanitizedRequest,
     customerId: userId,
@@ -70,5 +72,20 @@ export function createPayment(data: PaymentRequest, userId?: string, userEmail?:
     .catch((error) => {
       console.error("Error al crear el request del pago:", error)
       throw new Error("Fallo al crear el request del pago")
+    })
+}
+
+export function createPedido(data:PedidoCreateDto): Promise<Payment> {
+  return query<Payment>(`${BASE_ENDPOINT_PEDIDOS}`, {
+    method: "POST",
+    body: data,
+  })
+    .then((res) => {
+      console.log("Respuesta del servidor:", res)
+      return res
+    })
+    .catch((error) => {
+      console.error("Error al crear Pedido", error)
+      throw new Error("Fallo al crear Pedido")
     })
 }

@@ -7,15 +7,15 @@ import { OrderEmpty } from "./order-empty"
 import { OrderSkeleton } from "./order-skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShoppingBag } from "lucide-react"
-import { Order } from "@/interfaces/orders/pedido.interface"
+import { Pedido } from "@/interfaces/orders/pedido.interface"
 
 interface OrdersClientProps {
-  initialPedidos: Order[]
+  initialPedidos: Pedido[]
 }
 
 export function OrdersClient({ initialPedidos }: OrdersClientProps) {
-  const [pedidos, setPedidos] = useState<Order[]>(initialPedidos)
-  const [filteredPedidos, setFilteredPedidos] = useState<Order[]>(initialPedidos)
+  const [pedidos, setPedidos] = useState<Pedido[]>(initialPedidos)
+  const [filteredPedidos, setFilteredPedidos] = useState<Pedido[]>(initialPedidos)
   const [isLoading, setIsLoading] = useState(false)
 
   // Función para filtrar pedidos por estado

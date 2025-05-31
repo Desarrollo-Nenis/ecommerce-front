@@ -1,14 +1,14 @@
 import { BACKEND_ROUTES } from "@/contants/backend-routes/routes"
 import { DataResponse } from "@/interfaces/data/response.interface";
-import type { Order } from "@/interfaces/orders/pedido.interface"
+import type { Pedido } from "@/interfaces/orders/pedido.interface"
 import { query } from "@/lib/api/server/strapi"
 
 const BASE_ENDPOINT: string = BACKEND_ROUTES.ORDERS;
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 
-export async function getUserOrders(userId: number | undefined): Promise<DataResponse<Order[]>> {
+export async function getUserOrders(userId: number | undefined): Promise<DataResponse<Pedido[]>> {
   try {
-    const res = await query<DataResponse<Order[]>>(
+    const res = await query<DataResponse<Pedido[]>>(
       `${BASE_ENDPOINT}?filters[cliente][id][$eq]=${userId}&populate[informacionEnvio][populate][direccion][fields]=calle,ciudad,estado,codigoPostal,numeroExterior,numeroInterior,referencia,nombreRecibe,telefono&populate[pagos][fields]=monto,moneda,estadoPago,orderId`
     )
 
