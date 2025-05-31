@@ -1,7 +1,7 @@
 import * as z from "zod";
-
+ 
 export const formSchema = z.object({
-  paymentProvider: z.enum(["STRIPE", "MERCADO_PAGO"], {
+  paymentProvider:z.enum(["STRIPE", "MERCADO_PAGO"], {
     required_error: "Por favor selecciona un método de pago",
   }),
 });

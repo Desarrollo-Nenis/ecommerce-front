@@ -25,10 +25,10 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/formatDate";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { Order, PedidosStatus } from "@/interfaces/orders/pedido.interface";
+import { Pedido, PedidosStatus } from "@/interfaces/orders/pedido.interface";
 
 interface OrderItemProps {
-  pedido: Order;
+  pedido: Pedido;
 }
 
 export function OrderItem({ pedido }: OrderItemProps) {
@@ -83,7 +83,7 @@ export function OrderItem({ pedido }: OrderItemProps) {
               )}
               <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />{" "}
-                {formatDate(pedido.fechaPedido.toString())}
+                {pedido.fechaPedido ?formatDate(pedido.fechaPedido?.toString()): "fecha no disponible"}
               </p>
             </div>
           </div>
@@ -91,7 +91,9 @@ export function OrderItem({ pedido }: OrderItemProps) {
             <Badge
               key={pedido.estado}
               variant="outline"
-              className={`capitalize ${getStatusColor(pedido.estado)} border-0 flex gap-2 p-1.5`}
+              className={`capitalize ${getStatusColor(
+                pedido.estado
+              )} border-0 flex gap-2 p-1.5`}
             >
               {getStatusIcon(pedido.estado)}
               <p>{pedido.estado}</p>
@@ -216,7 +218,9 @@ export function OrderItem({ pedido }: OrderItemProps) {
                   <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg w-full sm:w-auto sm:min-w-[200px]">
                     <div className="flex justify-between font-bold mt-2 pt-2 dark:border-slate-700">
                       <span>Total:</span>
-                      <span>{formatCurrency(pedido.pagos[0].monto)}</span>
+                      {pedido.pagos && (
+                        <span>{pedido.metadata.total}</span>
+                      )}
                     </div>
                   </div>
                 </div>

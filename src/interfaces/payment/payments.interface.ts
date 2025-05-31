@@ -1,4 +1,3 @@
-import { User } from "../auth/user.interface"
 
 export interface PaymentItem {
   id: string

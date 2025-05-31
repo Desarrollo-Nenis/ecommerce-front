@@ -27,7 +27,7 @@ export default async function MainPage() {
 
         {/* Columna del grid de productos */}
         <section className="col-span-8">
-          <ProductGrid products={resultProducts.data} />
+          <ProductGrid products={resultProducts} />
         
         </section>
       </div>

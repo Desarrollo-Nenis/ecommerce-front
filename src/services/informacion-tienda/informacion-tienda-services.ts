@@ -28,25 +28,25 @@ export function getInfoEcommerce(): Promise<DataResponse<InfoEcommerce>> {
           ...red,
           icono: { ...red.icono, url: `${STRAPI_HOST}${red.icono.url}` },
         })),
-        // nosotros: {
-        //   ...res.data.nosotros,
-        //   imagenHistoria: res.data?.nosotros?.imagenHistoria
-        //     ? {
-        //         ...res.data.nosotros.imagenHistoria,
-        //         id: res.data.nosotros.imagenHistoria.id ?? 0,
-        //         url: `${STRAPI_HOST}${res.data.nosotros.imagenHistoria.url}`,
-        //       }
-        //     : undefined,
-        //   personal: res.data.nosotros?.personal?.map((persona) => ({
-        //     ...persona,
-        //     img: { ...persona.img, url: `${STRAPI_HOST}${persona.img.url}` },
-        //   })),
-        // },
-        direcciones: res.data.direcciones?.map((d) => ({
+        nosotros: {
+          ...res.data.nosotros,
+          imagenHistoria: res.data?.nosotros?.imagenHistoria
+            ? {
+                ...res.data.nosotros.imagenHistoria,
+                id: res.data.nosotros.imagenHistoria.id ?? 0,
+                url: `${STRAPI_HOST}${res.data.nosotros.imagenHistoria.url}`,
+              }
+            : undefined,
+          personal: res.data.nosotros?.personal?.map((persona) => ({
+            ...persona,
+            img: { ...persona.img, url: `${STRAPI_HOST}${persona.img.url}` },
+          })),
+        },
+        direcciones: res.data?.direcciones?.map((d) => ({
           ...d,
-          imagenes: d.imagenes.map((i) => ({
-            ...i,
-            url: `${STRAPI_HOST}${i.url}`,
+          imagenes: d.imagenes.map((img) => ({
+            ...img,
+            url: `${STRAPI_HOST}${img.url}`,
           })),
         })),
       };
