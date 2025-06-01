@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Heart, MapPin, Phone, Mail, Edit, ShoppingBag } from "lucide-react"
+import { Heart, Phone, Mail, ShoppingBag } from "lucide-react"
 import { User } from "@/interfaces/auth/user.interface";
 import { getTimeSinceCreation } from "@/lib/timeCreationProfile";
 import { getInitialsName } from "@/lib/getInitialsName";
