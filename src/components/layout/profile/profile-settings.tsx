@@ -6,8 +6,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Save } from "lucide-react"
+import { User } from "@/interfaces/auth/user.interface";
 
-export function ProfileSettings() {
+interface ProfileSettingsProps {
+  user: User
+}
+
+export function ProfileSettings({ user }: ProfileSettingsProps) {
   return (
     <Card>
       <CardHeader>
@@ -15,7 +20,7 @@ export function ProfileSettings() {
         <CardDescription>Actualiza tu información personal y preferencias</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <PersonalInfoForm />
+        <PersonalInfoForm user={ user } />
         <Separator />
         <PasswordChangeForm />
       </CardContent>
@@ -30,12 +35,12 @@ export function ProfileSettings() {
   )
 }
 
-function PersonalInfoForm() {
+function PersonalInfoForm({ user }: {user: User}) {
   const fields = [
-    { id: "nombre", label: "Nombre", defaultValue: "Juan", type: "text" },
-    { id: "apellido", label: "Apellido", defaultValue: "Domínguez", type: "text" },
-    { id: "email", label: "Correo electrónico", defaultValue: "juan.dominguez@email.com", type: "email" },
-    { id: "telefono", label: "Teléfono", defaultValue: "+52 55 1234 5678", type: "text" },
+    { id: "nombre", label: "Nombre", defaultValue: user.name, type: "text" },
+    { id: "apellido", label: "Apellido", defaultValue: user.lastName || `Apellido(s)`, type: "text" },
+    { id: "email", label: "Correo electrónico", defaultValue: user.email, type: "email" },
+    { id: "telefono", label: "Teléfono", defaultValue: user.telefono || `Número Teléfono`, type: "text" },
   ]
 
   return (
