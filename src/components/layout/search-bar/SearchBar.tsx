@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import CartDropdown from "../cart/cart-dropdown/cart-dropdown";
+import CartDropdown from "../../../modules/cart/cart-dropdown/cart-dropdown";
 
 export const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");

@@ -1,5 +1,5 @@
 import { auth } from "@/auth"
-import { ProfileLayout } from "@/components/layout/profile/profile"
+import { ProfileLayout } from "@/modules/profile/profile"
 import { getMeInfo } from "@/services/users/users-services";
 
 export default async function PerfilUsuario() {

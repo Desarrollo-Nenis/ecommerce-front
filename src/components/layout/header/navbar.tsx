@@ -44,7 +44,7 @@ import type { InfoEcommerce } from "@/interfaces/informacion-tienda/informacion-
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchBar } from "../search-bar/SearchBar";
-import { AvatarDropdown } from "../avatar-dropdown/AvatarDropdown";
+import { AvatarDropdown } from "../../../modules/common/components/avatar-dropdown/AvatarDropdown";
 import { ButtonLogin } from "@/modules/common/components/auth/login/ButtonLogin";
 import type { Session } from "next-auth";
 import { FRONTEND_ROUTES } from "../../../contants/frontend-routes/routes";

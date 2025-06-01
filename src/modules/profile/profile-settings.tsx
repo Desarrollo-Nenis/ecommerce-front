@@ -41,7 +41,7 @@ function PersonalInfoForm({ user }: { user: User }) {
     { id: "nombre", label: "Nombre", defaultValue: user.name || "", type: "text" },
     { id: "apellido", label: "Apellido", defaultValue: user.lastName || "", type: "text" },
     { id: "email", label: "Correo electrónico", defaultValue: user.email || "", type: "email" },
-    { id: "telefono", label: "Teléfono", defaultValue: user.phone || "", type: "text" },
+    { id: "telefono", label: "Teléfono", defaultValue: user.telefono || "", type: "text" },
   ]
 
   return (

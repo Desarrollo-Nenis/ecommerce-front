@@ -17,7 +17,7 @@ import { HiHome } from "react-icons/hi";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import clsx from "clsx";
-import { AddressDialog } from "../../address/form/address-dialog";
+import { AddressDialog } from "../../../components/layout/address/form/address-dialog";
 import { Button } from "@/components/ui/button";
 
 interface AddressStepProps {
