@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { BasketGrid } from "@/components/layout/cart/basket";
+import { BasketGrid } from "@/modules/cart/basket";
 import { Button } from "@/components/ui/button";
 import { ModalAuth } from "@/modules/common/components/auth/modalAuth";
 import { getUserDirections } from "@/services/directions/directions-services";

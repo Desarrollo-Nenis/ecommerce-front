@@ -2,43 +2,47 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Heart, MapPin, Phone, Mail, Edit, ShoppingBag } from "lucide-react"
+import { Heart, Phone, Mail, ShoppingBag } from "lucide-react"
+import { User } from "@/interfaces/auth/user.interface";
+import { getTimeSinceCreation } from "@/lib/timeCreationProfile";
+import { getInitialsName } from "@/lib/getInitialsName";
 
-export function ProfileSidebar() {
+interface ProfileSidebarProps {
+  user: User;
+  avatarUser: string | undefined | null;
+}
+
+export function ProfileSidebar({ user, avatarUser }: ProfileSidebarProps) {
   return (
     <Card className="md:col-span-2 lg:col-span-1">
       <CardHeader className="flex flex-col items-center text-center">
         <Avatar className="h-24 w-24 mb-3 shadow-lg ring-2 ring-primary ring-offset-2 ring-offset-background">
-          <AvatarImage src="/imgs/default/user.webp?height=96&width=96" alt="Foto de perfil" />
-          <AvatarFallback className="bg-orange-50 text-orange-600 font-semibold text-lg">EC</AvatarFallback>
+          <AvatarImage src={ avatarUser || `/imgs/default/user.webp?height=96&width=96`} alt="Foto de perfil" />
+          <AvatarFallback className="bg-orange-50 text-orange-600 font-semibold text-lg">{getInitialsName(user.name!, user.lastName)}</AvatarFallback>
         </Avatar>
-        <CardTitle>Eric Carballo</CardTitle>
-        <CardDescription>Cliente desde 2022</CardDescription>
-        <Badge className="mt-2 bg-blue-500 hover:bg-blue-600">Cliente Frecuente</Badge>
+        <CardTitle>{user.name} {user.lastName}</CardTitle>
+        <CardDescription>
+          <Badge className="mt-2 capitalize bg-blue-500 hover:bg-blue-600">
+            {getTimeSinceCreation( user.createdAt.toString() )}
+          </Badge>
+          </CardDescription>
+        {/* <Badge className="mt-2 capitalize bg-blue-500 hover:bg-blue-600">cliente frecuente</Badge> */}
       </CardHeader>
       <CardContent className="space-y-4">
-        <ContactInfo />
+        <ContactInfo user={user} />
         <Separator />
         <ActivitySummary />
       </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="w-full">
-          <Edit className="mr-2 h-4 w-4" />
-          Editar Perfil
-        </Button>
-      </CardFooter>
     </Card>
   )
 }
 
-function ContactInfo() {
+function ContactInfo({ user }: {user: User }) {
   const contactDetails = [
-    { icon: <Mail className="h-4 w-4 text-muted-foreground" />, text: "ericjasiel.11@gmail.com" },
-    { icon: <Phone className="h-4 w-4 text-muted-foreground" />, text: "+52 55 1234 5678" },
-    { icon: <MapPin className="h-4 w-4 text-muted-foreground" />, text: "Ciudad de México, México" },
+    { icon: <Mail className="h-4 w-4 text-muted-foreground" />, text: user.email },
+    { icon: <Phone className="h-4 w-4 text-muted-foreground" />, text: user.telefono || `no data` },
   ]
 
   return (

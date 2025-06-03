@@ -11,6 +11,7 @@ export interface User {
   authProvider:AuthProvider;
   direccions: Address[];
   rol: string;
+  telefono: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date;

@@ -44,7 +44,7 @@ import type { InfoEcommerce } from "@/interfaces/informacion-tienda/informacion-
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchBar } from "../search-bar/SearchBar";
-import { AvatarDropdown } from "../avatar-dropdown/AvatarDropdown";
+import { AvatarDropdown } from "../../../modules/common/components/avatar-dropdown/AvatarDropdown";
 import { ButtonLogin } from "@/modules/common/components/auth/login/ButtonLogin";
 import type { Session } from "next-auth";
 import { FRONTEND_ROUTES } from "../../../contants/frontend-routes/routes";
@@ -318,7 +318,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/perfil">
                           <User className="mr-2 h-4 w-4" />
@@ -328,7 +328,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/pedidos">
                           <Package className="mr-2 h-4 w-4" />
@@ -338,7 +338,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/direcciones">
                           <MapPin className="mr-2 h-4 w-4" />
@@ -348,7 +348,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href="/favoritos">
                           <Heart className="mr-2 h-4 w-4" />
@@ -358,7 +358,7 @@ export default function Navbar({
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start hover:bg-muted hover:text-primary transition-colors"
                       >
                         <Link href={session?.user?.user ? "/carrito" : "/"}>
                           <ShoppingCart className="mr-2 h-4 w-4" />

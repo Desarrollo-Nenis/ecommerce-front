@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { OrdersClient } from "@/components/layout/orders/orders-client"
+import { OrdersClient } from "@/modules/orders/orders-client"
 import { getUserOrders } from "@/services/orders/orders-services";
 
 export default async function PedidosPage() {
