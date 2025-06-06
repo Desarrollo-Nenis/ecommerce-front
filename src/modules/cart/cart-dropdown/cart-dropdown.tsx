@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/store/products-cart.store";
+import { getPrecioConDescuento } from "@/lib/price-descuento";
 
 const CartContent = () => {
   const { cart, increaseQuantity, decreaseQuantity, removeFromCart } =
@@ -25,8 +26,12 @@ const CartContent = () => {
 
   // Calcular el total del carrito
   const cartTotal = cart.reduce((total, item) => {
-    if (item.inventario?.precioVenta) {
-      return total + item.inventario.precioVenta * item.quantity;
+    const { finalPrice } = getPrecioConDescuento(
+      item.inventario,
+      item.descuento
+    );
+    if (finalPrice !== null) {
+      return total + finalPrice * item.quantity;
     }
     return total;
   }, 0);
@@ -44,59 +49,81 @@ const CartContent = () => {
 
       {cart.length > 0 ? (
         <div className="max-h-[250px] overflow-auto space-y-3">
-          {cart.map((item) => (
-            <div key={item.id} className="flex items-center gap-3">
-              <Image
-                src={item.coverUrl || "/imgs/products/default-img.png"}
-                alt={item.nombre}
-                width={50}
-                height={50}
-                className="rounded-md border"
-              />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium">{item.nombre}</p>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  {item.inventario?.precioVenta && (
-                    <span>
-                      $
-                      {(item.inventario?.precioVenta * item.quantity).toFixed(
-                        2
-                      )}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => decreaseQuantity(item.id)}
-                  >
-                    <Minus size={16} />
-                  </Button>
-                  <span className="w-6 text-center">{item.quantity}</span>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => increaseQuantity(item.id)}
-                  >
-                    <Plus size={16} />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => removeFromCart(item.id)}
-                  >
-                    <Trash size={16} />
-                  </Button>
+          {cart.map((item) => {
+            const { finalPrice, hasDiscount } = getPrecioConDescuento(
+              item.inventario,
+              item.descuento
+            );
+
+            return (
+              <div key={item.id} className="flex items-center gap-3">
+                <Image
+                  src={item.coverUrl || "/imgs/products/default-img.png"}
+                  alt={item.nombre}
+                  width={50}
+                  height={50}
+                  className="rounded-md border"
+                />
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm font-medium">{item.nombre}</p>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    {finalPrice !== null && (
+                      <span>
+                        ${(finalPrice * item.quantity).toFixed(2)}
+                        {hasDiscount && (
+                          <span className="ml-1 line-through opacity-60 text-xs">
+                            $
+                            {(
+                              item.inventario!.precioVenta * item.quantity
+                            ).toFixed(2)}
+                          </span>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => decreaseQuantity(item.id)}
+                    >
+                      <Minus size={16} />
+                    </Button>
+                    <span className="w-6 text-center">{item.quantity}</span>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => increaseQuantity(item.id)}
+                    >
+                      <Plus size={16} />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      <Trash size={16} />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="py-6 text-center">
           <p className="text-muted-foreground">Tu carrito está vacío</p>
         </div>
+      )}
+
+      {cart.length > 0 && (
+        <>
+          <Separator />
+          <div className="flex items-center justify-between font-medium">
+            <span>Total:</span>
+            <span>${cartTotal.toFixed(2)}</span>
+          </div>
+        </>
       )}
 
       {cart.length > 0 && (
