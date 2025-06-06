@@ -6,6 +6,7 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Marca } from "@/interfaces/marcas/marca.interface";
 
@@ -28,7 +29,7 @@ export default function MarcasCarousel({
         loop: false,
       }}
     >
-      <CarouselContent className="flex justify-center items-center -ml-2 md:-ml-4">
+      <CarouselContent className="">
         {marcas.map((item, index) => (
           <CarouselItem
             key={index}
@@ -55,6 +56,7 @@ export default function MarcasCarousel({
           </CarouselItem>
         ))}
       </CarouselContent>
+      <CarouselPrevious className="absolute -left-3 top-1/2 -translate-y-1/2" />
       <CarouselNext className="absolute -right-3 top-1/2 -translate-y-1/2" />
     </Carousel>
   );
