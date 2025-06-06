@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Session } from "next-auth";
 import type { Address } from "@/interfaces/directions/directions.interface";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,11 @@ import { useCartStore } from "@/store/products-cart.store";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 // import { useConfigStore } from "@/store/config-pago.store";
-import { extractTextFromBlocks } from "@/lib/descriptionProducts";
+import { showToastAlert } from "@/components/ui/altertas/toast";
+import { ProductoSeleccionadoInput } from "@/interfaces/orders/pedido.interface";
+import { createPedido } from "@/services/payments/payments-services";
+import { Payment } from "@/interfaces/payment/payments.interface";
+import { usePedidoStore } from "@/store/pedido.store";
 
 interface BasketGridProps {
   session: Session;
@@ -23,16 +27,12 @@ interface BasketGridProps {
 }
 
 export function BasketGrid({ session, addresses }: BasketGridProps) {
-  const paymentStepRef = useRef<{ handleSubmit: () => void }>(null);
   const searchParams = useSearchParams();
   const initialStep = Number.parseInt(searchParams.get("step") || "1", 10);
   const [step, setStep] = useState(initialStep);
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    getCartSummary,
-    cart,
-  } = useCartStore();
+  const { getCartSummary, cart } = useCartStore();
 
   const {
     // impuestos, envio, finalAmount
@@ -40,31 +40,59 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
     total,
   } = getCartSummary();
 
-  const paymentItems = cart.map((item) => {
-    let description = "";
+  const { pedido, setProductos, setCliente, resetPedido } = usePedidoStore();
 
-    if (Array.isArray(item.descripcion)) {
-      description = extractTextFromBlocks(item.descripcion);
+  const handleFinalizarPago = async () => {
+    try {
+      setIsLoading(true);
+
+      const provider = pedido.provider; // Ya está seteado por el PaymentStep
+      const clienteId = session?.user?.user?.id;
+const products: ProductoSeleccionadoInput[] = cart.map((item) => ({
+        producto: +item.id,
+        cantidad: item.quantity,
+      }));
+      if (!provider || !clienteId) {
+        showToastAlert({
+          title: "Información incompleta",
+          text: "Asegúrate de seleccionar un método de pago.",
+          icon: "warning",
+          position: "top-end",
+          toast: true,
+        });
+        return;
+      }
+
+      setCliente(clienteId);
+      setProductos(products);
+      console.log(pedido);
+      
+      const payment: Payment = await createPedido({
+        ...pedido,
+        cliente: clienteId,
+        productosSeleccionados: products,
+        provider,
+      });
+      
+
+      window.open(payment.redirectUrl);
+      resetPedido()
+    } catch (error) {
+      console.error("Error al procesar el pago:", error);
+      showToastAlert({
+        title: "Error al procesar el pago",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Ocurrió un error al crear el pago. Por favor, intenta nuevamente.",
+        icon: "error",
+        position: "top-end",
+        toast: true,
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    if (typeof item.descripcion === "string") {
-      description = item.descripcion;
-    }
-
-    if (!description) {
-      description = `${item.nombre} - ${
-        item.atributos?.map((a) => a.valor).join(", ") || ""
-      }`;
-    }
-
-    return {
-      id: item.id.toString(),
-      title: item.nombre,
-      description,
-      quantity: item.quantity,
-      unitPrice: item.inventario?.precioVenta || 0,
-    };
-  });
+  };
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -94,7 +122,7 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
           )
         );
       case 3:
-        return <PaymentStep ref={paymentStepRef} items={paymentItems} />;
+        return <PaymentStep />;
       default:
         return null;
     }
@@ -138,18 +166,7 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
             ) : (
               <Button
                 className="cursor-pointer"
-                onClick={async () => {
-                  if (paymentStepRef.current) {
-                    setIsLoading(true);
-                    try {
-                      await paymentStepRef.current.handleSubmit();
-                    } catch (err) {
-                      console.error(err);
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }
-                }}
+                onClick={handleFinalizarPago}
                 disabled={isLoading}
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
