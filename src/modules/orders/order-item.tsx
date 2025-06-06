@@ -83,7 +83,9 @@ export function OrderItem({ pedido }: OrderItemProps) {
               )}
               <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />{" "}
-                {pedido.fechaPedido ?formatDate(pedido.fechaPedido?.toString()): "fecha no disponible"}
+                {pedido.fechaPedido
+                  ? formatDate(pedido.fechaPedido?.toString())
+                  : "fecha no disponible"}
               </p>
             </div>
           </div>
@@ -107,13 +109,17 @@ export function OrderItem({ pedido }: OrderItemProps) {
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Dirección
               </p>
-              <p className="text-sm">
-                {pedido.informacionEnvio.direccion.calle},{" "}
-                {pedido.informacionEnvio.direccion.numeroExterior} -{" "}
-                <span className="italic uppercase text-xs">cp:</span>{" "}
-                {pedido.informacionEnvio.direccion.codigoPostal},{" "}
-                {pedido.informacionEnvio.direccion.ciudad}
-              </p>
+              {pedido.informacionEnvio.esLocal ? (
+                 <p className="text-sm">Entrega en Sucursal</p>
+              ) : (
+                <p className="text-sm">
+                  {pedido.informacionEnvio?.direccion?.calle},{" "}
+                  {pedido.informacionEnvio?.direccion?.numeroExterior} -{" "}
+                  <span className="italic uppercase text-xs">cp:</span>{" "}
+                  {pedido.informacionEnvio?.direccion?.codigoPostal},{" "}
+                  {pedido.informacionEnvio?.direccion?.ciudad}
+                </p>
+              )}
             </div>
           </div>
 
@@ -218,9 +224,7 @@ export function OrderItem({ pedido }: OrderItemProps) {
                   <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg w-full sm:w-auto sm:min-w-[200px]">
                     <div className="flex justify-between font-bold mt-2 pt-2 dark:border-slate-700">
                       <span>Total:</span>
-                      {pedido.pagos && (
-                        <span>{pedido.metadata.total}</span>
-                      )}
+                      {pedido.pagos && <span>{pedido.metadata.total}</span>}
                     </div>
                   </div>
                 </div>
