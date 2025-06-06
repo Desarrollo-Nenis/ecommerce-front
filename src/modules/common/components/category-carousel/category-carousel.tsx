@@ -30,7 +30,7 @@ export default function CategoryCarousel({
         loop: false,
       }}
     >
-      <CarouselContent className="flex justify-center items-center -ml-2 md:-ml-4">
+      <CarouselContent >
         {categorias.map((item, index) => (
           <CarouselItem
             key={index}
