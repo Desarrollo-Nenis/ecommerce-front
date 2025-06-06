@@ -4,8 +4,7 @@ import { HeaderShop } from "@/components/layout/header/header";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { WhatsAppButton } from "@/components/layout/whatsapp/whatsapp";
-import {Footer} from "@/components/layout/footer/footer";
-
+import { Footer } from "@/components/layout/footer/footer";
 
 export const metadata: Metadata = {
   title: "Ecommerce Ferreteria",
@@ -19,28 +18,27 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
-    <html lang="en" suppressHydrationWarning>
-      <head />
-      <body className="min-h-screen flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SessionProvider>
-          <WhatsAppButton phoneNumber={`+52${phoneNumber!}`} />
+      <html lang="en" suppressHydrationWarning>
+        <head />
+        <body className="min-h-screen flex flex-col">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SessionProvider>
+              <WhatsAppButton phoneNumber={`+52${phoneNumber!}`} />
 
-          <HeaderShop />
-             {/* El contenido crecerá y empujará el footer hacia abajo */}
-            <main className="flex-grow">
-              {children}
-            </main>
-          {/* <Footer></Footer> */}
-          </SessionProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  </>
+              <HeaderShop />
+              {/* El contenido crecerá y empujará el footer hacia abajo */}
+              <main className="flex-grow">{children}</main>
+              {/* <Footer></Footer> */}
+            </SessionProvider>
+          </ThemeProvider>
+          <Footer />
+        </body>
+      </html>
+    </>
   );
 }
