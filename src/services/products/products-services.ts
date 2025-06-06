@@ -218,7 +218,7 @@ function buildParamsWithFilters(
   }
 
   // Relaciones necesarias
- params.append("[fields][0]", "nombre");
+  params.append("[fields][0]", "nombre");
   params.append("[fields][1]", "slug");
   params.append("[fields][2]", "tipo");
   params.append("populate[categorias]", "true");
@@ -294,11 +294,17 @@ export interface ProductFilters {
   marcas?: string[];
   precioMin?: number;
   precioMax?: number;
-  sortBy?:SortOption
+  sortBy?: SortOption;
   page?: number;
   pageSize?: number;
+  descuentos?: boolean;
 }
-export type SortOption = "featured" | "price-asc" | "price-desc" | "name-asc" | "name-desc"
+export type SortOption =
+  | "featured"
+  | "price-asc"
+  | "price-desc"
+  | "name-asc"
+  | "name-desc";
 
 export async function getProductsByFilters(
   filters: ProductFilters = {}
@@ -366,12 +372,6 @@ function buildFilterParams(
     });
   }
 
-  if (filters.precioMin !== undefined && !isNaN(filters.precioMin)) {
-    params.append(
-      "filters[inventario][precioVenta][$gte]",
-      filters.precioMin.toString()
-    );
-  }
 
   if (filters.precioMax !== undefined && !isNaN(filters.precioMax)) {
     params.append(
@@ -408,6 +408,15 @@ function buildFilterParams(
     if (sortValue) params.append("sort", sortValue);
   }
 
+  // descuentos, ofertas
+  if (filters.descuentos) {
+    const now = new Date().toISOString();
+
+    params.append("filters[descuento][activo][$eq]", "true");
+    params.append("filters[descuento][fechaInicio][$lte]", now);
+    params.append("filters[descuento][fechaFin][$gte]", now);
+  }
+
   // Campos y relaciones
   params.append("[fields][0]", "nombre");
   params.append("[fields][1]", "slug");
@@ -417,6 +426,7 @@ function buildFilterParams(
     "[cover]",
     "[galeria]",
     "[inventario]",
+    "[descuento]",
     // "[variantes][populate][inventario]",
   ];
   populate.forEach((field) => params.append(`populate${field}`, "true"));
@@ -428,11 +438,12 @@ export async function getAllProducts(): Promise<DataResponse<Products[]>> {
   const params = new URLSearchParams();
   params.append("[fields][0]", "nombre");
   params.append("[fields][1]", "slug");
+  params.append("[fields][2]", "tipo");
+  params.append("populate[descuento]", "true");
+  params.append("populate[inventario]", "true");
   params.append("populate[categorias]", "true");
   params.append("populate[marca]", "true");
   params.append("populate[cover][fields][0]", "url");
-  params.append("populate[inventario]", "true");
-  params.append("populate[descuento]", "true");
   params.append("populate[variantes][populate][inventario]", "true");
 
   return query<DataResponse<Products[]>>(
@@ -517,6 +528,6 @@ export function parseProductFilters(
       : undefined,
     pageSize: getParam("pageSize") ? Number(getParam("pageSize")) : 10,
     page: getParam("page") ? Number(getParam("page")) : 1,
-    sortBy: getParam("sort") ? getParam("sort") as SortOption: "featured",
+    sortBy: getParam("sort") ? (getParam("sort") as SortOption) : "featured",
   };
 }
