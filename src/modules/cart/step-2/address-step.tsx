@@ -19,6 +19,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import clsx from "clsx";
 import { AddressDialog } from "../../../components/layout/address/form/address-dialog";
 import { Button } from "@/components/ui/button";
+import { usePedidoStore } from "@/store/pedido.store";
 
 interface AddressStepProps {
   addresses: Address[];
@@ -30,11 +31,7 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
   const [addressList, setAddressList] = useState<Address[]>(addresses);
   const [isLocal, setIsLocal] = useState(false);
 
-  // const handleAddressAdded = (newAddress: Address) => {
-  //   const updatedAddresses = [...addressList, newAddress];
-  //   setAddressList(updatedAddresses);
-  //   setSelectedAddress(newAddress.id.toString());
-  // };
+  const { pedido, setInformacionEnvio } = usePedidoStore();
 
   useEffect(() => {
     setAddressList(addresses);
@@ -43,6 +40,24 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
     else if (addresses.length > 0)
       setSelectedAddress(addresses[0].id.toString());
   }, [addresses]);
+
+  useEffect(() => {
+    if (isLocal == true)
+      setInformacionEnvio({
+        ...pedido.informacionEnvio,
+        esLocal: isLocal,
+
+        direccion: null,
+      });
+    else {
+      setInformacionEnvio({
+        ...pedido.informacionEnvio,
+        esLocal: isLocal,
+        direccion: selectedAddress !== undefined ? +selectedAddress : null,
+      });
+    }
+    console.log(pedido.informacionEnvio);
+  }, [isLocal, selectedAddress]);
 
   const selectedAddressData = selectedAddress
     ? addressList.find((a) => a.id.toString() === selectedAddress)
@@ -57,19 +72,23 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* envio a domicilio */}
         <ToggleGroup
           type="single"
           className="border"
-          value={isLocal ? "local" : "envio"}
+          value={pedido.informacionEnvio?.esLocal ? "local" : "envio"}
           onValueChange={(value) => {
             setIsLocal(value === "local");
           }}
         >
+          {/* entrega en tienda */}
           <ToggleGroup
             type="single"
             className="border"
-            value={isLocal ? "local" : "envio"}
-            onValueChange={(value) => setIsLocal(value === "local")}
+            value={!pedido.informacionEnvio?.esLocal ? "local" : "envio"}
+            onValueChange={(value) => {
+              setIsLocal(value === "envio");
+            }}
           />
           <ToggleGroupItem value="envio" aria-label="Envío a Domicilio">
             Envío a Domicilio
@@ -170,16 +189,15 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
                 </div>
               )}
             </div>
-            
           )}
           <div className="flex justify-center">
-          <AddressDialog userId={userId}>
-            <Button variant="outline" className="mt-2 cursor-pointer">
-              <FaPlus className="mr-2 h-4 w-4" />
-              Agregar nueva dirección
-            </Button>
-          </AddressDialog>
-        </div>
+            <AddressDialog userId={userId}>
+              <Button variant="outline" className="mt-2 cursor-pointer">
+                <FaPlus className="mr-2 h-4 w-4" />
+                Agregar nueva dirección
+              </Button>
+            </AddressDialog>
+          </div>
         </div>
       </CardContent>
     </Card>
