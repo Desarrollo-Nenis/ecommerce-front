@@ -1,7 +1,6 @@
 import { Address } from "../directions/directions.interface";
 import { PaymentProvider } from "../payments-providers/payment-prodivers";
 
-
 export enum PedidosStatus {
   PENDIENTE = "PENDIENTE",
   PAGADO = "PAGADO",
@@ -12,79 +11,75 @@ export enum PedidosStatus {
 }
 
 export interface Pedido {
-  id:               number;
-  uuid:               string;
-  documentId:       string;
-  estado:           PedidosStatus;
-  fechaPedido?:      Date;
-  provider:         string;
-  metadata:         Metadata;
-  createdAt:        Date;
-  updatedAt:        Date;
-  publishedAt:      Date;
+  id: number;
+  uuid: string;
+  documentId: string;
+  estado: PedidosStatus;
+  fechaPedido?: Date;
+  provider: string;
+  metadata: Metadata;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date;
   informacionEnvio: InformacionEnvio;
-  pagos:            Pago[];
+  pagos: Pago[];
 }
 
 export interface InformacionEnvio {
-  id:         number;
-  esLocal:    boolean;
+  id: number;
+  esLocal: boolean;
   costoEnvio: number;
-  nota:       null;
-  direccion:  Address;
+  nota: null;
+  direccion: Address;
 }
 
 export interface Metadata {
-  productos:        DetailsProducts[];
-  subtotal:         number;
-  total:            number;
+  productos: DetailsProducts[];
+  subtotal: number;
+  total: number;
   informacionEnvio: MetadataInformacionEnvio;
 }
 
 export interface MetadataInformacionEnvio {
-  esLocal:    boolean;
+  esLocal: boolean;
   costoEnvio: number;
-  direccion:  number;
+  direccion: number;
 }
 
 export interface DetailsProducts {
-  id:                number;
-  nombre:            string;
-  coverUrl:          string;
-  cantidad:          number;
-  precioUnitario:    number;
-  precioDescuento:   number;
-  tipoDescuento:     null;
+  id: number;
+  nombre: string;
+  coverUrl: string;
+  cantidad: number;
+  precioUnitario: number;
+  precioDescuento: number;
+  tipoDescuento: null;
   descuentoAplicado: number;
 }
 
 export interface Pago {
-  id:         number;
+  id: number;
   documentId: string;
-  monto:      number;
-  moneda:     string;
+  monto: number;
+  moneda: string;
   estadoPago: string;
-  orderId:    string;
+  orderId: string;
 }
-
-
 
 export interface PedidoCreateDto {
- 
-  cliente: number;
+  cliente: number | null;
   productosSeleccionados: ProductoSeleccionadoInput[];
-  informacionEnvio: InformacionEnvioCreateDto;
-  provider: PaymentProvider
+  informacionEnvio: InformacionEnvioCreateDto | null;
+  provider: PaymentProvider | null;
 }
 export interface InformacionEnvioCreateDto {
-  esLocal:    boolean;
-  costoEnvio: number;
-  nota?:       null;
-  direccion:  number;
+  esLocal: boolean;
+  costoEnvio?: number | null;
+  nota?: string | null;
+  direccion?: number | null;
 }
 
 export interface ProductoSeleccionadoInput {
   producto: number;
   cantidad: number;
 }
-
