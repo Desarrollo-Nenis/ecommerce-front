@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react"
+import { AlertCircle, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { ECOMMERCE_PRIVADO } from '../../../contants/auth/ecommerce-privado.constant';

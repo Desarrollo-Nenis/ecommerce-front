@@ -1,7 +1,7 @@
 import { User } from "../auth/user.interface";
 
 export interface Address {
-    id: number;
+    id?: number;
     documentId?: string;
     calle: string;
     ciudad: string;
@@ -26,5 +26,5 @@ export interface Address {
   
   export interface ApiResponse {
     data: Address;
-    meta: Record<string, any>;
+    meta: Record<string, unknown>;
   }

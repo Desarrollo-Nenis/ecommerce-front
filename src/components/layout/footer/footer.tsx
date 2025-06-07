@@ -37,7 +37,7 @@ export function Footer() {
 
   useEffect(() => {
     initInfoEcommerce();
-  }, []);
+  }, [initInfoEcommerce]);
 
   if (loading || !infoEcommerce) {
     <div></div>;

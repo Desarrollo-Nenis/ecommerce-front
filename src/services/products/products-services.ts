@@ -531,3 +531,35 @@ export function parseProductFilters(
     sortBy: getParam("sort") ? (getParam("sort") as SortOption) : "featured",
   };
 }
+
+
+export async function getFavoritesProducts(ids?: number[]): Promise<DataResponse<Products[]>> {
+  const params = new URLSearchParams();
+
+  // Filtrar por IDs si se proporcionan
+  if (ids && ids.length > 0) {
+    ids.forEach((id) => {
+      params.append("filters[id][$in][]", id.toString());
+    });
+  }
+
+  // Campos y relaciones a incluir
+  params.append("[fields][0]", "nombre");
+  params.append("[fields][1]", "slug");
+  params.append("[fields][2]", "tipo");
+  params.append("populate[descuento]", "true");
+  params.append("populate[inventario]", "true");
+  params.append("populate[categorias]", "true");
+  params.append("populate[marca]", "true");
+  params.append("populate[cover][fields][0]", "url");
+  params.append("populate[variantes][populate][inventario]", "true");
+
+  return query<DataResponse<Products[]>>(
+    `${BASE_ENDPOINT}?${params.toString()}`
+  )
+    .then((res) => ({ data: mapProductsWithImages(res.data), meta: res.meta }))
+    .catch((error) => {
+      console.error("Error al obtener los productos:", error);
+      throw error;
+    });
+}

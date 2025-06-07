@@ -41,6 +41,7 @@ export function createDirection(
     return Promise.reject(new Error("Todos los campos son requeridos."));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, createdAt, updatedAt, publishedAt, usuario, ...payload } = data;
 
   const fullPayload = {

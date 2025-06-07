@@ -77,8 +77,10 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
       cancelButtonText: "Cancelar",
       confirmButtonColor: "#d33",
       cancelButtonColor: "#6b7280",
+      
       callback: (result) => {
-        if (result.isConfirmed) {
+        const res = result as { isConfirmed: boolean }
+        if (res.isConfirmed) {
           removeFavorite(id)
         }
       },

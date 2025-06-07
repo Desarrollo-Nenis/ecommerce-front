@@ -81,11 +81,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
 
       reset();
       console.log(userToken);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setAlert({
         message:
-          error?.message || "Hubo un error al registrarte. Intenta de nuevo.",
+          error && typeof error === "object" && "message" in error
+            ? (error as { message?: string }).message || "Hubo un error al registrarte. Intenta de nuevo."
+            : "Hubo un error al registrarte. Intenta de nuevo.",
         type: "error",
       });
     }

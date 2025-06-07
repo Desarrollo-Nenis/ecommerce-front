@@ -25,7 +25,7 @@ export function getMeInfo( id: string | undefined ): Promise<DataResponse<User>>
     .then((res: DataResponse<User>) => {
       return res;
     })
-    .catch((error: any) => {
+    .catch((error: unknown) => {
       console.error(
         "Something terrible happened whe getting the users:",
         error

@@ -36,9 +36,10 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
   useEffect(() => {
     setAddressList(addresses);
     const primary = addresses.find((addr) => addr.principal);
-    if (primary) setSelectedAddress(primary.id.toString());
-    else if (addresses.length > 0)
-      setSelectedAddress(addresses[0].id.toString());
+    if (primary && primary.id !== undefined)
+      setSelectedAddress(primary.id.toString());
+    else if (addresses.length > 0 && addresses[0]?.id !== undefined)
+      setSelectedAddress(addresses[0]?.id?.toString());
   }, [addresses]);
 
   useEffect(() => {
@@ -57,10 +58,13 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
       });
     }
     console.log(pedido.informacionEnvio);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLocal, selectedAddress]);
 
   const selectedAddressData = selectedAddress
-    ? addressList.find((a) => a.id.toString() === selectedAddress)
+    ? addressList.find(
+        (a) => a.id !== undefined && a.id.toString() === selectedAddress
+      )
     : undefined;
 
   return (
@@ -115,12 +119,14 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
               <SelectValue placeholder="Selecciona una dirección" />
             </SelectTrigger>
             <SelectContent>
-              {addressList.map((addr) => (
-                <SelectItem key={addr.id} value={addr.id.toString()}>
-                  {formatAddress(addr)}
-                  {addr.principal && " (Principal)"}
-                </SelectItem>
-              ))}
+              {addressList
+                .filter((addr) => addr.id !== undefined)
+                .map((addr) => (
+                  <SelectItem key={addr.id} value={addr.id!.toString()}>
+                    {formatAddress(addr)}
+                    {addr.principal && " (Principal)"}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
 

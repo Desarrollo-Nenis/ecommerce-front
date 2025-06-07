@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { auth as middleware } from "@/auth";
-import { NextResponse } from "next/server";
 
 
-export default middleware(async (req) => {
+export default middleware(async (_req) => {
 //   const { nextUrl, auth } = req;
 //   const isLoggedIn = auth?.user;
 //   const LOGIN = "/auth/login";

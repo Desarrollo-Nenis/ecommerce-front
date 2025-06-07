@@ -19,8 +19,8 @@ interface MainCarouselProps {
 
 export function MainCarousel({ banners }: MainCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
+  const [, setCurrent] = useState(0);
+  const [, setCount] = useState(0);
 
   useEffect(() => {
     if (!api) {
@@ -48,9 +48,15 @@ export function MainCarousel({ banners }: MainCarouselProps) {
       >
         <CarouselContent>
           {banners.map((banner) => (
-            <CarouselItem key={banner.id} className="relative w-full h-auto aspect-[16/9] md:aspect-[21/9]">
+            <CarouselItem
+              key={banner.id}
+              className="relative w-full h-auto aspect-[16/9] md:aspect-[21/9]"
+            >
               {banner.link ? (
-                <Link href={banner.link} className="block relative w-full h-full">
+                <Link
+                  href={banner.link}
+                  className="block relative w-full h-full"
+                >
                   <BannerImage banner={banner} />
                 </Link>
               ) : (
@@ -83,7 +89,9 @@ function BannerImage({ banner }: { banner: MainCarouselItem }) {
       {(banner.title || banner.subtitle) && (
         <div className="absolute inset-0 flex flex-col justify-center items-start p-4 md:p-8 text-white">
           {banner.title && (
-            <h2 className="text-xl md:text-3xl font-bold mb-2">{banner.title}</h2>
+            <h2 className="text-xl md:text-3xl font-bold mb-2">
+              {banner.title}
+            </h2>
           )}
           {banner.subtitle && (
             <p className="text-sm md:text-lg">{banner.subtitle}</p>

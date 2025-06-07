@@ -19,7 +19,12 @@ export default function AddressGrid({ address, session }: AddressGridProps) {
 
   const fetchAddresses = async () => {
     try {
-      const res = await getUserDirections(session.user?.user.documentId!);
+      const documentId = session.user?.user?.documentId;
+      if (!documentId) {
+        console.error("No se encontró el documentId del usuario.");
+        return;
+      }
+      const res = await getUserDirections(documentId);
       setAddresses(res.data);
     } catch (error) {
       console.error("Error actualizando direcciones:", error);

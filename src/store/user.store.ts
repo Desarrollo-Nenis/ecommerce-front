@@ -18,20 +18,17 @@ export const useUserStore = create<UserState>((set) => ({
       return;
     }
   
-    let currentUser: User | null;
-    set((state) => {
-      currentUser = state.user;
-      return {};
-    });
+    // Get the current user from the store without using set
+    const currentUser = useUserStore.getState().user;
   
-    if (currentUser?.id === sessionUser.id) {
+    if (String(currentUser?.id) === sessionUser.id) {
       return;
     }
   
     set({ loading: true });
     try {
-      const fullUser = await getMeInfo(sessionUser.id);
-      set({ user: fullUser });
+      const response = await getMeInfo(sessionUser.id);
+      set({ user: response.data });
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
       set({ user: null });

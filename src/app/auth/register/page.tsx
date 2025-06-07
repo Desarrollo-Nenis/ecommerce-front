@@ -119,7 +119,7 @@ export default function RegisterForm() {
         text: "Creando tu cuenta...",
         allowOutsideClick: false,
         didOpen: () => {
-          Swal.showLoading()
+          Swal.showLoading(Swal.getDenyButton())
         },
       })
 
@@ -154,7 +154,7 @@ export default function RegisterForm() {
           confirmPassword: "",
         })
       }, 2000)
-    } catch (error) {
+    } catch {
       setIsSubmitting(false)
 
       // Mostrar alerta de error

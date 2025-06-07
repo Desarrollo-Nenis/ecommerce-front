@@ -1,10 +1,8 @@
-
 import { ProductGrid } from "@/modules/main/components/productCart/ProductGrid";
 import { ResponsiveStoreFilters } from "@/modules/shop/ResponsiveStoreFilters"; // Asegúrate que esta ruta esté bien
 import { getCategorias } from "@/services/categories/categories-services";
 import { getMarcas } from "@/services/marcas/marcas-services";
 import {
-  getProductsByFilters,
   parseProductFilters,
   ProductFilters,
   searchProductsWithParams,
@@ -14,18 +12,22 @@ export default async function MarcaPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  searchParams: { [key: string]: string };
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string }>;
 }) {
-  const slug = decodeURIComponent(params.slug);
-
+  const { slug } = await params;
+  const decodeSlug = decodeURIComponent(slug);
+  const searchParamsDecode = await searchParams;
   const { data: marcas } = await getMarcas();
   const { data: categorias } = await getCategorias();
-  const marca = marcas.find((cat) => cat.nombre === slug);
 
-  const filtros: ProductFilters = parseProductFilters(searchParams)
+  const filtros: ProductFilters = parseProductFilters(searchParamsDecode);
 
-  const productFilteredData = await searchProductsWithParams(filtros);
+  const filtrosWithMarca: ProductFilters = {
+    ...filtros,
+    marcas: [slug, ...(filtros.marcas ?? [])],
+  };
+  const productFilteredData = await searchProductsWithParams(filtrosWithMarca);
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -34,7 +36,7 @@ export default async function MarcaPage({
         <ResponsiveStoreFilters
           categorias={categorias}
           marcas={marcas}
-          marcaBase={slug}
+          marcaBase={decodeSlug}
         />
       </div>
       <div>
@@ -49,7 +51,8 @@ export default async function MarcaPage({
           <ResponsiveStoreFilters
             categorias={categorias}
             marcas={marcas}
-            marcaBase={slug}
+            selectedFilters={filtrosWithMarca}
+            marcaBase={decodeSlug}
           />
         </div>
         {/* Main content */}

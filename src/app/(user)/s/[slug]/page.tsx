@@ -1,5 +1,5 @@
 
-import {  parseProductFilters, searchProductsWithFallback, searchProductsWithParams } from "@/services/products/products-services";
+import {  parseProductFilters, searchProductsWithParams } from "@/services/products/products-services";
 import { ProductGrid } from "@/modules/main/components/productCart/ProductGrid";
 import { StoreFilters } from "@/modules/shop/StoreFilters";
 import { getCategorias } from "@/services/categories/categories-services";
