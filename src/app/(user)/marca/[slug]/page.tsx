@@ -1,3 +1,6 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
 import { ErrorState } from "@/modules/common/components/error/ErrorState";
 import { ProductGrid } from "@/modules/main/components/productCart/ProductGrid";
 import { ResponsiveStoreFilters } from "@/modules/shop/ResponsiveStoreFilters";

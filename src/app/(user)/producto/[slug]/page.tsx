@@ -1,3 +1,6 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
 import { ProductDetail } from "@/modules/product-detail/components/product-detail";
 import { getProductWithVariantesBySlug } from "@/services/products/products-services";
 import { notFound } from "next/navigation";

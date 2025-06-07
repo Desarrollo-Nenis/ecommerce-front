@@ -401,7 +401,7 @@ export default function Navbar({
         <div className="flex flex-row container gap-2">
           <Link href="/" className="hidden md:flex items-center gap-2 mr-6">
             <Image
-              src={informacionTienda?.logo.url || "/placeholder.svg"}
+              src={informacionTienda?.logo?.url || "/placeholder.svg"}
               width={100}
               height={100}
               alt="logo"

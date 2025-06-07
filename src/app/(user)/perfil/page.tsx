@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { auth } from "@/auth"
 import { ErrorState } from "@/modules/common/components/error/ErrorState";
 import { ProfileLayout } from "@/modules/profile/profile"

@@ -1,5 +1,7 @@
-// app/(user)/marca/page.tsx
+
 "use client";
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
 
 import MarcasGrid from "@/modules/common/components/marcas-grid/marcas-grid";
 import { TitleGradient } from "@/modules/common/components/titles/title-gradient";

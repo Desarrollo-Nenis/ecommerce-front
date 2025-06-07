@@ -1,3 +1,7 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
+
 import { Suspense } from "react"
 import { getInfoEcommerce } from "@/services/informacion-tienda/informacion-tienda-services"
 
@@ -13,6 +17,8 @@ export const metadata = {
   title: "Sobre Nosotros | Ferretería Online",
   description: "Conoce más sobre nuestra ferretería, historia, valores y equipo",
 }
+
+
 
 export default async function AboutUsPage() {
   try {

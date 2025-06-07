@@ -12,9 +12,9 @@ interface QueryOptions {
 
 export async function query<T>(
   url: string,
-  options: QueryOptions = {}, // Opciones para el CRUD
-): Promise<T> {
-  const { method = "GET", body, customerId, customerEmail } = options // Si no se manda método, por defecto es GET
+  options: QueryOptions = {},
+): Promise<T | null> {
+  const { method = "GET", body, customerId, customerEmail } = options
 
   try {
     const headers: Record<string, string> = {
@@ -22,7 +22,6 @@ export async function query<T>(
       Authorization: `Bearer ${STRAPI_TOKEN}`,
     }
 
-    // Añadir headers de cliente si están disponibles
     if (customerId) {
       headers["x-customer-id"] = customerId
     }
@@ -34,16 +33,16 @@ export async function query<T>(
     const response = await fetch(`${STRAPI_HOST}/api/${url}`, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined, // Solo se incluye el cuerpo si existe
+      body: body ? JSON.stringify(body) : undefined,
     })
 
-    // if (!response.ok) {
-    //   throw new Error(`Error en la solicitud: ${response.statusText}`)
-    // }
+    if (!response.ok) {
+      return null
+    }
 
     return await response.json()
   } catch (error) {
     console.error("Error al realizar la solicitud:", error)
-    throw error
+    return null
   }
 }

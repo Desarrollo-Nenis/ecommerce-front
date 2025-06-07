@@ -1,3 +1,6 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
 import { Card } from "@/components/ui/card";
 import CategoryCarousel from "@/modules/common/components/category-carousel/category-carousel";
 import { ErrorState } from "@/modules/common/components/error/ErrorState";

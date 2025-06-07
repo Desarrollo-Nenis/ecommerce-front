@@ -1,5 +1,8 @@
 "use client";
 
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import CategoriesGrid from "@/modules/common/components/categories-grid/categories-grid";
 import { TitleGradient } from "@/modules/common/components/titles/title-gradient";
@@ -17,8 +20,10 @@ export default function CategoriasPage() {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const { data } = await getCategorias({});
-        const categoriasFiltradas = data.filter((c: Categoria) => !c.principal);
+        const result = await getCategorias({});
+
+        const categoriasFiltradas =
+          result?.data.filter((c: Categoria) => !c.principal) || [];
         setCategorias(categoriasFiltradas);
       } catch (err) {
         console.error("Error al obtener categorías:", err);

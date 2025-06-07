@@ -1,3 +1,8 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
+
+
 import { Skeleton } from "@/components/ui/skeleton";
 import AboutUsLocations from "@/modules/about-us/components/about-us-locations";
 import AboutUsSocial from "@/modules/about-us/components/about-us-social";
@@ -15,6 +20,7 @@ import { TagIcon } from "lucide-react";
 import Image from "next/image";
 import { Suspense } from "react";
 
+
 export default async function Home() {
   try {
     // fetch product
@@ -24,7 +30,6 @@ export default async function Home() {
     const resultcategorias = await getCategorias();
     const resultMarcas = await getMarcas();
     const { data: infoEcommerce } = await getInfoEcommerce();
-    console.log(resultProducts);
 
     const banners: MainCarouselItem[] = [
       {

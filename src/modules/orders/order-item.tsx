@@ -32,7 +32,7 @@ interface OrderItemProps {
 }
 
 export function OrderItem({ pedido }: OrderItemProps) {
-  console.log(pedido);
+  
   // Función para obtener el icono según el estado del pedido
   const getStatusIcon = (estado: string) => {
     switch (estado) {

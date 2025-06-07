@@ -1,3 +1,7 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
+
 import { auth } from "@/auth";
 import { ErrorState } from "@/modules/common/components/error/ErrorState";
 import { OrdersClient } from "@/modules/orders/orders-client"
