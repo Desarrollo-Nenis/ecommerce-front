@@ -55,7 +55,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface NavbarProps {
   marcas: Marca[];
   categorias: Categoria[];
-  informacionTienda: InfoEcommerce;
+  informacionTienda: InfoEcommerce |null;
   session: Session | null;
 }
 
@@ -115,7 +115,7 @@ export default function Navbar({
               <SheetTitle>
                 <Link href="/" className="flex flex-row items-center gap-2">
                   <Image
-                    src={informacionTienda.logo.url || "/placeholder.svg"}
+                    src={informacionTienda?.logo?.url || "/placeholder.svg"}
                     width={100}
                     height={100}
                     alt="logo"
@@ -389,7 +389,7 @@ export default function Navbar({
             <div className="border-t p-4 bg-background">
               <div className="flex justify-between items-center">
                 <p className="text-xs text-muted-foreground">
-                  © {new Date().getFullYear()} {informacionTienda.nombre}
+                  © {new Date().getFullYear()} {informacionTienda?.nombre}
                 </p>
                 <ThemeToggle />
               </div>
@@ -401,7 +401,7 @@ export default function Navbar({
         <div className="flex flex-row container gap-2">
           <Link href="/" className="hidden md:flex items-center gap-2 mr-6">
             <Image
-              src={informacionTienda.logo.url || "/placeholder.svg"}
+              src={informacionTienda?.logo.url || "/placeholder.svg"}
               width={100}
               height={100}
               alt="logo"

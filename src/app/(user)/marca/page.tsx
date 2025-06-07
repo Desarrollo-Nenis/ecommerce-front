@@ -1,23 +1,38 @@
+// app/(user)/marca/page.tsx
+"use client";
+
 import MarcasGrid from "@/modules/common/components/marcas-grid/marcas-grid";
 import { TitleGradient } from "@/modules/common/components/titles/title-gradient";
-import { getMarcas } from "@/services/marcas/marcas-services";
 import { Tags } from "lucide-react";
+import { getMarcas } from "@/services/marcas/marcas-services";
+import { useEffect, useState } from "react";
+import { Marca } from "@/interfaces/marcas/marca.interface";
 
-export default async function MarcasPage() {
-  //  const { data: productos } = await getProductsByFilters(filtros);
-  const { data: marcas } = await getMarcas();
+export default function MarcasPage() {
+  const [marcas, setMarcas] = useState<Marca[]>([]);
+
+  useEffect(() => {
+    async function fetchMarcas() {
+      try {
+        const { data } = await getMarcas();
+        setMarcas(data);
+      } catch (error) {
+        console.error("Error al obtener marcas:", error);
+      }
+    }
+
+    fetchMarcas();
+  }, []);
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div>
         <TitleGradient
-          title="Categorias"
-          subtitle="Explora nuestras categorias"
+          title="Categorías"
+          subtitle="Explora nuestras categorías"
           tagIcon={<Tags size={40} />}
-        ></TitleGradient>
-        <div className="">
-          <MarcasGrid marcas={marcas} />
-        </div>
+        />
+        <MarcasGrid marcas={marcas} />
       </div>
     </main>
   );
