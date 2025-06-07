@@ -154,7 +154,7 @@ export default function RegisterForm() {
           confirmPassword: "",
         })
       }, 2000)
-    } catch (error) {
+    } catch {
       setIsSubmitting(false)
 
       // Mostrar alerta de error

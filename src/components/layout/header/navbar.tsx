@@ -39,7 +39,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Marca } from "@/interfaces/marcas/marca.interface";
 import Image from "next/image";
 import type { Categoria } from "@/interfaces/categories/categories.interface";
-import { Card } from "@/components/ui/card";
 import type { InfoEcommerce } from "@/interfaces/informacion-tienda/informacion-tienda.interface";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -68,7 +67,7 @@ export default function Navbar({
 }: NavbarProps) {
   const { loadCart } = useCartStore();
   const categoriasFiltradas = categorias.filter((cat) => !cat.principal);
-  const [isMobile, setIsMobile] = useState(false);
+  const [, setIsMobile] = useState(false);
 
   useEffect(() => {
     loadCart();

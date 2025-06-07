@@ -23,7 +23,7 @@ interface ToastAlertProps {
   cancelButtonText?: string
   confirmButtonColor?: string
   cancelButtonColor?: string
-  callback?: (result: any) => void
+  callback?: (result: unknown) => void
 }
 
 export function showToastAlert({
@@ -40,7 +40,7 @@ export function showToastAlert({
   cancelButtonColor = "#d33",
   callback,
 }: ToastAlertProps) {
-  const config: any = {
+  const config: import("sweetalert2").SweetAlertOptions = {
     title,
     text,
     icon,

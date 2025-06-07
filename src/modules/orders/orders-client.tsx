@@ -14,7 +14,7 @@ interface OrdersClientProps {
 }
 
 export function OrdersClient({ initialPedidos }: OrdersClientProps) {
-  const [pedidos, setPedidos] = useState<Pedido[]>(initialPedidos)
+  const [pedidos] = useState<Pedido[]>(initialPedidos)
   const [filteredPedidos, setFilteredPedidos] = useState<Pedido[]>(initialPedidos)
   const [isLoading, setIsLoading] = useState(false)
 

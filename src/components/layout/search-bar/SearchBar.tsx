@@ -37,7 +37,7 @@ export const SearchBar = () => {
     }, 1500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, router]); // solo depende de searchQuery
+  }, [searchQuery, router, searchParams]); // depende de searchQuery, router y searchParams
 
   return (
     <div className="ml-auto flex items-center">

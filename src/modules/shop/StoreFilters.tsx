@@ -1,5 +1,5 @@
 "use client";
-
+import { useCallback } from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
@@ -59,7 +59,7 @@ export const StoreFilters = ({
     Number(selectedFilters?.precioMax?.toString() ?? "99999"),
   ]);
 
-const updateURL = () => {
+const updateURL = useCallback(() => {
   const currentParams = new URLSearchParams(window.location.search);
 
   if (selectedCategorias.length)
@@ -82,11 +82,11 @@ const updateURL = () => {
   currentParams.set("page", "1");
 
   router.push(`?${currentParams.toString()}`);
-};
+}, [selectedCategorias, selectedMarcas, minPrice, maxPrice, router]);
 
   useEffect(() => {
     updateURL();
-  }, [selectedCategorias, selectedMarcas]);
+  }, [selectedCategorias, selectedMarcas, updateURL]);
 
   const applyPriceFilter = () => {
     updateURL();

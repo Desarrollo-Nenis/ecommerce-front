@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { type ReactNode, useEffect, useState } from "react"
@@ -67,6 +68,7 @@ export function AddressDialog({ address, children, userId, onRefreshCard, onAddr
       const isModified = Object.keys(form.getValues()).some((key) => form.getValues()[key] !== address[key])
       setIsEditing(isModified)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getValues(), address])
 
   async function onSubmit(values: AddressFormValues) {
@@ -118,9 +120,13 @@ export function AddressDialog({ address, children, userId, onRefreshCard, onAddr
 
         setOpen(false)
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLoading(false)
-      console.error("Error al procesar dirección:", err.message)
+      let errorMessage = "Error desconocido";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      console.error("Error al procesar dirección:", errorMessage);
       showToastAlert({
         title: "Error",
         text: "Ocurrió un error al procesar la dirección.",

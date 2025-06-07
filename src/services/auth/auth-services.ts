@@ -57,9 +57,13 @@ export async function registerUser(
     }
 
     return result.data as User;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al realizar la solicitud:", error);
-    throw new Error("Error en la solicitud: " + error.message);
+    if (error instanceof Error) {
+      throw new Error("Error en la solicitud: " + error.message);
+    } else {
+      throw new Error("Error en la solicitud: " + String(error));
+    }
   }
 }
 
@@ -80,8 +84,12 @@ export async function loginUser(data: RegisterPartialData): Promise<UserToken> {
     }
 
     return await response.json();
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error al realizar la solicitud:", error);
-    throw error;
+    if (error instanceof Error) {
+      throw new Error("Error en la solicitud: " + error.message);
+    } else {
+      throw new Error("Error en la solicitud: " + String(error));
+    }
   }
 }

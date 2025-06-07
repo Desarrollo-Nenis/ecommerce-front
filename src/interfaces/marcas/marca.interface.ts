@@ -1,4 +1,4 @@
-import { Img } from "../data/Img.interface";
+import { Img } from "../data/img.interface";
 
 
 export interface Marca {

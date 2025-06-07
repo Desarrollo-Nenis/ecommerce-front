@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { CreditCard, AlertCircle } from "lucide-react";
-import { useSession } from "next-auth/react";
 import {
   Form,
   FormControl,
@@ -23,8 +22,8 @@ import { PaymentProvider } from "@/interfaces/payments-providers/payment-prodive
 import { usePedidoStore } from "@/store/pedido.store";
 
 export const PaymentStep = () => {
-  const [error, setError] = useState<string | null>(null);
-  const { setProvider, pedido } = usePedidoStore();
+  const [error] = useState<string | null>(null);
+  const { setProvider } = usePedidoStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

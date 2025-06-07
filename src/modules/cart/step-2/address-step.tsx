@@ -57,7 +57,7 @@ export function AddressStep({ addresses, userId }: AddressStepProps) {
       });
     }
     console.log(pedido.informacionEnvio);
-  }, [isLocal, selectedAddress]);
+  }, [isLocal, selectedAddress, pedido.informacionEnvio, setInformacionEnvio]);
 
   const selectedAddressData = selectedAddress
     ? addressList.find((a) => a.id.toString() === selectedAddress)

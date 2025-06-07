@@ -17,13 +17,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useCartStore } from "@/store/products-cart.store";
-import { getPrecioConDescuento } from "@/lib/price-descuento";
+import { CartItem, useCartStore } from "@/store/products-cart.store";
+import {
+  getPrecioConDescuento,
+  getPrecioMinimoVariantes,
+} from "@/lib/price-descuento";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { ProductType } from "@/interfaces/products/products.interface";
+import { ECOMMERCE_PRIVADO } from "@/contants/auth/ecommerce-privado.constant";
+import { useSession } from "next-auth/react";
 
 const CartContent = () => {
   const { cart, increaseQuantity, decreaseQuantity, removeFromCart } =
     useCartStore();
-
+  const { data: session } = useSession();
   // Calcular el total del carrito
   const cartTotal = cart.reduce((total, item) => {
     const { finalPrice } = getPrecioConDescuento(
@@ -35,6 +42,61 @@ const CartContent = () => {
     }
     return total;
   }, 0);
+
+  // modificalo para que multiplique por la cantidad
+  const renderPrecio = (producto: CartItem) => {
+    if (!session && ECOMMERCE_PRIVADO) {
+      return (
+        <span className="text-sm text-muted-foreground">
+          Inicia sesión para ver el precio
+        </span>
+      );
+    }
+
+    const precioBase = producto.inventario?.precioVenta || 0;
+    const { finalPrice: precioFinal, hasDiscount: tieneDescuento } =
+      getPrecioConDescuento(producto.inventario, producto.descuento);
+    const precioMinimo = getPrecioMinimoVariantes(producto);
+    const cantidad = producto.quantity;
+
+    if (
+      producto.tipo === ProductType.SIMPLE ||
+      producto.tipo === ProductType.VARIANT
+    ) {
+      if (precioFinal !== null && precioFinal !== undefined) {
+        return (
+          <div className="flex flex-col items-start">
+            <span className="font-bold text-primary">
+              {formatCurrency(precioFinal * cantidad)}
+            </span>
+            {tieneDescuento && (
+              <span className="text-xs line-through text-muted-foreground">
+                {formatCurrency(precioBase * cantidad)}
+              </span>
+            )}
+          </div>
+        );
+      }
+      return (
+        <span className="text-sm text-muted-foreground">No disponible</span>
+      );
+    }
+
+    if (producto.tipo === "base") {
+      if (precioMinimo !== null && precioMinimo !== undefined) {
+        return (
+          <span className="font-bold text-primary">
+            Desde {formatCurrency(precioMinimo)}
+          </span>
+        );
+      }
+      return (
+        <span className="text-sm text-muted-foreground">No disponible</span>
+      );
+    }
+
+    return <span className="text-sm text-muted-foreground">No disponible</span>;
+  };
 
   return (
     <div className="space-y-4">
@@ -50,11 +112,6 @@ const CartContent = () => {
       {cart.length > 0 ? (
         <div className="max-h-[250px] overflow-auto space-y-3">
           {cart.map((item) => {
-            const { finalPrice, hasDiscount } = getPrecioConDescuento(
-              item.inventario,
-              item.descuento
-            );
-
             return (
               <div key={item.id} className="flex items-center gap-3">
                 <Image
@@ -67,19 +124,7 @@ const CartContent = () => {
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">{item.nombre}</p>
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    {finalPrice !== null && (
-                      <span>
-                        ${(finalPrice * item.quantity).toFixed(2)}
-                        {hasDiscount && (
-                          <span className="ml-1 line-through opacity-60 text-xs">
-                            $
-                            {(
-                              item.inventario!.precioVenta * item.quantity
-                            ).toFixed(2)}
-                          </span>
-                        )}
-                      </span>
-                    )}
+                    {renderPrecio(item)}
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -121,17 +166,11 @@ const CartContent = () => {
           <Separator />
           <div className="flex items-center justify-between font-medium">
             <span>Total:</span>
-            <span>${cartTotal.toFixed(2)}</span>
-          </div>
-        </>
-      )}
-
-      {cart.length > 0 && (
-        <>
-          <Separator />
-          <div className="flex items-center justify-between font-medium">
-            <span>Total:</span>
-            <span>${cartTotal.toFixed(2)}</span>
+            {!session && ECOMMERCE_PRIVADO ? (
+              `inicia sesion `
+            ) : (
+              <span>${cartTotal.toFixed(2)}</span>
+            )}
           </div>
         </>
       )}

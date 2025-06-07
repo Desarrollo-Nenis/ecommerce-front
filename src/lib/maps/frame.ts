@@ -7,7 +7,7 @@ export function getGoogleMapsEmbedUrl(input?: string): string | null {
 
   if (dmsMatch) {
     function toDecimal(deg: string, min: string, sec: string, dir: string): number {
-      let decimal = parseFloat(deg) + parseFloat(min) / 60 + parseFloat(sec) / 3600;
+      const decimal = parseFloat(deg) + parseFloat(min) / 60 + parseFloat(sec) / 3600;
       return dir === "S" || dir === "W" ? -decimal : decimal;
     }
 

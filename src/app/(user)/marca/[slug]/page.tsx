@@ -4,7 +4,6 @@ import { ResponsiveStoreFilters } from "@/modules/shop/ResponsiveStoreFilters"; 
 import { getCategorias } from "@/services/categories/categories-services";
 import { getMarcas } from "@/services/marcas/marcas-services";
 import {
-  getProductsByFilters,
   parseProductFilters,
   ProductFilters,
   searchProductsWithParams,
@@ -21,7 +20,6 @@ export default async function MarcaPage({
 
   const { data: marcas } = await getMarcas();
   const { data: categorias } = await getCategorias();
-  const marca = marcas.find((cat) => cat.nombre === slug);
 
   const filtros: ProductFilters = parseProductFilters(searchParams)
 

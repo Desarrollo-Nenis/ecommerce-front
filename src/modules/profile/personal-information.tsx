@@ -1,8 +1,15 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ShoppingCart, Package, Clock, TrendingUp, Wrench } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ShoppingCart, Package, Clock, TrendingUp, Wrench } from "lucide-react";
+import Image from "next/image";
 
 export function InformacionPersonal() {
   return (
@@ -12,7 +19,7 @@ export function InformacionPersonal() {
       <RecentPurchases />
       <RecommendedProducts />
     </div>
-  )
+  );
 }
 
 function ActivityStats() {
@@ -35,13 +42,15 @@ function ActivityStats() {
       descripcion: "Desde mayo 2022",
       icono: <Clock className="h-5 w-5 text-purple-500" />,
     },
-  ]
+  ];
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">Resumen de actividad</CardTitle>
-        <CardDescription>Tu historial como cliente en nuestra ferretería</CardDescription>
+        <CardDescription>
+          Tu historial como cliente en nuestra ferretería
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -50,13 +59,15 @@ function ActivityStats() {
               <div className="flex justify-center mb-2">{stat.icono}</div>
               <div className="font-bold text-2xl">{stat.valor}</div>
               <div className="font-medium text-sm">{stat.titulo}</div>
-              <div className="text-xs text-muted-foreground">{stat.descripcion}</div>
+              <div className="text-xs text-muted-foreground">
+                {stat.descripcion}
+              </div>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function FavoriteCategories() {
@@ -65,7 +76,7 @@ function FavoriteCategories() {
     { nombre: "Herramientas Manuales", compras: 8, icono: "🔧" },
     { nombre: "Materiales de Construcción", compras: 6, icono: "🧱" },
     { nombre: "Seguridad Industrial", compras: 4, icono: "🦺" },
-  ]
+  ];
 
   return (
     <Card>
@@ -74,17 +85,24 @@ function FavoriteCategories() {
           <TrendingUp className="h-5 w-5 text-orange-500" />
           Tus categorías favoritas
         </CardTitle>
-        <CardDescription>Productos que más compras en nuestra tienda</CardDescription>
+        <CardDescription>
+          Productos que más compras en nuestra tienda
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {categoriasFavoritas.map((categoria, index) => (
-            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{categoria.icono}</span>
                 <div>
                   <div className="font-medium">{categoria.nombre}</div>
-                  <div className="text-sm text-muted-foreground">{categoria.compras} compras</div>
+                  <div className="text-sm text-muted-foreground">
+                    {categoria.compras} compras
+                  </div>
                 </div>
               </div>
               <Badge variant="secondary">{categoria.compras}</Badge>
@@ -93,7 +111,7 @@ function FavoriteCategories() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function RecentPurchases() {
@@ -116,7 +134,7 @@ function RecentPurchases() {
       precio: "$180.00",
       imagen: "/placeholder.svg?height=60&width=60",
     },
-  ]
+  ];
 
   return (
     <Card>
@@ -130,15 +148,22 @@ function RecentPurchases() {
       <CardContent>
         <div className="space-y-3">
           {productosRecientes.map((producto, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-              <img
+            <div
+              key={index}
+              className="flex items-center gap-3 p-3 border rounded-lg"
+            >
+              <Image
+                width={100}
+                height={100}
                 src={producto.imagen || "/placeholder.svg"}
                 alt={producto.nombre}
                 className="w-12 h-12 rounded object-cover"
               />
               <div className="flex-1">
                 <div className="font-medium text-sm">{producto.nombre}</div>
-                <div className="text-xs text-muted-foreground">{producto.fecha}</div>
+                <div className="text-xs text-muted-foreground">
+                  {producto.fecha}
+                </div>
               </div>
               <div className="font-bold text-green-600">{producto.precio}</div>
             </div>
@@ -146,7 +171,7 @@ function RecentPurchases() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function RecommendedProducts() {
@@ -163,7 +188,7 @@ function RecommendedProducts() {
       badge: "Más vendido",
       imagen: "/placeholder.svg?height=100&width=100",
     },
-  ]
+  ];
 
   return (
     <Card>
@@ -178,14 +203,18 @@ function RecommendedProducts() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {recommendedProducts.map((product, index) => (
             <div key={index} className="border rounded-lg p-4 space-y-2">
-              <img
+              <Image
+                width={100}
+                height={100}
                 src={product.imagen || "/placeholder.svg"}
                 alt={product.nombre}
                 className="w-full h-24 object-cover rounded"
               />
               <h4 className="font-medium text-sm">{product.nombre}</h4>
               <div className="flex items-center justify-between">
-                <span className="font-bold text-green-600">{product.precio}</span>
+                <span className="font-bold text-green-600">
+                  {product.precio}
+                </span>
                 <Badge variant="secondary" className="text-xs">
                   {product.badge}
                 </Badge>
@@ -195,5 +224,5 @@ function RecommendedProducts() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
