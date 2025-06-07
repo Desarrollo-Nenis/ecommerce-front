@@ -6,13 +6,18 @@ import { query } from "@/lib/api/server/strapi"
 const BASE_ENDPOINT: string = BACKEND_ROUTES.ORDERS;
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 
-export async function getUserOrders(userId: number | undefined): Promise<DataResponse<Pedido[]>> {
+export async function getUserOrders(userId: number | undefined): Promise<DataResponse<Pedido[]> | null> {
   try {
     const res = await query<DataResponse<Pedido[]>>(
       `${BASE_ENDPOINT}?filters[cliente][id][$eq]=${userId}&populate[informacionEnvio][populate][direccion][fields]=calle,ciudad,estado,codigoPostal,numeroExterior,numeroInterior,referencia,nombreRecibe,telefono&populate[pagos][fields]=monto,moneda,estadoPago,orderId`
     )
 
     const orders = res.data.map(order => {
+
+      if( !res) {
+        return null;
+      }
+      
       // procesamos los coverUrl de los productos
       const productos = order.metadata?.productos?.map(producto => ({
         ...producto,
