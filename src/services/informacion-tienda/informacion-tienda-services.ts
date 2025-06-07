@@ -6,7 +6,7 @@ import { query } from "@/lib/api/server/strapi";
 const BASE_ENDPOINT: string = BACKEND_ROUTES.INFORMATION_ECOMMERCE;
 const STRAPI_HOST = process.env.NEXT_PUBLIC_STRAPI_HOST;
 
-export function getInfoEcommerce(): Promise<DataResponse<InfoEcommerce>> {
+export function getInfoEcommerce(): Promise<DataResponse<InfoEcommerce> | null> {
   const params = new URLSearchParams();
 
   params.set("populate[logo][fields][0]", "url");
@@ -21,6 +21,11 @@ export function getInfoEcommerce(): Promise<DataResponse<InfoEcommerce>> {
   const url = `${BASE_ENDPOINT}?${params.toString()}`;
   return query<DataResponse<InfoEcommerce>>(url)
     .then((res) => {
+
+      if(!res){
+        return null
+      }
+
       const dataMap: InfoEcommerce = {
         ...res.data,
         logo: { ...res.data.logo, url: `${STRAPI_HOST}${res.data?.logo?.url}` },
