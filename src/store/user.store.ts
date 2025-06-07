@@ -28,7 +28,7 @@ export const useUserStore = create<UserState>((set) => ({
     set({ loading: true });
     try {
       const response = await getMeInfo(sessionUser.id);
-      set({ user: response.data });
+      set({ user: response?.data ?? null });
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
       set({ user: null });

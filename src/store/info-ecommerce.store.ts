@@ -29,8 +29,12 @@ export const useInfoEcommerceStore = create<InfoEcommerceState>((set) => ({
 
       // Paso 2: No había info, hacer fetch
       const response = await getInfoEcommerce();
-      localStorage.setItem('infoEcommerce', JSON.stringify(response.data));
-      set({ infoEcommerce: response.data, loading: false });
+      if (response && response.data) {
+        localStorage.setItem('infoEcommerce', JSON.stringify(response.data));
+        set({ infoEcommerce: response.data, loading: false });
+      } else {
+        set({ error: 'No se pudo obtener la información del ecommerce', loading: false });
+      }
     } catch (error) {
       console.error(error);
       set({ error: 'Error al cargar la información del ecommerce', loading: false });
@@ -42,8 +46,12 @@ export const useInfoEcommerceStore = create<InfoEcommerceState>((set) => ({
 
     try {
       const response = await getInfoEcommerce();
-      localStorage.setItem('infoEcommerce', JSON.stringify(response.data));
-      set({ infoEcommerce: response.data, loading: false });
+      if (response && response.data) {
+        localStorage.setItem('infoEcommerce', JSON.stringify(response.data));
+        set({ infoEcommerce: response.data, loading: false });
+      } else {
+        set({ error: 'No se pudo obtener la información del ecommerce', loading: false });
+      }
     } catch (error) {
       console.error(error);
       set({ error: 'Error al actualizar la información del ecommerce', loading: false });
