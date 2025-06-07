@@ -12,11 +12,11 @@ export async function getUserOrders(userId: number | undefined): Promise<DataRes
       `${BASE_ENDPOINT}?filters[cliente][id][$eq]=${userId}&populate[informacionEnvio][populate][direccion][fields]=calle,ciudad,estado,codigoPostal,numeroExterior,numeroInterior,referencia,nombreRecibe,telefono&populate[pagos][fields]=monto,moneda,estadoPago,orderId`
     )
 
-    const orders = res.data.map(order => {
+    if( !res ) {
+      return null;
+    }
 
-      if( !res) {
-        return null;
-      }
+    const orders = res.data.map(order => {
       
       // procesamos los coverUrl de los productos
       const productos = order.metadata?.productos?.map(producto => ({

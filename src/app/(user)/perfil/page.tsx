@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { auth } from "@/auth"
 import { ErrorState } from "@/modules/common/components/error/ErrorState";
 import { ProfileLayout } from "@/modules/profile/profile"
+import { getUserOrders } from "@/services/orders/orders-services";
 import { getMeInfo } from "@/services/users/users-services";
 import { AlertTriangle } from "lucide-react";
 
@@ -10,8 +11,9 @@ export default async function PerfilUsuario() {
 try{
   const sesion = await auth();
   const user = await getMeInfo( sesion?.user?.user.documentId);
+  const pedidos = await getUserOrders( sesion?.user?.user.id) ;
 
-  return <ProfileLayout user={user.data} userAvatar={ sesion?.user?.image} />
+  return <ProfileLayout user={user.data} userAvatar={ sesion?.user?.image} pedidos={pedidos?.data} />
    } catch (error) {
     console.error("Error en la página de marca:", error);
     return (

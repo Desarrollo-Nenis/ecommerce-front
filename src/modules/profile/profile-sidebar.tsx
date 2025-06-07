@@ -24,7 +24,7 @@ export function ProfileSidebar({ user, avatarUser }: ProfileSidebarProps) {
         </Avatar>
         <CardTitle>{user.name} {user.lastName}</CardTitle>
         <CardDescription>
-          <Badge className="mt-2 capitalize bg-blue-500 hover:bg-blue-600">
+          <Badge className="mt-2 capitalize bg-blue-500 hover:bg-blue-600">Cliente desde hace
             {getTimeSinceCreation( user.createdAt.toString() )}
           </Badge>
           </CardDescription>

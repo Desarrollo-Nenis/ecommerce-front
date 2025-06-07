@@ -8,10 +8,13 @@ import { InformacionPersonal } from "./personal-information";
 import { ProductosFavoritos } from "./favorites-products";
 import { ProfileSettings } from "./profile-settings";
 import { User } from "@/interfaces/auth/user.interface";
+import { getTimeSinceCreation } from "@/lib/timeCreationProfile";
+import { Pedido } from "@/interfaces/orders/pedido.interface";
 
 interface ProfileProps {
   user: User;
   userAvatar: string | undefined | null;
+  pedidos?: Pedido[] | undefined;
 }
 
 export function ProfileLayout({ user, userAvatar }: ProfileProps) {
@@ -74,7 +77,7 @@ function ProfileTabs({ user }: {user: User}) {
       </TabsContent>
 
       <TabsContent value="information" className="space-y-4">
-        <InformacionPersonal />
+        <InformacionPersonal compras={""} productsComprados={""} clientTime={user.createdAt.toString()} />
       </TabsContent>
     </Tabs>
   );

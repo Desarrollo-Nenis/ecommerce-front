@@ -36,7 +36,7 @@ export default function RootLayout({
               {/* <Footer></Footer> */}
             </SessionProvider>
           </ThemeProvider>
-          <Footer />
+          {/* <Footer /> */}
         </body>
       </html>
     </>
