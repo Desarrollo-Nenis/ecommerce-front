@@ -37,9 +37,9 @@ export async function query<T>(
       body: body ? JSON.stringify(body) : undefined, // Solo se incluye el cuerpo si existe
     })
 
-    if (!response.ok) {
-      throw new Error(`Error en la solicitud: ${response.statusText}`)
-    }
+    // if (!response.ok) {
+    //   throw new Error(`Error en la solicitud: ${response.statusText}`)
+    // }
 
     return await response.json()
   } catch (error) {
