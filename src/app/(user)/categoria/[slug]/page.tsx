@@ -24,14 +24,15 @@ export default async function CategoriaPage({
   try {
     const slug = decodeURIComponent((await params).slug);
     const searhParamsResust = await searchParams;
-    const { data: categorias } = await getCategorias();
-    const categoria = categorias.find((cat) => cat.nombre === slug);
+    const categoriasResult = await getCategorias();
+    const categoria =
+      categoriasResult?.data?.find((cat) => cat.nombre === slug) ;
 
     const filtros: ProductFilters = {
       categorias: [
         slug,
         // ...(categoria?.subcategorias?.map((s) => s.nombre) || []),
-        ...(searhParamsResust?.categorias?.split(",") || []),
+        ...(searhParamsResust?.categorias?.split(",") ?? []),
       ].filter(Boolean),
       marcas: searhParamsResust?.marca?.split(","),
       precioMin: searhParamsResust?.precioMin
@@ -45,15 +46,15 @@ export default async function CategoriaPage({
     const productResult = await getProductsByFilters(filtros);
     console.log(productResult);
 
-    const { data: marcas } = await getMarcas();
+    const marcasResult = await getMarcas();
 
     return (
       <main className="container mx-auto px-4 py-8">
         {/* Mobile: Filters on top */}
         <div className="md:hidden mb-4">
           <ResponsiveStoreFilters
-            categorias={categorias}
-            marcas={marcas}
+            categorias={categoriasResult?.data ?? []}
+            marcas={marcasResult?.data ?? []}
             categoriaBase={slug}
             selectedFilters={filtros}
           />
@@ -64,8 +65,8 @@ export default async function CategoriaPage({
           {/* Desktop: Filters on the side */}
           <div className="hidden md:block">
             <ResponsiveStoreFilters
-              categorias={categorias}
-              marcas={marcas}
+              categorias={categoriasResult?.data ?? []}
+              marcas={marcasResult?.data ?? []}
               categoriaBase={slug}
               selectedFilters={filtros}
             />

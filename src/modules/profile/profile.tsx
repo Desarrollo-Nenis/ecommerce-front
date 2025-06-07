@@ -1,7 +1,12 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Heart, Package, Settings } from "lucide-react";
 import { ProfileSidebar } from "./profile-sidebar";
 import { InformacionPersonal } from "./personal-information";
@@ -10,7 +15,7 @@ import { ProfileSettings } from "./profile-settings";
 import { User } from "@/interfaces/auth/user.interface";
 
 interface ProfileProps {
-  user: User;
+  user: User | null;
   userAvatar: string | undefined | null;
 }
 
@@ -18,12 +23,12 @@ export function ProfileLayout({ user, userAvatar }: ProfileProps) {
   return (
     <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8 max-w-7xl">
       <div className="grid gap-6 md:grid-cols-5">
-        <ProfileSidebar user={user} avatarUser={ userAvatar } />
+        <ProfileSidebar user={user} avatarUser={userAvatar} />
 
         <div className="md:col-span-3 lg:col-span-4 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{`Bienvenido de vuelta, ${user.name}`}</CardTitle>
+              <CardTitle>{`Bienvenido de vuelta, ${user?.name ?? "usuario"}`}</CardTitle>
               <CardDescription>
                 Gestiona tu información, revisa tus compras y descubre productos
                 recomendados.
@@ -31,14 +36,14 @@ export function ProfileLayout({ user, userAvatar }: ProfileProps) {
             </CardHeader>
           </Card>
 
-          <ProfileTabs user={ user } />
+          <ProfileTabs user={user} />
         </div>
       </div>
     </div>
   );
 }
 
-function ProfileTabs({ user }: {user: User}) {
+function ProfileTabs({ user }: { user: User | null }) {
   return (
     <Tabs defaultValue="settings" className="w-full">
       <TabsList className="grid grid-cols-3 mb-4">
@@ -66,7 +71,7 @@ function ProfileTabs({ user }: {user: User}) {
       </TabsList>
 
       <TabsContent value="settings" className="space-y-4">
-        <ProfileSettings user={ user } />
+        <ProfileSettings user={user} />
       </TabsContent>
 
       <TabsContent value="favorites" className="space-y-4">

@@ -25,8 +25,8 @@ export default async function MarcaPage({
     const decodeSlug = decodeURIComponent(slug);
     const searchParamsDecode = await searchParams;
 
-    const { data: marcas } = await getMarcas();
-    const { data: categorias } = await getCategorias();
+    const marcas = (await getMarcas())?.data ?? [];
+    const categorias = (await getCategorias())?.data ?? [];
 
     const filtros: ProductFilters = parseProductFilters(searchParamsDecode);
 
@@ -35,7 +35,9 @@ export default async function MarcaPage({
       marcas: [slug, ...(filtros.marcas ?? [])],
     };
 
-    const productFilteredData = await searchProductsWithParams(filtrosWithMarca);
+    const productFilteredData = await searchProductsWithParams(
+      filtrosWithMarca
+    );
 
     return (
       <main className="container mx-auto px-4 py-8">
@@ -67,7 +69,7 @@ export default async function MarcaPage({
         </div>
       </main>
     );
-   } catch (error) {
+  } catch (error) {
     console.error("Error en la página de marca:", error);
     return (
       <main className="container mx-auto px-4 py-8">

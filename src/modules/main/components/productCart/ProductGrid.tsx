@@ -28,7 +28,7 @@ import type { DataResponse } from "@/interfaces/data/response.interface"
 import { SortOption } from "@/services/products/products-services"
 
 export interface ProductGridProps {
-  products: DataResponse<Products[]>
+  products: DataResponse<Products[]>| null;
 }
 
 type ViewMode = "grid" | "list"
@@ -46,7 +46,7 @@ export function ProductGrid({ products }: ProductGridProps) {
   )
   const pageSize = useMemo(() => Math.max(Number(searchParams.get("pageSize") || 5), 5), [searchParams])
 
-  const totalItems = products.meta?.pagination.total ?? 0
+  const totalItems = products?.meta?.pagination.total ?? 0
   const totalPages = Math.ceil(totalItems / pageSize)
   const startItem = Math.min((page - 1) * pageSize + 1, totalItems)
   const endItem = Math.min(page * pageSize, totalItems)
@@ -192,13 +192,13 @@ export function ProductGrid({ products }: ProductGridProps) {
 
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {products.data.map((product) => (
+          {products?.data.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {products.data.map((product) => (
+          {products?.data.map((product) => (
             <ProductCardHorizontal key={product.id} product={product} />
           ))}
         </div>

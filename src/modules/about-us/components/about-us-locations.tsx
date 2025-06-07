@@ -1,25 +1,27 @@
-"use client"
-import Image from "next/image"
-import { MapPin, Clock, Phone, Mail, Navigation } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { getGoogleMapsEmbedUrl } from "@/lib/maps/frame"
-import { DireccionSucursal } from '../../../interfaces/informacion-tienda/informacion-tienda.interface';
-import ImageLightbox from "./image-lightbox"
-import { useRef } from "react"
-
-
+"use client";
+import Image from "next/image";
+import { MapPin, Clock, Phone, Mail, Navigation } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { getGoogleMapsEmbedUrl } from "@/lib/maps/frame";
+import { DireccionSucursal } from "../../../interfaces/informacion-tienda/informacion-tienda.interface";
+import ImageLightbox from "./image-lightbox";
+import { useRef } from "react";
 
 interface AboutUsLocationsProps {
-  locations: DireccionSucursal[]
-  generalPhone?: string | null
-  generalEmail?: string | null
+  locations: DireccionSucursal[] | null;
+  generalPhone?: string | null;
+  generalEmail?: string | null;
 }
 
-export default function AboutUsLocations({ locations, generalPhone, generalEmail }: AboutUsLocationsProps) {
+export default function AboutUsLocations({
+  locations,
+  generalPhone,
+  generalEmail,
+}: AboutUsLocationsProps) {
   if (!locations || locations.length === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -29,7 +31,10 @@ export default function AboutUsLocations({ locations, generalPhone, generalEmail
 
       <div className="container relative px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-6 text-center mb-12">
-          <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary">
+          <Badge
+            variant="outline"
+            className="bg-primary/10 border-primary/20 text-primary"
+          >
             <Navigation className="w-4 h-4 mr-2" />
             Encuéntranos
           </Badge>
@@ -50,7 +55,10 @@ export default function AboutUsLocations({ locations, generalPhone, generalEmail
         </div>
 
         {locations.length > 1 ? (
-          <Tabs defaultValue={locations[0].id.toString() || "location-0"} className="w-full">
+          <Tabs
+            defaultValue={locations[0].id.toString() || "location-0"}
+            className="w-full"
+          >
             <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8 bg-muted/50 p-1">
               {locations.map((location, index) => (
                 <TabsTrigger
@@ -64,17 +72,28 @@ export default function AboutUsLocations({ locations, generalPhone, generalEmail
             </TabsList>
 
             {locations.map((location, index) => (
-              <TabsContent key={location.id || `location-${index}`} value={location.id.toString() || `location-${index}`}>
-                <LocationCard location={location} generalPhone={generalPhone} generalEmail={generalEmail} />
+              <TabsContent
+                key={location.id || `location-${index}`}
+                value={location.id.toString() || `location-${index}`}
+              >
+                <LocationCard
+                  location={location}
+                  generalPhone={generalPhone}
+                  generalEmail={generalEmail}
+                />
               </TabsContent>
             ))}
           </Tabs>
         ) : (
-          <LocationCard location={locations[0]} generalPhone={generalPhone} generalEmail={generalEmail} />
+          <LocationCard
+            location={locations[0]}
+            generalPhone={generalPhone}
+            generalEmail={generalEmail}
+          />
         )}
       </div>
     </section>
-  )
+  );
 }
 
 function LocationCard({
@@ -82,12 +101,11 @@ function LocationCard({
   generalPhone,
   generalEmail,
 }: {
-  location: DireccionSucursal
-  generalPhone?: string | null
-  generalEmail?: string | null
+  location: DireccionSucursal;
+  generalPhone?: string | null;
+  generalEmail?: string | null;
 }) {
-
-  const triggerRef = useRef<HTMLButtonElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-start">
@@ -95,8 +113,10 @@ function LocationCard({
         <CardContent className="p-0">
           <div className="relative aspect-square overflow-hidden">
             {location.imagenes && location.imagenes.length > 0 ? (
-              
-        <ImageLightbox images={location.imagenes} triggerRef={triggerRef} />
+              <ImageLightbox
+                images={location.imagenes}
+                triggerRef={triggerRef}
+              />
             ) : (
               <Image
                 src="/icon/logo.webp"
@@ -106,9 +126,10 @@ function LocationCard({
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
             )}
-            <div 
-             onClick={() => triggerRef.current?.click()}
-            className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div
+              onClick={() => triggerRef.current?.click()}
+              className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            />
           </div>
         </CardContent>
       </Card>
@@ -128,7 +149,7 @@ function LocationCard({
                 <iframe
                   src={
                     getGoogleMapsEmbedUrl(location?.coordenadas) ||
-                    location.urlFrame 
+                    location.urlFrame
                   }
                   width="100%"
                   height="100%"
@@ -155,14 +176,18 @@ function LocationCard({
                 <div className="rounded-full bg-primary/10 p-2">
                   <MapPin className="h-4 w-4 text-primary" />
                 </div>
-                <p className="text-muted-foreground flex-1">{location.direccion}</p>
+                <p className="text-muted-foreground flex-1">
+                  {location.direccion}
+                </p>
               </div>
 
               <div className="flex items-start space-x-4 p-1 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-300">
                 <div className="rounded-full bg-secondary/10 p-2">
                   <Clock className="h-4 w-4 text-secondary" />
                 </div>
-                <p className="text-muted-foreground flex-1 ">{location.horario}</p>
+                <p className="text-muted-foreground flex-1 ">
+                  {location.horario}
+                </p>
               </div>
 
               <div className="flex items-start space-x-4 p-1 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-300">
@@ -187,5 +212,5 @@ function LocationCard({
         </Card>
       </div>
     </div>
-  )
+  );
 }
