@@ -1,7 +1,7 @@
 import { User } from "../auth/user.interface";
 
 export interface Address {
-    id: number;
+    id?: number;
     documentId?: string;
     calle: string;
     ciudad: string;

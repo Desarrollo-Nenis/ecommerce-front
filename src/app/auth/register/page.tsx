@@ -119,7 +119,7 @@ export default function RegisterForm() {
         text: "Creando tu cuenta...",
         allowOutsideClick: false,
         didOpen: () => {
-          Swal.showLoading()
+          Swal.showLoading(Swal.getDenyButton())
         },
       })
 

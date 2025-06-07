@@ -3,10 +3,7 @@ import { TitleGradient } from "@/modules/common/components/titles/title-gradient
 import { getCategorias } from "@/services/categories/categories-services";
 import { Tags } from "lucide-react";
 
-export default async function CategoriasPage({}: {
-  params: { slug: string };
-  searchParams: { [key: string]: string };
-}) {
+export default async function CategoriasPage() {
   //  const { data: productos } = await getProductsByFilters(filtros);
   const { data: categorias } = await getCategorias({});
 

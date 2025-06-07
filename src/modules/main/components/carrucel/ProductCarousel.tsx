@@ -8,7 +8,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Products } from "@/interfaces/products/products.interface";
-import { ProductCard } from "../productCart/ProductCart";
+import { ProductCard } from "@/modules/common/components/product-carousel/product-card";
 
 interface ProductCarouselProps {
   products: Products[];

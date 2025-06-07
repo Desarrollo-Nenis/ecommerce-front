@@ -46,7 +46,11 @@ export function AddressDialog({ address, children, userId, onRefreshCard, onAddr
 
   useEffect(() => {
     if (address) {
-      form.reset(address)
+      // Map null referencia to undefined for compatibility with form.reset
+      form.reset({
+        ...address,
+        referencia: address.referencia === null ? undefined : address.referencia,
+      })
     } else {
       form.reset({
         calle: "",
@@ -64,12 +68,21 @@ export function AddressDialog({ address, children, userId, onRefreshCard, onAddr
   }, [address, form, open])
 
   useEffect(() => {
-    if (address) {
-      const isModified = Object.keys(form.getValues()).some((key) => form.getValues()[key] !== address[key])
-      setIsEditing(isModified)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.getValues(), address])
+  if (!address) return
+
+  const subscription = form.watch((values) => {
+    // Comparamos los valores actuales del formulario con la dirección original
+    const isDifferent = JSON.stringify(values) !== JSON.stringify({
+      ...address,
+      referencia: address.referencia === null ? undefined : address.referencia,
+    })
+
+    setIsEditing(isDifferent)
+  })
+
+  return () => subscription.unsubscribe()
+}, [address, form])
+
 
   async function onSubmit(values: AddressFormValues) {
     setLoading(true)

@@ -25,7 +25,7 @@ export const TitleGradient = ({
           variant="outline"
           className="bg-primary/10 border-primary/20 text-primary"
         >
-          {badgeIcon && <span className="mr-2">{badgeIcon}</span>}
+          {badgeIcon && <span className="px-2">{badgeIcon}</span>}
           {badgeText}
         </Badge>
       )}

@@ -3,10 +3,7 @@ import { TitleGradient } from "@/modules/common/components/titles/title-gradient
 import { getMarcas } from "@/services/marcas/marcas-services";
 import { Tags } from "lucide-react";
 
-export default async function MarcasPage({}: {
-  params: { slug: string };
-  searchParams: { [key: string]: string };
-}) {
+export default async function MarcasPage() {
   //  const { data: productos } = await getProductsByFilters(filtros);
   const { data: marcas } = await getMarcas();
 
