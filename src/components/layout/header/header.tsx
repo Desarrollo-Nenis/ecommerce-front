@@ -8,17 +8,17 @@ import { auth } from "@/auth";
 
 export const HeaderShop = async () => {
   try {
-    const informacionTiendaResult = await getInfoEcommerce();
-    const marcasResult = await getMarcas();
-    const categoriaResult = await getCategorias();
+    const informacionTienda = (await getInfoEcommerce())?.data ?? null;
+    const categorias = (await getCategorias())?.data ?? [];
+    const marcas = (await getMarcas())?.data ?? [];
     const sesion = await auth();
 
     return (
       <header className="">
         <Navbar
-          informacionTienda={informacionTiendaResult.data}
-          marcas={marcasResult.data}
-          categorias={categoriaResult.data}
+          informacionTienda={informacionTienda}
+          marcas={marcas}
+          categorias={categorias}
           session={sesion}
         ></Navbar>
         <div className="container mx-auto  pt-20">

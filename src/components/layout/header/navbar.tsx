@@ -47,15 +47,16 @@ import { AvatarDropdown } from "../../../modules/common/components/avatar-dropdo
 import { ButtonLogin } from "@/modules/common/components/auth/login/ButtonLogin";
 import type { Session } from "next-auth";
 import { FRONTEND_ROUTES } from "../../../contants/frontend-routes/routes";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useCartStore } from "@/store/products-cart.store";
 import { FaWhatsapp } from "react-icons/fa";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface NavbarProps {
   marcas: Marca[];
   categorias: Categoria[];
-  informacionTienda: InfoEcommerce |null;
+  informacionTienda: InfoEcommerce | null;
   session: Session | null;
 }
 
@@ -401,7 +402,7 @@ export default function Navbar({
         <div className="flex flex-row container gap-2">
           <Link href="/" className="hidden md:flex items-center gap-2 mr-6">
             <Image
-              src={informacionTienda?.logo.url || "/placeholder.svg"}
+              src={informacionTienda?.logo?.url || "/placeholder.svg"}
               width={100}
               height={100}
               alt="logo"
@@ -483,7 +484,9 @@ export default function Navbar({
             </NavigationMenuList>
           </NavigationMenu>
           {/* search */}
-          <SearchBar />
+          <Suspense fallback={<Skeleton ></Skeleton>}>
+            <SearchBar />
+          </Suspense>
           <div className="flex flex-row items-center gap-2">
             {/* avatar */}
             <AvatarDropdown avatarUrl={session?.user?.image} />

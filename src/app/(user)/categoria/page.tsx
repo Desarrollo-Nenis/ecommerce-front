@@ -17,8 +17,10 @@ export default function CategoriasPage() {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const { data } = await getCategorias({});
-        const categoriasFiltradas = data.filter((c: Categoria) => !c.principal);
+        const result = await getCategorias({});
+
+        const categoriasFiltradas =
+          result?.data.filter((c: Categoria) => !c.principal)?? [];
         setCategorias(categoriasFiltradas);
       } catch (err) {
         console.error("Error al obtener categorías:", err);

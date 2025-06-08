@@ -26,8 +26,8 @@ export default async function SearchSlugPage({
 
     const productData = await searchProductsWithParams(filtered);
     console.log("productos", productData);
-    const { data: categorias } = await getCategorias();
-    const { data: marcas } = await getMarcas();
+    const categorias = (await getCategorias())?.data ?? [];
+    const marcas = (await getMarcas())?.data ?? [];
 
     return (
       <main className="container mx-auto px-4 py-8">
@@ -39,7 +39,7 @@ export default async function SearchSlugPage({
               <span className="text-primary">{searchDecode}</span>
             </h2>
 
-            {productData.data.length > 0 ? (
+            {productData && productData.data.length >0 ? (
               <ProductGrid products={productData} />
             ) : (
               <p>No se encontraron productos para esta búsqueda.</p>

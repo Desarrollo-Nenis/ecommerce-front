@@ -1,5 +1,6 @@
-// app/(user)/marca/page.tsx
 "use client";
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
 
 import MarcasGrid from "@/modules/common/components/marcas-grid/marcas-grid";
 import { TitleGradient } from "@/modules/common/components/titles/title-gradient";
@@ -13,12 +14,9 @@ export default function MarcasPage() {
 
   useEffect(() => {
     async function fetchMarcas() {
-      try {
-        const { data } = await getMarcas();
-        setMarcas(data);
-      } catch (error) {
-        console.error("Error al obtener marcas:", error);
-      }
+      const marcas = (await getMarcas())?.data ?? [];
+
+      setMarcas(marcas);
     }
 
     fetchMarcas();

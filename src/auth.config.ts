@@ -3,7 +3,7 @@ import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 
 import { loginUser, registerUser } from "./services/auth/auth-services";
-import { UserToken } from "./interfaces/auth/user.interface";
+import { User, UserToken } from "./interfaces/auth/user.interface";
 import { AuthProvider } from "@/interfaces/auth/auth-providers.enum";
 import { ExtendedJWT, ExtendedUser } from "./next-auth";
 import {
@@ -67,7 +67,7 @@ const authConfig: NextAuthConfig = {
             authProvider: AuthProvider.Google,
           };
 
-          let userToken: UserToken;
+          let userToken: UserToken | null;
 
           try {
             userToken = await loginUser(loginData);
@@ -89,8 +89,8 @@ const authConfig: NextAuthConfig = {
             userToken = await loginUser(registerData);
           }
 
-          (user as ExtendedUser).jwt = userToken.jwt;
-          (user as ExtendedUser).user = userToken.user;
+          (user as ExtendedUser).jwt = userToken?.jwt ?? "";
+          (user as ExtendedUser).user = userToken?.user ?? {} as User;
 
           return true;
         } catch (error) {

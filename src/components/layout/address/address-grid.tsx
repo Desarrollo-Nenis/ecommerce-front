@@ -24,8 +24,8 @@ export default function AddressGrid({ address, session }: AddressGridProps) {
         console.error("No se encontró el documentId del usuario.");
         return;
       }
-      const res = await getUserDirections(documentId);
-      setAddresses(res.data);
+      const addresResult = (await getUserDirections(documentId))?.data ?? [];
+      setAddresses(addresResult);
     } catch (error) {
       console.error("Error actualizando direcciones:", error);
     }

@@ -6,7 +6,7 @@ import { query } from "@/lib/api/server/strapi"
 const BASE_ENDPOINT_PEDIDOS: string = BACKEND_ROUTES.PEDIDOS
 const BASE_ENDPOINT_PAYMENTS: string = BACKEND_ROUTES.PAYMENTS
 
-export function createPayment(data: PaymentRequest, userId?: string, userEmail?: string): Promise<Payment> {
+export function createPayment(data: PaymentRequest, userId?: string, userEmail?: string): Promise<Payment | null> {
   // Sanitizar los datos
   const sanitizedRequest = {
     ...data,
@@ -20,8 +20,6 @@ export function createPayment(data: PaymentRequest, userId?: string, userEmail?:
             : `${item.title} - Producto`,
     })),
   }
-
-  console.log("Datos sanitizados:", sanitizedRequest)
 
   // Validar campos requeridos
   if (
@@ -66,22 +64,26 @@ export function createPayment(data: PaymentRequest, userId?: string, userEmail?:
     customerEmail: userEmail,
   })
     .then((res) => {
-      console.log("Respuesta del servidor:", res)
-      return res
+      if( !res ) {
+        return null;
+      }
+      return res;
     })
     .catch((error) => {
-      console.error("Error al crear el request del pago:", error)
-      throw new Error("Fallo al crear el request del pago")
+      console.error("Error al crear el request del pago:", error);
+      throw new Error("Fallo al crear el request del pago");
     })
 }
 
-export function createPedido(data:PedidoCreateDto): Promise<Payment> {
+export function createPedido(data:PedidoCreateDto): Promise<Payment | null> {
   return query<Payment>(`${BASE_ENDPOINT_PEDIDOS}`, {
     method: "POST",
     body: data,
   })
     .then((res) => {
-      console.log("Respuesta del servidor:", res)
+      if( !res ) {
+        return null;
+      }
       return res
     })
     .catch((error) => {

@@ -1,10 +1,14 @@
-"use client"
+"use client";
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
 
-import { Button } from "@/components/ui/button"
-import { Home, ArrowLeft, Search } from "lucide-react"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import { Home, ArrowLeft, Search } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-8">
@@ -16,9 +20,12 @@ export default function NotFound() {
 
         {/* Error Message */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-slate-800">Página no encontrada</h2>
+          <h2 className="text-2xl font-semibold text-slate-800">
+            Página no encontrada
+          </h2>
           <p className="text-slate-600 leading-relaxed">
-            Lo sentimos, la página que estás buscando no existe o ha sido movida. Verifica la URL o regresa al inicio.
+            Lo sentimos, la página que estás buscando no existe o ha sido
+            movida. Verifica la URL o regresa al inicio.
           </p>
         </div>
 
@@ -43,7 +50,12 @@ export default function NotFound() {
             </Button>
           </Link>
 
-          <Button variant="outline" className="w-full" size="lg" onClick={() => window.history.back()}>
+          <Button
+            variant="outline"
+            className="w-full"
+            size="lg"
+            onClick={() => router.back()}
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver atrás
           </Button>
@@ -60,5 +72,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }

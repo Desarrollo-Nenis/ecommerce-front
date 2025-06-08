@@ -1,3 +1,6 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
 import { ErrorState } from "@/modules/common/components/error/ErrorState";
 import { ProductGrid } from "@/modules/main/components/productCart/ProductGrid";
 import { ResponsiveStoreFilters } from "@/modules/shop/ResponsiveStoreFilters";
@@ -22,8 +25,8 @@ export default async function MarcaPage({
     const decodeSlug = decodeURIComponent(slug);
     const searchParamsDecode = await searchParams;
 
-    const { data: marcas } = await getMarcas();
-    const { data: categorias } = await getCategorias();
+    const marcas = (await getMarcas())?.data ?? [];
+    const categorias = (await getCategorias())?.data ?? [];
 
     const filtros: ProductFilters = parseProductFilters(searchParamsDecode);
 
@@ -32,7 +35,9 @@ export default async function MarcaPage({
       marcas: [slug, ...(filtros.marcas ?? [])],
     };
 
-    const productFilteredData = await searchProductsWithParams(filtrosWithMarca);
+    const productFilteredData = await searchProductsWithParams(
+      filtrosWithMarca
+    );
 
     return (
       <main className="container mx-auto px-4 py-8">
@@ -64,7 +69,7 @@ export default async function MarcaPage({
         </div>
       </main>
     );
-   } catch (error) {
+  } catch (error) {
     console.error("Error en la página de marca:", error);
     return (
       <main className="container mx-auto px-4 py-8">

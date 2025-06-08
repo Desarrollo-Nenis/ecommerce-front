@@ -14,7 +14,7 @@ type CategoryFilters = {
   
 };
 
-export function getCategorias(filters: CategoryFilters = {}): Promise<DataResponse<Categoria[]>> {
+export function getCategorias(filters: CategoryFilters = {}): Promise<DataResponse<Categoria[]> |null> {
   const searchParams = new URLSearchParams();
 
   // Agregar filtros si existen
@@ -34,6 +34,10 @@ export function getCategorias(filters: CategoryFilters = {}): Promise<DataRespon
 
   return query<DataResponse<Categoria[]>>(url)
     .then((res) => {
+
+      if(!res){
+        return null;
+      }
       const data: DataResponse<Categoria[]> = {
         ...res,
         data: res.data.map((categoria) => ({

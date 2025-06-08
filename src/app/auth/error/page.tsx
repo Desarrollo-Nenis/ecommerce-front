@@ -1,8 +1,14 @@
+// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
+export const dynamic = "force-dynamic";
+
+
 import Link from "next/link"
 import { AlertCircle, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { ECOMMERCE_PRIVADO } from '../../../contants/auth/ecommerce-privado.constant';
+
+
 
 export default function AuthErrorPage() {
   return (

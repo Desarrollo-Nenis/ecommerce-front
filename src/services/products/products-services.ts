@@ -46,7 +46,7 @@ function mapProductsWithImages(products: Products[]): Products[] {
 
 export async function searchProducts(
   search: string
-): Promise<DataResponse<Products[]>> {
+): Promise<DataResponse<Products[]> | null> {
   const params = new URLSearchParams();
 
   params.append("filters[$or][0][nombre][$containsi]", search);
@@ -61,6 +61,9 @@ export async function searchProducts(
 
   try {
     const res = await query<DataResponse<Products[]>>(url);
+    if (!res) {
+      return null;
+    }
     return { data: mapProductsWithImages(res.data), meta: res.meta };
   } catch (error) {
     console.error("Error al realizar la solicitud:", error);
@@ -70,13 +73,17 @@ export async function searchProducts(
 
 export async function searchProductsWithFallback(
   search: string
-): Promise<DataResponse<Products[]>> {
+): Promise<DataResponse<Products[]> | null> {
   const searchTerms = search.trim().split(/\s+/);
 
   const strictParams = buildParams(searchTerms, true);
   const strictResults = await fetchProductsByUrl(
     `productos?${strictParams.toString()}`
   );
+
+  if (!strictResults) {
+    return null;
+  }
 
   if (strictResults.data.length > 0) return strictResults;
 
@@ -85,17 +92,25 @@ export async function searchProductsWithFallback(
     `productos?${looseParams.toString()}`
   );
 
+  if (!looseResults) {
+    return null;
+  }
+
   return looseResults;
 }
 
 export async function searchProductsWithParams(
   filters: ProductFilters
-): Promise<DataResponse<Products[]>> {
+): Promise<DataResponse<Products[]> | null> {
   // Primero intenta con búsqueda estricta
   const strictParams = buildParamsWithFilters(filters, true);
   const strictResults = await fetchProductsByUrl(
     `productos?${strictParams.toString()}`
   );
+
+  if (!strictResults) {
+    return null;
+  }
 
   if (strictResults.data.length > 0) return strictResults;
 
@@ -105,6 +120,10 @@ export async function searchProductsWithParams(
     `productos?${looseParams.toString()}`
   );
 
+  if (!looseResults) {
+    return null;
+  }
+
   return looseResults;
 }
 
@@ -112,8 +131,6 @@ function buildParamsWithFilters(
   filters: ProductFilters,
   isStrict: boolean
 ): URLSearchParams {
-  console.log(filters);
-
   const params = new URLSearchParams();
   const searchTerms = filters.search?.trim().split(/\s+/) || [];
 
@@ -275,8 +292,12 @@ function buildParams(terms: string[], isStrict: boolean): URLSearchParams {
 
 async function fetchProductsByUrl(
   url: string
-): Promise<DataResponse<Products[]>> {
+): Promise<DataResponse<Products[]> | null> {
   const res = await query<DataResponse<Products[]>>(url);
+
+  if (!res) {
+    return null;
+  }
   return { ...res, data: mapProductsWithImages(res.data) };
 }
 
@@ -308,13 +329,17 @@ export type SortOption =
 
 export async function getProductsByFilters(
   filters: ProductFilters = {}
-): Promise<DataResponse<Products[]>> {
+): Promise<DataResponse<Products[]> | null> {
   const normalizedFilters = normalizeFilters(filters);
 
   // Intento estricto
   const strictParams = buildFilterParams(normalizedFilters, true);
   const strictUrl = `${BASE_ENDPOINT}?${strictParams.toString()}`;
   const strictRes = await query<DataResponse<Products[]>>(strictUrl);
+
+  if (!strictRes) {
+    return null;
+  }
 
   if (strictRes.data.length > 0) {
     return {
@@ -327,6 +352,10 @@ export async function getProductsByFilters(
   const looseParams = buildFilterParams(normalizedFilters, false);
   const looseUrl = `${BASE_ENDPOINT}?${looseParams.toString()}`;
   const looseRes = await query<DataResponse<Products[]>>(looseUrl);
+
+  if (!looseRes) {
+    return null;
+  }
 
   return { data: mapProductsWithImages(looseRes.data), meta: looseRes.meta };
 }
@@ -371,7 +400,6 @@ function buildFilterParams(
       );
     });
   }
-
 
   if (filters.precioMax !== undefined && !isNaN(filters.precioMax)) {
     params.append(
@@ -434,11 +462,17 @@ function buildFilterParams(
   return params;
 }
 
-export async function getAllProducts(): Promise<DataResponse<Products[]>> {
+export async function getAllProducts(): Promise<DataResponse<
+  Products[]
+> | null> {
   const params = new URLSearchParams();
-  params.append("[fields][0]", "nombre");
-  params.append("[fields][1]", "slug");
-  params.append("[fields][2]", "tipo");
+
+  // Campos específicos
+  params.append("fields[0]", "nombre");
+  params.append("fields[1]", "slug");
+  params.append("fields[2]", "tipo");
+
+  // Relaciones a popular
   params.append("populate[descuento]", "true");
   params.append("populate[inventario]", "true");
   params.append("populate[categorias]", "true");
@@ -446,23 +480,38 @@ export async function getAllProducts(): Promise<DataResponse<Products[]>> {
   params.append("populate[cover][fields][0]", "url");
   params.append("populate[variantes][populate][inventario]", "true");
 
-  return query<DataResponse<Products[]>>(
-    `${BASE_ENDPOINT}?${params.toString()}`
-  )
-    .then((res) => ({ data: mapProductsWithImages(res.data), meta: res.meta }))
-    .catch((error) => {
-      console.error("Error al obtener los productos:", error);
-      throw error;
-    });
+  try {
+    const res = await query<DataResponse<Products[]>>(
+      `${BASE_ENDPOINT}?${params.toString()}`
+    );
+
+    if (!res) {
+      return null;
+    }
+
+    const data: DataResponse<Products[]> = {
+      ...res,
+      data: mapProductsWithImages(res.data),
+    };
+
+    return data;
+  } catch (error) {
+    console.error("Error al obtener los productos:", error);
+    throw error;
+  }
 }
 
-export async function getProductBySlug(slug: string): Promise<Products> {
+export async function getProductBySlug(slug: string): Promise<Products | null> {
   if (!slug) {
     throw new Error("Slug no proporcionado");
   }
 
   const params = new URLSearchParams();
+
+  // Filtro por slug
   params.append("filters[slug][$eq]", slug);
+
+  // Populate datos principales
   params.append("populate[cover]", "true");
   params.append("populate[galeria]", "true");
   params.append("populate[categorias]", "true");
@@ -471,7 +520,7 @@ export async function getProductBySlug(slug: string): Promise<Products> {
   params.append("populate[inventario]", "true");
   params.append("populate[descuento]", "true");
 
-  // Populate variantes y sus atributos
+  // Populate variantes y sus relaciones
   params.append("populate[variantes][populate][atributos]", "true");
   params.append("populate[variantes][populate][inventario]", "true");
   params.append("populate[variantes][populate][descuento]", "true");
@@ -482,20 +531,29 @@ export async function getProductBySlug(slug: string): Promise<Products> {
 
   const url = `${BASE_ENDPOINT}?${params.toString()}`;
 
-  const products = await query<DataResponse<Products[]>>(url)
-    .then((res) => ({ data: mapProductsWithImages(res.data), meta: res.meta }))
-    .catch((error) => {
-      console.error("Error al obtener el producto por slug:", error);
-      throw error;
-    });
+  try {
+    const res = await query<DataResponse<Products[]>>(url);
 
-  return products.data[0] || null;
+    if (!res) {
+      return null;
+    }
+
+    const [product] = mapProductsWithImages(res.data);
+    return product;
+  } catch (error) {
+    console.error("Error al obtener el producto por slug:", error);
+    throw error;
+  }
 }
 
 export async function getProductWithVariantesBySlug(
   slug: string
-): Promise<Products> {
+): Promise<Products | null> {
   const product = await getProductBySlug(slug);
+
+  if (!product) {
+    return null;
+  }
 
   if (product?.tipo == "variante" && product.principal) {
     const principal = await getProductBySlug(product.principal.slug);
@@ -532,21 +590,22 @@ export function parseProductFilters(
   };
 }
 
-
-export async function getFavoritesProducts(ids?: number[]): Promise<DataResponse<Products[]>> {
+export async function getFavoritesProducts(
+  ids?: number[]
+): Promise<DataResponse<Products[]> | null> {
   const params = new URLSearchParams();
 
   // Filtrar por IDs si se proporcionan
-  if (ids && ids.length > 0) {
+  if (ids?.length) {
     ids.forEach((id) => {
       params.append("filters[id][$in][]", id.toString());
     });
   }
 
   // Campos y relaciones a incluir
-  params.append("[fields][0]", "nombre");
-  params.append("[fields][1]", "slug");
-  params.append("[fields][2]", "tipo");
+  params.append("fields[0]", "nombre");
+  params.append("fields[1]", "slug");
+  params.append("fields[2]", "tipo");
   params.append("populate[descuento]", "true");
   params.append("populate[inventario]", "true");
   params.append("populate[categorias]", "true");
@@ -554,12 +613,23 @@ export async function getFavoritesProducts(ids?: number[]): Promise<DataResponse
   params.append("populate[cover][fields][0]", "url");
   params.append("populate[variantes][populate][inventario]", "true");
 
-  return query<DataResponse<Products[]>>(
-    `${BASE_ENDPOINT}?${params.toString()}`
-  )
-    .then((res) => ({ data: mapProductsWithImages(res.data), meta: res.meta }))
-    .catch((error) => {
-      console.error("Error al obtener los productos:", error);
-      throw error;
-    });
+  try {
+    const res = await query<DataResponse<Products[]>>(
+      `${BASE_ENDPOINT}?${params.toString()}`
+    );
+
+    if (!res) {
+      return null;
+    }
+
+    const data: DataResponse<Products[]> = {
+      ...res,
+      data: mapProductsWithImages(res.data),
+    };
+
+    return data;
+  } catch (error) {
+    console.error("Error al obtener los productos favoritos:", error);
+    throw error;
+  }
 }

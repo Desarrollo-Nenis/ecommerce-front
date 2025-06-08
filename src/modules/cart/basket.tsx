@@ -43,54 +43,47 @@ export function BasketGrid({ session, addresses }: BasketGridProps) {
   const { pedido, setProductos, setCliente, resetPedido } = usePedidoStore();
 
   const handleFinalizarPago = async () => {
-    try {
-      setIsLoading(true);
+    setIsLoading(true);
 
-      const provider = pedido.provider; // Ya está seteado por el PaymentStep
-      const clienteId = session?.user?.user?.id;
-const products: ProductoSeleccionadoInput[] = cart.map((item) => ({
-        producto: +item.id,
-        cantidad: item.quantity,
-      }));
-      if (!provider || !clienteId) {
-        showToastAlert({
-          title: "Información incompleta",
-          text: "Asegúrate de seleccionar un método de pago.",
-          icon: "warning",
-          position: "top-end",
-          toast: true,
-        });
-        return;
-      }
-
-      setCliente(clienteId);
-      setProductos(products);
-      console.log(pedido);
-      
-      const payment: Payment = await createPedido({
-        ...pedido,
-        cliente: clienteId,
-        productosSeleccionados: products,
-        provider,
+    const provider = pedido.provider; // Ya está seteado por el PaymentStep
+    const clienteId = session?.user?.user?.id;
+    const products: ProductoSeleccionadoInput[] = cart.map((item) => ({
+      producto: +item.id,
+      cantidad: item.quantity,
+    }));
+    if (!provider || !clienteId) {
+      showToastAlert({
+        title: "Información incompleta",
+        text: "Asegúrate de seleccionar un método de pago.",
+        icon: "warning",
+        position: "top-end",
+        toast: true,
       });
-      
+      return;
+    }
 
+    setCliente(clienteId);
+    setProductos(products);
+    console.log(pedido);
+
+    const payment: Payment | null = await createPedido({
+      ...pedido,
+      cliente: clienteId,
+      productosSeleccionados: products,
+      provider,
+    });
+
+    if (payment) {
       window.open(payment.redirectUrl);
-      resetPedido()
-    } catch (error) {
-      console.error("Error al procesar el pago:", error);
+      resetPedido();
+    } else {
       showToastAlert({
         title: "Error al procesar el pago",
-        text:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al crear el pago. Por favor, intenta nuevamente.",
+        text: "Ocurrió un error al crear el pago. Por favor, intenta nuevamente.",
         icon: "error",
         position: "top-end",
         toast: true,
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

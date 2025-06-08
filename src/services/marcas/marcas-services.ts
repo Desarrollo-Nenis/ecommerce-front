@@ -10,7 +10,9 @@ type MarcaFilters = {
   nombre?: string;
 };
 
-export function getMarcas(filters: MarcaFilters = {}): Promise<DataResponse<Marca[]>> {
+export function getMarcas(
+  filters: MarcaFilters = {}
+): Promise<DataResponse<Marca[]> | null> {
   const searchParams = new URLSearchParams();
 
   // Filtro por nombre
@@ -25,11 +27,17 @@ export function getMarcas(filters: MarcaFilters = {}): Promise<DataResponse<Marc
 
   return query<DataResponse<Marca[]>>(url)
     .then((res) => {
+      if (!res) {
+        return null;
+      }
+
       const data: DataResponse<Marca[]> = {
         ...res,
         data: res.data.map((marca) => ({
           ...marca,
-          img: marca.img ? { ...marca.img, url: `${STRAPI_HOST}${marca.img.url}` } : undefined,
+          img: marca.img
+            ? { ...marca.img, url: `${STRAPI_HOST}${marca.img.url}` }
+            : undefined,
         })),
       };
 
