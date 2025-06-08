@@ -1,20 +1,26 @@
 export const dynamic = "force-dynamic";
 
-import { auth } from "@/auth"
+import { auth } from "@/auth";
 import { ErrorState } from "@/modules/common/components/error/ErrorState";
-import { ProfileLayout } from "@/modules/profile/profile"
+import { ProfileLayout } from "@/modules/profile/profile";
 import { getUserOrders } from "@/services/orders/orders-services";
 import { getMeInfo } from "@/services/users/users-services";
 import { AlertTriangle } from "lucide-react";
 
 export default async function PerfilUsuario() {
-try{
-  const sesion = await auth();
-  const user = await getMeInfo( sesion?.user?.user.documentId);
-  const pedidos = await getUserOrders( sesion?.user?.user.id) ;
+  try {
+    const sesion = await auth();
+    const user = await getMeInfo(sesion?.user?.user.documentId);
+    const pedidos = await getUserOrders(sesion?.user?.user.id, "5");
 
-  return <ProfileLayout user={user.data} userAvatar={ sesion?.user?.image} pedidos={pedidos?.data} />
-   } catch (error) {
+    return (
+      <ProfileLayout
+        user={user?.data ?? null}
+        userAvatar={sesion?.user?.image}
+        orders={pedidos?.data ?? []}
+      />
+    );
+  } catch (error) {
     console.error("Error en la página de marca:", error);
     return (
       <main className="container mx-auto px-4 py-8">

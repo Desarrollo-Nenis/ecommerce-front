@@ -23,7 +23,7 @@ export default function CategoriasPage() {
         const result = await getCategorias({});
 
         const categoriasFiltradas =
-          result?.data.filter((c: Categoria) => !c.principal) || [];
+          result?.data.filter((c: Categoria) => !c.principal)?? [];
         setCategorias(categoriasFiltradas);
       } catch (err) {
         console.error("Error al obtener categorías:", err);

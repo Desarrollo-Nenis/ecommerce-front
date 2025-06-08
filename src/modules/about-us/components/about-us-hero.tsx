@@ -2,8 +2,8 @@ import { Badge } from "@/components/ui/badge"
 import { Sparkles } from "lucide-react"
 
 interface AboutUsHeroProps {
-  companyName: string
-  slogan?: string
+  companyName?: string |null
+  slogan?: string |null
 }
 
 export default function AboutUsHero({ companyName, slogan }: AboutUsHeroProps) {
