@@ -12,7 +12,6 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
   const product = await getProductWithVariantesBySlug(slug);
-  
 
   if (!product) {
     notFound();
@@ -20,7 +19,7 @@ export default async function ProductDetailPage({
 
   return (
     <main className="container mx-auto px-10 py-4">
-      <ProductDetail product={product}  selectedSlug={slug}/>
+      <ProductDetail product={product} selectedSlug={slug} />
     </main>
   );
 }

@@ -21,9 +21,8 @@ export function getInfoEcommerce(): Promise<DataResponse<InfoEcommerce> | null> 
   const url = `${BASE_ENDPOINT}?${params.toString()}`;
   return query<DataResponse<InfoEcommerce>>(url)
     .then((res) => {
-
-      if(!res){
-        return null
+      if (!res) {
+        return null;
       }
 
       const dataMap: InfoEcommerce = {
@@ -57,11 +56,7 @@ export function getInfoEcommerce(): Promise<DataResponse<InfoEcommerce> | null> 
       };
       return { ...res, data: dataMap };
     })
-    .catch((error) => {
-      console.error(
-        "Something terrible happened when getting stock actions: ",
-        error
-      );
-      throw error;
+    .catch(() => {
+      return null;
     });
 }

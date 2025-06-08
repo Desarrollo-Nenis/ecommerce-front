@@ -1,8 +1,6 @@
 // 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
 export const dynamic = "force-dynamic";
 
-
-
 import { Skeleton } from "@/components/ui/skeleton";
 import AboutUsLocations from "@/modules/about-us/components/about-us-locations";
 import AboutUsSocial from "@/modules/about-us/components/about-us-social";
@@ -20,16 +18,15 @@ import { TagIcon } from "lucide-react";
 import Image from "next/image";
 import { Suspense } from "react";
 
-
 export default async function Home() {
   try {
     // fetch product
     const resultProducts = await getProductsByFilters({
       descuentos: true,
     });
-    const resultcategorias = await getCategorias();
-    const resultMarcas = await getMarcas();
-    const { data: infoEcommerce } = await getInfoEcommerce();
+    const categorias = (await getCategorias())?.data ?? [];
+    const marcas = (await getMarcas())?.data ?? [];
+    const infoEcommerce = (await getInfoEcommerce())?.data;
 
     const banners: MainCarouselItem[] = [
       {
@@ -70,23 +67,23 @@ export default async function Home() {
           <MainCarousel banners={banners} />
           <div className="mt-5">
             <TitleGradient
-              title={infoEcommerce.nombre}
+              title={infoEcommerce?.nombre ?? "Nombre de la Tienda"}
               badgeText="BIENVENIDO"
               tagIcon={
                 <Image
                   width={100}
                   height={100}
                   alt="logo"
-                  src={infoEcommerce.logo.url}
+                  src={infoEcommerce?.logo.url ?? "/icons/logo.webp"}
                 />
               }
             />
           </div>
           {/* Carrusel category */}
-          <CategoryCarousel categorias={resultcategorias.data} />
+          <CategoryCarousel categorias={categorias} />
 
           {/* Carrusel de productos (ya existente) */}
-          {resultProducts.data.length > 0 && (
+          {resultProducts && resultProducts.data.length > 0 && (
             <ProductCarousel
               products={resultProducts.data}
               title="Ofertas de la Semana"
@@ -98,13 +95,13 @@ export default async function Home() {
           badgeText="oficiales"
           tagIcon={<TagIcon size={40} />}
         />
-        <MarcasCarousel marcas={resultMarcas.data} />
+        <MarcasCarousel marcas={marcas} />
         <div>
           <Suspense fallback={<Skeleton className="h-[500px] w-full" />}>
             <AboutUsLocations
-              locations={infoEcommerce.direcciones}
-              generalPhone={infoEcommerce.numeroGeneral}
-              generalEmail={infoEcommerce.correoGeneral}
+              locations={infoEcommerce?.direcciones ?? []}
+              generalPhone={infoEcommerce?.numeroGeneral}
+              generalEmail={infoEcommerce?.correoGeneral}
             />
           </Suspense>
 
@@ -113,7 +110,7 @@ export default async function Home() {
           </Suspense> */}
 
           <Suspense fallback={<Skeleton className="h-[100px] w-full" />}>
-            <AboutUsSocial socialNetworks={infoEcommerce.redesSociales} />
+            <AboutUsSocial socialNetworks={infoEcommerce?.redesSociales} />
           </Suspense>
         </div>
       </main>

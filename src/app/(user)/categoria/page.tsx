@@ -1,8 +1,5 @@
 "use client";
 
-// 👇 Esto fuerza a que Next.js no prerenderice y lo trate como una página 100% dinámica
-export const dynamic = "force-dynamic";
-
 import { useEffect, useState } from "react";
 import CategoriesGrid from "@/modules/common/components/categories-grid/categories-grid";
 import { TitleGradient } from "@/modules/common/components/titles/title-gradient";
