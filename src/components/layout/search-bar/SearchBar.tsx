@@ -3,35 +3,39 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import CartDropdown from "../../../modules/cart/cart-dropdown/cart-dropdown";
 
 export const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const pathname = usePathname()
   const handleSearch = useCallback(
-    (query: string) => {
-      const trimmedQuery = query.trim();
+  (query: string) => {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery === "") return;
 
-      // ⛔ No buscar si está vacío
-      if (trimmedQuery === "") return;
+    const currentSearchParam = searchParams.get("search");
+    const shouldUpdateSearch = currentSearchParam !== trimmedQuery;
+    if (!shouldUpdateSearch) return;
 
-      const currentSearchParam = searchParams.get("search");
-      const shouldUpdateSearch = currentSearchParam !== trimmedQuery;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("search", trimmedQuery);
+    params.set("page", "1");
+    params.set("pageSize", "10");
 
-      if (!shouldUpdateSearch) return;
+    const isInCategoriaOrMarca =
+      pathname.startsWith("/categoria/") || pathname.startsWith("/marca/");
 
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("search", trimmedQuery);
-      params.set("page", "1");
-      params.set("pageSize", "10");
+    const targetUrl = isInCategoriaOrMarca
+      ? `?${params.toString()}`
+      : `/s/${trimmedQuery}?${params.toString()}`;
 
-      router.push(`/s/${trimmedQuery}?${params.toString()}`);
-    },
-    [router, searchParams]
-  );
+    router.push(targetUrl);
+  },
+  [router, searchParams, pathname]
+);
 
   useEffect(() => {
     if (searchQuery.trim() === "") return; // ⛔ Ignora si está vacío
@@ -42,6 +46,15 @@ export const SearchBar = () => {
 
     return () => clearTimeout(delayDebounce);
   }, [searchQuery, handleSearch]);
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("search")) {
+    params.delete("search");
+    setSearchQuery("");
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+}, [pathname,router]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();

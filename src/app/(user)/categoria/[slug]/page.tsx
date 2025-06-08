@@ -10,6 +10,7 @@ import { getCategorias } from "@/services/categories/categories-services";
 import { getMarcas } from "@/services/marcas/marcas-services";
 import {
   getProductsByFilters,
+  parseProductFilters,
   ProductFilters,
 } from "@/services/products/products-services";
 import { AlertTriangle } from "lucide-react";
@@ -23,26 +24,18 @@ export default async function CategoriaPage({
 }) {
   try {
     const slug = decodeURIComponent((await params).slug);
-    const searhParamsResust = await searchParams;
+    const searchParamsDecode = await searchParams;
     const categoriasResult = await getCategorias();
-    const categoria =
-      categoriasResult?.data?.find((cat) => cat.nombre === slug) ;
+    const categoria = categoriasResult?.data?.find(
+      (cat) => cat.nombre === slug
+    );
 
-    const filtros: ProductFilters = {
-      categorias: [
-        slug,
-        // ...(categoria?.subcategorias?.map((s) => s.nombre) || []),
-        ...(searhParamsResust?.categorias?.split(",") ?? []),
-      ].filter(Boolean),
-      marcas: searhParamsResust?.marca?.split(","),
-      precioMin: searhParamsResust?.precioMin
-        ? Number(searhParamsResust?.precioMin)
-        : undefined,
-      precioMax: searhParamsResust?.precioMax
-        ? Number(searhParamsResust?.precioMax)
-        : undefined,
+    const filtros: ProductFilters = parseProductFilters(searchParamsDecode);
+
+    const filtrosWithCategoria: ProductFilters = {
+      ...filtros,
+      categorias: [slug, ...(filtros.categorias ?? [])],
     };
-
     const productResult = await getProductsByFilters(filtros);
     console.log(productResult);
 
@@ -56,7 +49,7 @@ export default async function CategoriaPage({
             categorias={categoriasResult?.data ?? []}
             marcas={marcasResult?.data ?? []}
             categoriaBase={slug}
-            selectedFilters={filtros}
+            selectedFilters={filtrosWithCategoria}
           />
         </div>
 
@@ -68,7 +61,7 @@ export default async function CategoriaPage({
               categorias={categoriasResult?.data ?? []}
               marcas={marcasResult?.data ?? []}
               categoriaBase={slug}
-              selectedFilters={filtros}
+              selectedFilters={filtrosWithCategoria}
             />
           </div>
           {/* Main content */}
