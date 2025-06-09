@@ -4,22 +4,25 @@ export const dynamic = "force-dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import AboutUsLocations from "@/modules/about-us/components/about-us-locations";
 import AboutUsSocial from "@/modules/about-us/components/about-us-social";
+import { StrapiCarousel } from "@/modules/common/components/carousel/strapi-carousel";
+import { CarrucelItem } from "@/modules/common/components/carousel/types/carousel";
 import CategoryCarousel from "@/modules/common/components/category-carousel/category-carousel";
-import { MainCarousel } from "@/modules/common/components/main-carousel/main-carousel";
 import MarcasCarousel from "@/modules/common/components/marcas-carousel/marcas-carousel";
 import { ProductCarousel } from "@/modules/common/components/product-carousel/product-carousel";
 import { TitleGradient } from "@/modules/common/components/titles/title-gradient";
-import { MainCarouselItem } from "@/modules/common/interface/main-carousel";
 import { getCategorias } from "@/services/categories/categories-services";
 import { getInfoEcommerce } from "@/services/informacion-tienda/informacion-tienda-services";
 import { getMarcas } from "@/services/marcas/marcas-services";
+import { getPaginaPrincipal } from "@/services/pagina-principal/pagina-principal.services";
 import { getProductsByFilters } from "@/services/products/products-services";
 import { TagIcon } from "lucide-react";
 import Image from "next/image";
 import { Suspense } from "react";
+import respaldo from "@/contants/json/template-datos-ecommerce.json";
 
 export default async function Home() {
   try {
+    const paginaPrincipalResult = (await getPaginaPrincipal())?.data;
     // fetch product
     const resultProducts = await getProductsByFilters({
       descuentos: true,
@@ -27,44 +30,22 @@ export default async function Home() {
     const categorias = (await getCategorias())?.data ?? [];
     const marcas = (await getMarcas())?.data ?? [];
     const infoEcommerce = (await getInfoEcommerce())?.data;
-
-    const banners: MainCarouselItem[] = [
-      {
-        id: "1",
-        imageUrl: "/imgs/carrucel/main-carrucel-1.webp",
-        link: "/promociones",
-        title: "Renueva tu celular",
-        subtitle: "¡Hasta 40% de descuento!",
-      },
-      {
-        id: "2",
-        imageUrl: "/imgs/carrucel/main-carrucel-2.webp",
-        link: "/ofertas",
-        title: "Hasta 15 MSI pagando con...",
-        subtitle: "Aprovecha nuestras promociones",
-      },
-      {
-        id: "3",
-        imageUrl: "/imgs/carrucel/main-carrucel-5.webp",
-        link: "/ofertas",
-        title: "",
-        subtitle: "",
-      },
-      {
-        id: "4",
-        imageUrl: "/imgs/carrucel/main-carrucel-7.webp",
-        link: "/ofertas",
-        title: "Hasta 15 MSI pagando con...",
-        subtitle: "",
-      },
-      // ... más banners
-    ];
+    
 
     return (
       <main className="container mx-auto ">
         <div>
           {/* Carrusel principal */}
-          <MainCarousel banners={banners} />
+
+          <StrapiCarousel
+            items={
+              paginaPrincipalResult?.carrucel ?? respaldo.paginaPrincipal.carrucel as CarrucelItem[]
+            }
+            autoplay={true}
+            intervalo={5000}
+            // showControls={false}
+            // showIndicators={false}
+          />
           <div className="mt-5">
             <TitleGradient
               title={infoEcommerce?.nombre ?? "Nombre de la Tienda"}

@@ -65,10 +65,8 @@ export async function searchProducts(
       return null;
     }
     return { data: mapProductsWithImages(res.data), meta: res.meta };
-  } catch (error) {
-    console.error("Error al realizar la solicitud:", error);
-    throw new Error("Error en la solicitud: " + error);
-  }
+  } catch {
+    return null;  }
 }
 
 export async function searchProductsWithFallback(
@@ -497,13 +495,13 @@ export async function getAllProducts(): Promise<DataResponse<
     return data;
   } catch (error) {
     console.error("Error al obtener los productos:", error);
-    throw error;
+    return null;
   }
 }
 
 export async function getProductBySlug(slug: string): Promise<Products | null> {
   if (!slug) {
-    throw new Error("Slug no proporcionado");
+    return null;
   }
 
   const params = new URLSearchParams();
@@ -542,7 +540,7 @@ export async function getProductBySlug(slug: string): Promise<Products | null> {
     return product;
   } catch (error) {
     console.error("Error al obtener el producto por slug:", error);
-    throw error;
+    return null;
   }
 }
 
@@ -630,6 +628,50 @@ export async function getFavoritesProducts(
     return data;
   } catch (error) {
     console.error("Error al obtener los productos favoritos:", error);
-    throw error;
+    return null;
+  }
+}
+
+export async function getProductByDocumentId(
+  documentId: string
+): Promise<Products | null> {
+  if (!documentId) {
+    return null;
+  }
+
+  const params = new URLSearchParams();
+
+  // Populate datos principales
+  params.append("populate[cover]", "true");
+  params.append("populate[galeria]", "true");
+  params.append("populate[categorias]", "true");
+  params.append("populate[marca]", "true");
+  params.append("populate[principal]", "true");
+  params.append("populate[inventario]", "true");
+  params.append("populate[descuento]", "true");
+
+  // Populate variantes y sus relaciones
+  params.append("populate[variantes][populate][atributos]", "true");
+  params.append("populate[variantes][populate][inventario]", "true");
+  params.append("populate[variantes][populate][descuento]", "true");
+  params.append("populate[variantes][populate][cover]", "true");
+  params.append("populate[variantes][populate][galeria]", "true");
+  params.append("populate[variantes][populate][marca]", "true");
+  params.append("populate[variantes][populate][categorias]", "true");
+
+  const url = `${BASE_ENDPOINT}/${documentId}?${params.toString()}`;
+
+  try {
+    const res = await query<DataResponse<Products>>(url);
+
+    if (!res) {
+      return null;
+    }
+
+    const [product] = mapProductsWithImages([res.data]);
+    return product;
+  } catch (error) {
+    console.error("Error al obtener el producto por slug:", error);
+    return null;
   }
 }
