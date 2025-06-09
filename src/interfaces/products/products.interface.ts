@@ -3,6 +3,7 @@ import { Img } from "../data/img.interface";
 import { Marca } from "../marcas/marca.interface";
 
 export interface Products {
+  documentId?:string;
   id: number;
   nombre: string;
   slug: string;
