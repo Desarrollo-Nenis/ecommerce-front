@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Marca } from "@/interfaces/marcas/marca.interface";
+import { FRONTEND_ROUTES } from "@/contants/frontend-routes/routes";
 
 interface CategoryCarouselProps {
   marcas: Marca[];
@@ -36,7 +37,7 @@ export default function MarcasCarousel({
             className="pl-2 md:pl-4 basis-[140px] md:basis-[150px] flex justify-center"
           >
             <Link
-              href={`/categoria/${item.nombre}`}
+              href={`${FRONTEND_ROUTES.MARCA}/${item.nombre}`}
               className="flex flex-col items-center"
             >
               <div className="relative w-[120px] h-[120px] rounded-full overflow-hidden bg-gray-100">
